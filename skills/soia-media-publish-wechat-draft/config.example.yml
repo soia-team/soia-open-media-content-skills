@@ -1,0 +1,7 @@
+# soia-media-publish-wechat-draft private config example.
+# Copy to ~/.config/soia-skills/soia-media-publish-wechat-draft/config.yml.
+
+env:
+  WECHAT_APP_ID: "<YOUR_APP_ID>"
+  WECHAT_APP_SECRET: "<YOUR_APP_SECRET>"
+  OBSIDIAN_VAULT: "<vault-path>"
