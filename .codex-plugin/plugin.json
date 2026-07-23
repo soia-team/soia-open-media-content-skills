@@ -1,0 +1,23 @@
+{
+  "name": "soia-media-content",
+  "version": "1.0.0",
+  "description": "新媒体内容技能：文章成文、封面图与公众号、X、小红书发布",
+  "author": {
+    "name": "soia-team"
+  },
+  "interface": {
+    "displayName": "新媒体内容技能库",
+    "shortDescription": "文章成文、封面图与多平台发布",
+    "longDescription": "用于撰写文章、生成封面图，并适配微信公众号、X 和小红书内容发布的技能。",
+    "developerName": "soia-team",
+    "category": "Creative",
+    "capabilities": [
+      "文章创作",
+      "封面设计",
+      "多平台发布"
+    ],
+    "defaultPrompt": [
+      "请把这份素材改写成适合目标平台发布的完整内容。"
+    ]
+  }
+}
