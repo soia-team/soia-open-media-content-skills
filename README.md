@@ -1,26 +1,36 @@
 # SOIA 新媒体内容技能库
 
-新媒体：写作、封面图片、公众号/X/小红书发布（soia-media-*）
+覆盖文章写作、封面生成与公众号、X、小红书内容适配和草稿发布的可复用 AI 技能集合。
 
-## 域说明
+## 技能目录
 
-本仓负责 `media` 域，技能名称统一使用 `soia-media-*` 前缀。
+| 技能名 | 一句话简介 |
+|---|---|
+| `soia-media-compose-article-draft` | 将提炼后的用户观点组织成可继续编辑和发布的文章草稿。 |
+| `soia-media-cover-image` | 为公众号、X 和小红书文章生成多种比例的封面图。 |
+| `soia-media-publish-rednote-card` | 将文章草稿改写为供人工发布的小红书标题、正文、标签与配图建议。 |
+| `soia-media-publish-wechat-draft` | 将文章排版为公众号兼容 HTML 并推入草稿箱，不自动群发。 |
+| `soia-media-publish-x-article` | 将 Markdown 长文写入 X Articles 草稿箱并完成机械校验，不自动发布。 |
+| `soia-media-publish-x-thread` | 将文章改写为符合长度约束的 X thread，默认仅生成文本。 |
 
 ## 安装
 
+将 `<技能>` 替换为上表中的技能名：
+
 ```bash
-npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s <skill> -y
+npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s <技能> -y
 ```
 
-## 技能清单
+例如安装文章起草技能：
 
-| 技能 | 用途 |
-|---|---|
-| `soia-media-compose-article-draft` | 把提炼出的观点写成可发布的文章草稿 |
-| `soia-media-cover-image` | 为公众号、X 和小红书文章生成封面图 |
-| `soia-media-publish-wechat-draft` | 排版并推入微信公众号草稿箱，不自动群发 |
-| `soia-media-publish-x-thread` | 把文章改写成 X thread，可选存草稿或经确认后发布 |
-| `soia-media-publish-x-article` | 把 Markdown 长文写入 X Articles 草稿箱，绝不自动发布 |
-| `soia-media-publish-rednote-card` | 把文章改写成供人工发布的小红书笔记文案 |
+```bash
+npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-compose-article-draft -y
+```
 
-本仓属于 SOIA 技能生态，规范真源见 [soia-team/soia-open-skills](https://github.com/soia-team/soia-open-skills)。
+## 生态导航
+
+规范真源与全生态目录见 [soia-team/soia-open-skills](https://github.com/soia-team/soia-open-skills)。
+
+## License
+
+MIT License，详见 [LICENSE](./LICENSE)。
