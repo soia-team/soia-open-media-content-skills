@@ -50,6 +50,7 @@ templates:
     reference: prompt-plugin-icon.md
     default_aspect: "1:1"
     output_stem: plugin-icon
-    text_density: none
+    text_density: low
     batch_consistency: required
-    use_when: "需要插件市场图标、应用图标或技能库标识；成批生成时必须保持家族一致"
+    two_stage: true
+    use_when: "需要插件市场图标、应用图标或技能库标识；本模板产出设计稿，终稿须矢量确定性重绘"
