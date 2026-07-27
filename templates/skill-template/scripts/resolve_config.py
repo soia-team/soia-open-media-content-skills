@@ -11,8 +11,6 @@ from pathlib import Path
 
 CONFIG_NAMES = ("config.yml", "config.yaml", "config.json")
 ENV_NAME = "YOUR_SKILL_CONFIG_FILE"
-REPO_NAME = "soia-open-media-content-skills"
-SKILL_TYPE = "your-skill-type"
 SKILL_NAME = "your-skill-name"
 
 
@@ -24,7 +22,7 @@ def candidate_paths(cwd: Path) -> list[Path]:
 
     config_home = Path("~/.config/soia-skills").expanduser()
     for name in CONFIG_NAMES:
-        paths.append(config_home / REPO_NAME / SKILL_TYPE / SKILL_NAME / name)
+        paths.append(config_home / SKILL_NAME / name)
 
     deduped: list[Path] = []
     seen: set[str] = set()
@@ -57,7 +55,7 @@ def main() -> int:
     else:
         print(
             "No config found. Set "
-            f"{ENV_NAME} or create ~/.config/soia-skills/{REPO_NAME}/{SKILL_TYPE}/{SKILL_NAME}/config.yml"
+            f"{ENV_NAME} or create ~/.config/soia-skills/{SKILL_NAME}/config.yml"
         )
     return 0
 

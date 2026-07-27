@@ -79,7 +79,7 @@ that answers:
 - Hard dependencies, optional dependencies, third-party skill relationships, and
   installation/setup steps.
 - Where skill-specific private config belongs, using
-  `~/.config/soia-skills/<repo>/<skill-type>/<skill-name>/config.yml` and
+  `~/.config/soia-skills/<skill-name>/config.yml` and
   `SOIA_<TYPE>_<SHORT>_CONFIG_FILE` when relevant.
 - What logs, file changes, validation evidence, issues, and next steps the
   customer will see after every run.
@@ -215,7 +215,7 @@ outputs/transform
 $OBSIDIAN_VAULT
 --vault <path>
 SOIA_PKM_TRANSFORM_CONFIG=/path/to/transform.yml
-~/.config/soia-skills/soia-open-media-content-skills/soia-pkm/soia-pkm-transform/config.yml
+~/.config/soia-skills/<skill-name>/config.yml
 ```
 
 Chinese or highly personal directory names are allowed only in a user's private config, never as public defaults.
@@ -274,7 +274,7 @@ Config templates must be generic and safe. They may show placeholders but not pe
 Default private config location:
 
 ```text
-~/.config/soia-skills/soia-open-media-content-skills/<skill-type>/<skill-name>/config.yml
+~/.config/soia-skills/<skill-name>/config.yml
 ```
 
 The file uses YAML with an `env:` mapping. Example:
@@ -290,8 +290,8 @@ The older `SOIA_<TYPE>_<SHORT>_ENV_FILE` spelling may be accepted as a compatibi
 but new docs should prefer `CONFIG_FILE`.
 
 Provider-owned login state may live under the skill directory only when the skill explicitly
-owns that provider home. Example: `soia-pkm-transform` may set `NOTEBOOKLM_HOME` to
-`~/.config/soia-skills/soia-open-media-content-skills/soia-pkm/soia-pkm-transform/notebooklm`.
+owns that provider home. Example: a NotebookLM-bound skill may set `NOTEBOOKLM_HOME` to
+`~/.config/soia-skills/<skill-name>/notebooklm`.
 Other provider-owned stores such as `~/.config/aliyunpan/` stay with the provider; the
 skill config may only hold override pointers such as `ALIYUNPAN_CONFIG_DIR`.
 
@@ -299,7 +299,7 @@ skill config may only hold override pointers such as `ALIYUNPAN_CONFIG_DIR`.
 flowchart LR
   A["CLI args"] --> B["process env"]
   B --> C["SOIA_<TYPE>_<SHORT>_CONFIG_FILE"]
-  C --> D["~/.config/soia-skills/<repo>/<type>/<skill>/config.yml"]
+  C --> D["~/.config/soia-skills/<skill-name>/config.yml"]
   D --> E["provider-owned home override"]
   E --> F["safe default / ask user"]
 ```

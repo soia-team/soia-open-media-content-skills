@@ -1,6 +1,6 @@
 # soia-media-generate-article-image 非秘密偏好配置样例。
 # 复制到：
-# ~/.config/soia-skills/soia-open-media-content-skills/soia-media/soia-media-generate-article-image/config.yml
+# ~/.config/soia-skills/soia-media-generate-article-image/config.yml
 # 或设置 SOIA_MEDIA_ARTICLE_IMAGE_CONFIG_FILE。
 
 schema_version: 1

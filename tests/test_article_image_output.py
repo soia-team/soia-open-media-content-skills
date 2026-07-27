@@ -20,7 +20,7 @@ class ArticleImageOutputTest(unittest.TestCase):
     def test_storage_roots_follow_data_storage_spec_on_macos(self) -> None:
         home = Path("/Users/example")
         roots = MODULE.storage_roots(env={}, home=home, platform_name="darwin", temp_root=Path("/tmp"))
-        suffix = Path(MODULE.REPO_NAME) / MODULE.SKILL_TYPE / MODULE.SKILL_NAME
+        suffix = Path(MODULE.SKILL_NAME)
         self.assertEqual(roots["config"], home / ".config" / "soia-skills" / suffix)
         self.assertEqual(roots["state"], home / ".local" / "state" / "soia-skills" / suffix)
         self.assertEqual(roots["cache"], home / "Library" / "Caches" / "soia-skills" / suffix)
@@ -37,7 +37,7 @@ class ArticleImageOutputTest(unittest.TestCase):
             platform_name="linux",
             temp_root=Path("/temp"),
         )
-        suffix = Path(MODULE.REPO_NAME) / MODULE.SKILL_TYPE / MODULE.SKILL_NAME
+        suffix = Path(MODULE.SKILL_NAME)
         self.assertEqual(roots["config"], Path("/cfg") / suffix)
         self.assertEqual(roots["state"], Path("/state") / suffix)
         self.assertEqual(roots["cache"], Path("/cache") / suffix)
@@ -55,6 +55,51 @@ class ArticleImageOutputTest(unittest.TestCase):
             )
             self.assertEqual(output, (root / "cli").resolve())
             self.assertEqual(origin, "cli")
+
+    def test_legacy_three_level_config_is_read_only_fallback(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp)
+            legacy = home / ".config" / "soia-skills" / MODULE.LEGACY_SUFFIX / "config.yml"
+            legacy.parent.mkdir(parents=True)
+            legacy.write_text(
+                f"paths:\n  output_dir: {home / 'legacy-output'}\n",
+                encoding="utf-8",
+            )
+            output, origin, selected = MODULE.resolve_output_dir(
+                source="article.md",
+                env={},
+                home=home,
+                platform_name="linux",
+            )
+            self.assertEqual(output, (home / "legacy-output").resolve())
+            self.assertEqual(origin, "config")
+            self.assertEqual(selected, legacy)
+
+    def test_flat_config_wins_over_legacy_fallback(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp)
+            config_base = home / ".config" / "soia-skills"
+            current = config_base / MODULE.SKILL_NAME / "config.yml"
+            legacy = config_base / MODULE.LEGACY_SUFFIX / "config.yml"
+            current.parent.mkdir(parents=True)
+            legacy.parent.mkdir(parents=True)
+            current.write_text(
+                f"paths:\n  output_dir: {home / 'current-output'}\n",
+                encoding="utf-8",
+            )
+            legacy.write_text(
+                f"paths:\n  output_dir: {home / 'legacy-output'}\n",
+                encoding="utf-8",
+            )
+            output, origin, selected = MODULE.resolve_output_dir(
+                source="article.md",
+                env={},
+                home=home,
+                platform_name="linux",
+            )
+            self.assertEqual(output, (home / "current-output").resolve())
+            self.assertEqual(origin, "config")
+            self.assertEqual(selected, current)
 
     def test_config_wins_over_product_convention(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

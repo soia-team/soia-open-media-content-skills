@@ -12,9 +12,6 @@ from collections.abc import Mapping
 from pathlib import Path
 
 
-REPO_NAME = "soia-open-media-content-skills"
-
-
 def _configured_path(env: Mapping[str, str], name: str) -> Path | None:
     value = env.get(name)
     return Path(value).expanduser() if value else None
@@ -60,7 +57,10 @@ def storage_paths(
         else:
             cache_base = Path(values.get("XDG_CACHE_HOME", user_home / ".cache")) / "soia-skills"
 
-    suffix = Path(REPO_NAME) / skill_type / skill_name
+    # skill_type remains part of the public helper signature for callers that
+    # use it in environment-variable names, but storage is isolated by the
+    # globally unique skill name only.
+    suffix = Path(skill_name)
     temporary_base = Path(tempfile.gettempdir()) if temp_root is None else temp_root
     return {
         "config": config_base / suffix,

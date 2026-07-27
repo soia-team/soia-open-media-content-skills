@@ -1,9 +1,9 @@
 ---
 name: soia-media-generate-article-image
 description: 为文章生成封面、正文小结卡、康奈尔笔记或视觉隐喻海报，并完成 Prompt 落盘和位图验收。触发：「生成文章图片」「正文小结图」「康奈尔笔记图」「Godot 像素海报」
-version: 3.1.0
+version: 3.1.1
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-07-27 11:44:45
+updated_at: 2026-07-27 14:05:14
 created_by: claude opus 4.6
 updated_by: gpt-5.6-sol
 ---
@@ -48,7 +48,7 @@ npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-
 配置路径：
 
 ```text
-~/.config/soia-skills/soia-open-media-content-skills/soia-media/soia-media-generate-article-image/config.yml
+~/.config/soia-skills/soia-media-generate-article-image/config.yml
 SOIA_MEDIA_ARTICLE_IMAGE_CONFIG_FILE=<custom-config-path>
 SOIA_MEDIA_ARTICLE_IMAGE_OUTPUT_DIR=<custom-output-directory>
 ```
@@ -61,14 +61,15 @@ SOIA_MEDIA_ARTICLE_IMAGE_OUTPUT_DIR=<custom-output-directory>
 
 | 类型 | 默认位置 | 内容与保留策略 |
 |---|---|---|
-| 非秘密配置 | `~/.config/soia-skills/soia-open-media-content-skills/soia-media/soia-media-generate-article-image/` | 只放 `config.yml`；可用 `SOIA_SKILLS_CONFIG_HOME` 改根目录 |
-| 中间候选 | OS 临时目录下 `soia-skills/soia-open-media-content-skills/soia-media/soia-media-generate-article-image/<run-id>/` | 只放本次候选图和临时回执；成功、失败都清理 |
+| 非秘密配置 | `~/.config/soia-skills/soia-media-generate-article-image/` | 只放 `config.yml`；可用 `SOIA_SKILLS_CONFIG_HOME` 改根目录 |
+| 中间候选 | OS 临时目录下 `soia-skills/soia-media-generate-article-image/<run-id>/` | 只放本次候选图和临时回执；成功、失败都清理 |
 | Provider 缓存 | 由 imagegen provider 管理 | 本技能不移动、不复制、不把缓存路径写入交付 manifest |
-| 可选运行回执 | `~/.local/state/soia-skills/soia-open-media-content-skills/soia-media/soia-media-generate-article-image/` | 默认关闭；仅 `runtime.keep_run_receipts: true` 时持久保留 |
+| 可选运行回执 | `~/.local/state/soia-skills/soia-media-generate-article-image/` | 默认关闭；仅 `runtime.keep_run_receipts: true` 时持久保留 |
 | 最终交付 | 客户明确目录；未指定时为 Downloads 下的技能目录 | 只放最终 Prompt、选中位图和 manifest |
 
 - 只读取客户提供的文章、参考图和当前任务目录；不扫描无关私人目录。
 - 默认不持久保留任何中间状态。`runtime.keep_failed_candidates: true` 仅用于客户明确要求排查失败生图时。
+- 旧三层配置路径仅作只读兼容回退；新配置和所有新状态一律写入扁平的 skill-specific 路径。
 - 不在技能仓、cwd、vault 根或最终交付目录中创建缓存与运行状态。
 - 完整存储规范见仓库根 `DATA_STORAGE_SPEC.md`；脚本可用 `--json` 输出实际解析到的四类运行根与最终交付根。
 
