@@ -1,11 +1,11 @@
 ---
 name: soia-media-generate-article-image
 description: 为文章生成封面、正文小结卡、康奈尔笔记或视觉隐喻海报，并完成 Prompt 落盘和位图验收。触发：「生成文章图片」「正文小结图」「康奈尔笔记图」「Godot 像素海报」
-version: 3.1.1
+version: 3.2.0
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-07-27 14:05:14
+updated_at: 2026-07-27 14:34:50
 created_by: claude opus 4.6
-updated_by: gpt-5.6-sol
+updated_by: claude opus 5
 ---
 
 # soia-media-generate-article-image
@@ -21,6 +21,7 @@ updated_by: gpt-5.6-sol
 | 公众号、X、小红书文章封面 | `cover` / `godot_pixel_metaphor` 或 `auto` | 完整 Prompt、PNG/JPG 封面、视觉验收回执 |
 | 正文段落或章节小结图 | `summary_card` / `editorial_summary_card` | 可嵌入正文的编辑式小结卡 |
 | 把文章总结成康奈尔笔记 | `learning_note` / `cornell_notes` | A4 竖版康奈尔笔记信息图 |
+| 插件市场图标、应用图标 | `icon` / `plugin_icon` | 1:1 无文字扁平矢量图标，成批时家族一致 |
 | 后续新增文章图片模板 | 注册到 `references/template-registry.yml` | 同一技能内按 preset 路由，不复制新技能 |
 
 ### 客户如何使用

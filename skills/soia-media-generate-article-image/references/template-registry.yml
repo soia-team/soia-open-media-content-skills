@@ -44,3 +44,12 @@ templates:
     output_stem: cornell-notes
     text_density: high
     use_when: "文章适合转成问题线索、模块化笔记、回顾总结和一句话记忆"
+
+  - id: plugin_icon
+    image_type: [icon]
+    reference: prompt-plugin-icon.md
+    default_aspect: "1:1"
+    output_stem: plugin-icon
+    text_density: none
+    batch_consistency: required
+    use_when: "需要插件市场图标、应用图标或技能库标识；成批生成时必须保持家族一致"
