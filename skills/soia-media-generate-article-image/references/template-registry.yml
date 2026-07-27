@@ -1,0 +1,46 @@
+schema_version: 2
+
+selection_order:
+  - image_type
+  - preset
+  - visual_style
+  - scene_or_symbol
+
+prompt_blocks:
+  required:
+    - source_grounding
+    - primary_task
+    - composition_and_layout
+    - visual_style_and_materials
+    - exact_text
+    - aspect_and_output
+    - constraints_and_avoid
+  optional:
+    - reference_image_roles
+    - lighting_and_mood
+    - variant_axes
+
+templates:
+  - id: godot_pixel_metaphor
+    image_type: [cover, poster]
+    reference: prompt-godot-pixel-metaphor.md
+    default_aspect: "16:9"
+    output_stem: godot-pixel-metaphor
+    text_density: low
+    use_when: "文章需要用一个游戏世界和单一视觉隐喻表达核心冲突"
+
+  - id: editorial_summary_card
+    image_type: [summary_card]
+    reference: prompt-editorial-summary-card.md
+    default_aspect: "4:5"
+    output_stem: editorial-summary-card
+    text_density: medium
+    use_when: "正文需要一张观点小结图，突出主命题、关键词与补充解释"
+
+  - id: cornell_notes
+    image_type: [learning_note, summary_card]
+    reference: prompt-cornell-notes-infographic.md
+    default_aspect: "A4-portrait"
+    output_stem: cornell-notes
+    text_density: high
+    use_when: "文章适合转成问题线索、模块化笔记、回顾总结和一句话记忆"

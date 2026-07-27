@@ -25,7 +25,6 @@ GRANDFATHER_INVALID_DATETIME: frozenset[str] = frozenset()
 GRANDFATHER_MISSING_PRIVATE_DATA_SECTION = frozenset(
     {
         "soia-media-compose-article-draft",
-        "soia-media-cover-image",
         "soia-media-publish-rednote-card",
         "soia-media-publish-wechat-draft",
         "soia-media-publish-x-article",

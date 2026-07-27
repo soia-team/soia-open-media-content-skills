@@ -1,6 +1,6 @@
 # THIRD_PARTY_NOTICES
 
-> Last updated: 2026-07-22
+> Last updated: 2026-07-27
 > This file records third-party code adaptations and design references used by skills in this repository.
 
 ## Code adaptations
