@@ -48,8 +48,10 @@ class ArticleImageContractTest(unittest.TestCase):
         manifest_path = ROOT / ".codex-plugin" / "plugin.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         interface = manifest["interface"]
-        logo = (manifest_path.parent / interface["logo"]).resolve()
-        composer = (manifest_path.parent / interface["composerIcon"]).resolve()
+        # 官方 validate_asset_path 以 plugin root 为基准解析，不是 manifest 所在目录；
+        # 原先按 manifest_path.parent 解析，官方 validator 判「points to a missing file」。
+        logo = (ROOT / interface["logo"]).resolve()
+        composer = (ROOT / interface["composerIcon"]).resolve()
         self.assertEqual(self.png_size(logo), (512, 512))
         self.assertEqual(self.png_size(composer), (32, 32))
 
