@@ -19,5 +19,6 @@
     "defaultPrompt": [
       "请把这份素材改写成适合目标平台发布的完整内容。"
     ]
-  }
+  },
+  "homepage": "https://github.com/soia-team/soia-open-media-content-skills"
 }
