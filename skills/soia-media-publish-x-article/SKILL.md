@@ -208,4 +208,4 @@ python3 scripts/x_article_post.py draft /tmp/x_article.json  # 完整草稿：�
 
 1. **做了什么**：一句话 + 草稿 URL。
 2. **校验清单**：第 3 步逐项结果；未通过项如实标注。
-3. **下一步**：人工审阅后自行发布；建议配 `soia-media-cover-image` 生成封面。
+3. **下一步**：人工审阅后自行发布；建议配 `soia-media-generate-article-image` 生成封面。

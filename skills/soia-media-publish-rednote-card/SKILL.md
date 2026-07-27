@@ -1,13 +1,13 @@
 ---
 name: soia-media-publish-rednote-card
 description: 把成文草稿改写成 rednote（小红书）笔记：生成吸睛标题（可带 emoji）、3–5 段短文、话题标签和配图建议。只产出文本并由客户人工发布，不接平台 API。Triggers：「发成小红书」「小红书笔记」「改成 rednote」「rednote 这篇」
-version: 2.0.0
+version: 2.0.1
 created_at: 2026-07-16 15:44:20
-updated_at: 2026-07-22 21:00:45
+updated_at: 2026-07-27 10:00:00
 created_by: gpt-5.6-luna
-updated_by: gpt-5.6-luna
+updated_by: gpt-5.6-sol
 dependencies:
-  optional: [soia-media-cover-image]
+  optional: [soia-media-generate-article-image]
 ---
 
 # soia-media-publish-rednote-card
@@ -23,7 +23,7 @@ dependencies:
 | 客户想要 | 技能会做 | 客户能看到 |
 |---|---|---|
 | 把文章发成小红书笔记 | 提炼角度、重写标题和短段落、补充标签 | 一份可复制的 rednote Markdown 文案 |
-| 需要视觉素材方向 | 给出封面/配图的主体、构图、文字和比例建议 | 可执行的配图建议；需要时可衔接 `soia-media-cover-image` |
+| 需要视觉素材方向 | 给出封面/配图的主体、构图、文字和比例建议 | 可执行的配图建议；需要时可衔接 `soia-media-generate-article-image` |
 | 发布到 rednote | 只生成发布文本 | “产出文本、人工发布”；不会调用 API 或发布内容 |
 
 ### 客户如何使用
@@ -42,7 +42,7 @@ npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-
 ```
 
 - 本技能是纯 LLM 改写流程，无 scripts、无私有配置、无账号凭据和无 rednote API 依赖。
-- `soia-media-cover-image` 是可选衔接 skill：需要生成封面位图时，先安装并运行它；本 skill 只提供配图方向，不替客户生成或上传图片。
+- `soia-media-generate-article-image` 是可选衔接 skill：需要生成封面或正文位图时，先安装并运行它；本 skill 只提供配图方向，不替客户生成或上传图片。
 - `soia-media-compose-article-draft` 是常见上游产物，但不是安装级强依赖；也可以直接提供任意成文草稿。
 - 当前不接 rednote API。任何“发布”都只表示生成文本，人工发布由客户完成。
 
@@ -93,7 +93,7 @@ npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-
 - 至少给出 1 条封面建议，说明画面主体、构图、主色、文字层级和推荐比例；可按 1:1 小红书方图场景提出建议。
 - 文章有步骤、对比或清单时，可补充 1–3 张内页卡片建议，写明每张卡片承载的单一信息。
 - 建议中的标题、数字和来源必须与文案一致；不把未经验证的事实放到图片文字里。
-- 客户需要实际封面时，说明可以把建议交给 `soia-media-cover-image`，但不要声称图片已生成、上传或发布。
+- 客户需要实际图片时，说明可以把建议交给 `soia-media-generate-article-image`，但不要声称图片已生成、上传或发布。
 
 ## 输出格式
 

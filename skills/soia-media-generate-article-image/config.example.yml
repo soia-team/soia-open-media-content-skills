@@ -1,0 +1,26 @@
+# soia-media-generate-article-image 非秘密偏好配置样例。
+# 复制到：
+# ~/.config/soia-skills/soia-open-media-content-skills/soia-media/soia-media-generate-article-image/config.yml
+# 或设置 SOIA_MEDIA_ARTICLE_IMAGE_CONFIG_FILE。
+
+schema_version: 1
+
+paths:
+  # 留空时按 SKILL.md 的 C 类交付物优先级解析。
+  output_dir: null
+
+defaults:
+  image_type: auto
+  preset: auto
+  aspect: auto
+  output_format: png
+  quick_mode: false
+
+provider:
+  preferred: builtin-imagegen
+  forbid_code_render_fallback: true
+
+runtime:
+  # 默认不保留中间候选与运行状态；临时目录在成功或失败后都应清理。
+  keep_failed_candidates: false
+  keep_run_receipts: false
