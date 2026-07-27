@@ -1,11 +1,11 @@
 ---
 name: soia-media-cover-image
-description: 为公众号/X/小红书文章生成封面图，支持五维参数与多种比例；公众号产出接 soia-media-publish-wechat-draft --cover。仅用 codex CLI 内置生图，缺失时停止并提示，不静默降级。Triggers：「生成封面」「做个封面图」「配一张公众号头图」「做张小红书封面」「cover image」
-version: 2.0.0
+description: 为文章生成适配发布渠道的封面图。触发：「生成文章封面」「做张小红书封面」「cover image」
+version: 2.0.1
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-07-22 21:00:45
+updated_at: 2026-07-27 10:47:17
 created_by: claude opus 4.6
-updated_by: gpt-5.6-luna
+updated_by: gpt-5.6-sol
 ---
 
 # soia-media-cover-image
@@ -23,6 +23,8 @@ updated_by: gpt-5.6-luna
 | 后端不可用（没装 codex / 未登录） | 停止生成，明确告知缺什么、如何补齐，绝不降级成代码画图冒充位图 | 缺失说明 + 安装/登录指引 |
 
 ### 客户如何使用
+
+其他可识别说法包括「做个封面图」「配一张公众号头图」；需要把文章正文转换成长图或信息图时不使用本技能。
 
 1. 提供：文章的**确切标题**（不可由本技能编造或改写）、主题/要点、目标发布渠道（公众号 / X / 小红书，决定默认比例）。
 2. Agent 分析内容后推荐五维参数与比例，连同"确认闸门"一起交给客户确认——除非客户在**当前这句话**里已明说"直接生成"/`--quick`。

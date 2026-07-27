@@ -1,11 +1,11 @@
 ---
 name: soia-media-publish-x-article
-description: 把成文草稿（Markdown）直传 X/Twitter Articles 草稿箱：解析标题/封面/正文图与分割线，富文本粘贴保格式，倒序插图，机械校验后只存草稿、绝不点发布。需已登录浏览器且订阅含「撰写文章」权益。Triggers：「发成 X Article」「上传到 X 文章」「推到 X 草稿箱」「X Articles draft」「把这篇发 X 长文」
-version: 2.0.0
+description: 将 Markdown 成文上传到 X Articles 草稿箱并校验格式，只保存草稿。触发：「发成 X Article」「推到 X 文章草稿箱」
+version: 2.0.1
 created_at: 2026-07-20 19:30:00
-updated_at: 2026-07-22 21:00:45
+updated_at: 2026-07-27 10:47:17
 created_by: claude fable 5
-updated_by: gpt-5.6-luna
+updated_by: gpt-5.6-sol
 dependencies:
   hard: [soia-media-publish-x-thread]
 ---
@@ -27,6 +27,8 @@ dependencies:
 **安全底线**：只保存草稿，**绝不点击「发布/Publish」**；登录态只留在浏览器里，不导出 cookie、不写任何凭据到磁盘。
 
 ### 客户如何使用
+
+其他可识别说法包括「上传到 X 文章」「X Articles draft」「把这篇发 X 长文」；只有普通短帖或 thread 时转交 `soia-media-publish-x-thread`。
 
 1. 说「把 <文件> 发成 X Article」。首次使用需要登录一次：脚本弹出浏览器窗口，人工登录后长期复用（与 `soia-media-publish-x-thread` 共用同一份登录态，任一技能登录过就都不用再登）；账号需订阅含「撰写文章」权益。
 2. Agent 先 dry-run 解析并汇报：标题、封面、正文图数量、缺图清单；封面缺失时先问你。
