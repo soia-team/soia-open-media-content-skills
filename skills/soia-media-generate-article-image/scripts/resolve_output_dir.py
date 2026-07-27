@@ -14,9 +14,8 @@ from pathlib import Path
 from typing import Any
 
 
-REPO_NAME = "soia-open-media-content-skills"
-SKILL_TYPE = "soia-media"
 SKILL_NAME = "soia-media-generate-article-image"
+LEGACY_SUFFIX = Path("soia-open-media-content-skills") / "soia-media" / SKILL_NAME
 CONFIG_ENV = "SOIA_MEDIA_ARTICLE_IMAGE_CONFIG_FILE"
 OUTPUT_ENV = "SOIA_MEDIA_ARTICLE_IMAGE_OUTPUT_DIR"
 PRODUCT_OUTPUT_ENV = "SOIA_DERIVED_OUTPUT_DIR"
@@ -65,7 +64,7 @@ def storage_roots(
         else:
             cache_base = Path(values.get("XDG_CACHE_HOME", user_home / ".cache")) / "soia-skills"
 
-    suffix = Path(REPO_NAME) / SKILL_TYPE / SKILL_NAME
+    suffix = Path(SKILL_NAME)
     temporary_base = Path(tempfile.gettempdir()) if temp_root is None else temp_root
     return {
         "config": config_base / suffix,
@@ -87,6 +86,8 @@ def config_candidates(
         candidates.append(Path(env[CONFIG_ENV]).expanduser())
     root = config_home(env, home, platform_name)
     candidates.extend(root / name for name in ("config.yml", "config.yaml"))
+    legacy_root = root.parent / LEGACY_SUFFIX
+    candidates.extend(legacy_root / name for name in ("config.yml", "config.yaml"))
     return candidates
 
 
