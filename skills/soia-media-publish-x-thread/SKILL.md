@@ -1,11 +1,11 @@
 ---
 name: soia-media-publish-x-thread
-description: 把成文草稿改写成 X thread：拆成带 (1/N) 编号的推文串，每条 ≤280 字符。默认只产文本；可选用自带 Playwright 脚本（宿主无关）把内容填进 X 撰写框存草稿，明确授权才发布。不接 X API。Triggers：「发成 X thread」「拆成推文串」「thread 这篇」「发条 X」「发个推」
-version: 2.0.0
+description: 把成文草稿拆成带编号的 X thread，每条不超过 280 字符。默认只产文本，发布需显式授权。触发：「发成 X thread」「拆成推文串」
+version: 2.0.1
 created_at: 2026-07-16 15:44:20
-updated_at: 2026-07-22 21:00:45
+updated_at: 2026-07-27 10:47:32
 created_by: gpt-5.6-luna
-updated_by: gpt-5.6-luna
+updated_by: claude opus 5
 ---
 
 # soia-media-publish-x-thread

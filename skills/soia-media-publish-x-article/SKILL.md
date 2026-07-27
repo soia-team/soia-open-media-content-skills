@@ -1,11 +1,11 @@
 ---
 name: soia-media-publish-x-article
-description: 把成文草稿（Markdown）直传 X/Twitter Articles 草稿箱：解析标题/封面/正文图与分割线，富文本粘贴保格式，倒序插图，机械校验后只存草稿、绝不点发布。需已登录浏览器且订阅含「撰写文章」权益。Triggers：「发成 X Article」「上传到 X 文章」「推到 X 草稿箱」「X Articles draft」「把这篇发 X 长文」
-version: 2.0.0
+description: 把 Markdown 终稿直传 X Articles 草稿箱，保留富文本格式与配图。只存草稿不发布。触发：「发成 X Article」「推到 X 草稿箱」
+version: 2.0.1
 created_at: 2026-07-20 19:30:00
-updated_at: 2026-07-22 21:00:45
+updated_at: 2026-07-27 10:47:32
 created_by: claude fable 5
-updated_by: gpt-5.6-luna
+updated_by: claude opus 5
 dependencies:
   hard: [soia-media-publish-x-thread]
 ---

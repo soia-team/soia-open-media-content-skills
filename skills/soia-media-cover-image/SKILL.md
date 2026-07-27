@@ -1,11 +1,11 @@
 ---
 name: soia-media-cover-image
-description: 为公众号/X/小红书文章生成封面图，支持五维参数与多种比例；公众号产出接 soia-media-publish-wechat-draft --cover。仅用 codex CLI 内置生图，缺失时停止并提示，不静默降级。Triggers：「生成封面」「做个封面图」「配一张公众号头图」「做张小红书封面」「cover image」
-version: 2.0.0
+description: 为公众号、X、小红书文章生成封面图，支持多种比例与风格参数。触发：「生成封面」「做个封面图」「cover image」
+version: 2.0.1
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-07-22 21:00:45
+updated_at: 2026-07-27 10:47:32
 created_by: claude opus 4.6
-updated_by: gpt-5.6-luna
+updated_by: claude opus 5
 ---
 
 # soia-media-cover-image
