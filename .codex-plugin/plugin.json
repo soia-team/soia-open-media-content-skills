@@ -1,6 +1,6 @@
 {
   "name": "soia-media-content",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "新媒体内容技能：文章成文、文章图片与公众号、X、小红书发布",
   "author": {
     "name": "soia-team"
@@ -19,7 +19,7 @@
     "defaultPrompt": [
       "请把这份素材改写成适合目标平台发布的完整内容。"
     ],
-    "brandColor": "#5B5CE2",
+    "brandColor": "#FB7185",
     "composerIcon": "./assets/icon.svg",
     "logo": "./assets/icon.png",
     "screenshots": [],
