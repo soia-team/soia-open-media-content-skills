@@ -3,7 +3,7 @@
 # ~/.config/soia-skills/soia-media-generate-article-image/config.yml
 # 或设置 SOIA_MEDIA_ARTICLE_IMAGE_CONFIG_FILE。
 
-schema_version: 1
+schema_version: 2
 
 paths:
   # 留空时按 SKILL.md 的 C 类交付物优先级解析。
@@ -12,6 +12,8 @@ paths:
 defaults:
   image_type: auto
   preset: auto
+  platform: general
+  layout_mode: auto
   aspect: auto
   output_format: png
   quick_mode: false
@@ -19,6 +21,17 @@ defaults:
 provider:
   preferred: builtin-imagegen
   forbid_code_render_fallback: true
+  # 两阶段模板只允许确定性排版工具处理注册表声明的 deterministic_fields。
+  allow_deterministic_compositor_for_two_stage: true
+
+social_cards:
+  slide_count: auto
+  claim_mode: total
+  cta_mode: all
+  max_regenerations: 2
+  require_ocr_match: true
+  require_qr_decode: true
+  require_mobile_preview: true
 
 runtime:
   # 默认不保留中间候选与运行状态；临时目录在成功或失败后都应清理。
