@@ -100,8 +100,13 @@ class ArticleImageContractTest(unittest.TestCase):
         # 原先按 manifest_path.parent 解析，官方 validator 判「points to a missing file」。
         logo = (ROOT / interface["logo"]).resolve()
         composer = (ROOT / interface["composerIcon"]).resolve()
-        self.assertEqual(self.png_size(logo), (512, 512))
-        self.assertEqual(self.png_size(composer), (32, 32))
+        self.assertTrue(logo.is_file(), logo)
+        self.assertTrue(composer.is_file(), composer)
+        # 本仓原先自成一套（logo 512、composerIcon 32px PNG），是全生态唯一的例外。
+        # 图标已收敛到元仓 scripts/generate_icons.py 的单一配色表统一派生：
+        # composerIcon 用矢量母版（官方要求 SVG，PNG 是当时的将就），logo 用 1024 位图。
+        self.assertEqual(composer.suffix, ".svg")
+        self.assertEqual(self.png_size(logo), (1024, 1024))
 
 
 if __name__ == "__main__":
