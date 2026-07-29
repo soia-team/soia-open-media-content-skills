@@ -83,9 +83,15 @@ Avoid:
 Codex 的 `interface.composerIcon` / `logo` / `logoDark` **以 plugin root 为基准解析**，不是 manifest 所在目录：
 
 ```
-<plugin root>/assets/logo.png           512×512
-<plugin root>/assets/composer-icon.png  32×32
+<plugin root>/assets/icon.svg   矢量母版，composerIcon 指它
+<plugin root>/assets/icon.png   1024×1024，logo 指它
 ```
+
+> SOIA 自己的插件图标**不用本技能生成**，而是由元仓 `scripts/generate_icons.py`
+> 从单一配色/字形表确定性派生（同一张表还派生 WorkBuddy 专家头像）。
+> 本仓曾自成一套（`logo.png` 512、`composer-icon.png` 32×32 PNG），是全生态唯一的例外，
+> 已于 2026-07-29 收敛。要改 SOIA 图标请改那张表，不要在这里另画一份。
+> 本文档的构图与用色原则仍适用于**第三方插件**的图标委托。
 
 放进 `.codex-plugin/assets/` 会让官方 `validate_plugin.py` 报 `points to a missing file`，Codex 运行时也找不到（2026-07-27 实际踩过）。
 
