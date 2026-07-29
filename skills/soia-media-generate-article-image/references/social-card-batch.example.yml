@@ -1,0 +1,21 @@
+schema_version: 1
+series_id: <series-id>
+platform: rednote
+slide_count: auto
+as_of_date: <YYYY-MM-DD>
+
+include:
+  - repo: <path-to-first-skill-repo>
+    repository: <owner/first-skill-repo>
+    claim_mode: total
+    cta_mode: all
+    label_map: <optional-label-map.yml>
+  - repo: <path-to-second-skill-repo>
+    repository: <owner/second-skill-repo>
+    claim_mode: featured
+    featured_skills: [<skill-name>]
+    cta_mode: featured
+    cta_featured_skill: <skill-name>
+
+exclude:
+  - <owner/excluded-skill-repo>

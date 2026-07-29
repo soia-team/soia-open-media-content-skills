@@ -1,8 +1,11 @@
-schema_version: 2
+schema_version: 3
 
 selection_order:
   - image_type
   - preset
+  - platform
+  - layout_mode
+  - slide_count
   - visual_style
   - scene_or_symbol
 
@@ -17,6 +20,8 @@ prompt_blocks:
     - constraints_and_avoid
   optional:
     - reference_image_roles
+    - source_facts
+    - brand_asset_roles
     - lighting_and_mood
     - variant_axes
 
@@ -44,6 +49,18 @@ templates:
     output_stem: cornell-notes
     text_density: high
     use_when: "文章适合转成问题线索、模块化笔记、回顾总结和一句话记忆"
+
+  - id: social_skill_catalog
+    image_type: [social_card, carousel]
+    reference: prompt-social-skill-catalog.md
+    contract: social-card-contract.yml
+    default_aspect: "4:5"
+    output_stem: social-skill-catalog
+    text_density: high
+    batch_consistency: required
+    two_stage: true
+    deterministic_fields: [claim, skill_labels, install_command, repository_url, qr_code, brand_logos]
+    use_when: "需要把开源技能库、插件集合或产品能力清单做成朋友圈单图或小红书轮播，并确保数量、命令、URL 与二维码可机械核验"
 
   - id: plugin_icon
     image_type: [icon]

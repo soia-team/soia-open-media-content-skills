@@ -25,7 +25,7 @@ class ArticleImageContractTest(unittest.TestCase):
 
     def test_registry_declares_atomic_prompt_blocks(self) -> None:
         registry = yaml.safe_load((SKILL / "references" / "template-registry.yml").read_text(encoding="utf-8"))
-        self.assertEqual(registry["schema_version"], 2)
+        self.assertEqual(registry["schema_version"], 3)
         self.assertEqual(
             registry["prompt_blocks"]["required"],
             [
@@ -38,6 +38,42 @@ class ArticleImageContractTest(unittest.TestCase):
                 "constraints_and_avoid",
             ],
         )
+
+    def test_social_catalog_is_two_stage_and_deterministic(self) -> None:
+        registry = yaml.safe_load((SKILL / "references" / "template-registry.yml").read_text(encoding="utf-8"))
+        templates = {item["id"]: item for item in registry["templates"]}
+        social = templates["social_skill_catalog"]
+        self.assertEqual(social["image_type"], ["social_card", "carousel"])
+        self.assertTrue(social["two_stage"])
+        self.assertEqual(social["default_aspect"], "4:5")
+        self.assertIn("skill_labels", social["deterministic_fields"])
+        self.assertIn("install_command", social["deterministic_fields"])
+        self.assertIn("qr_code", social["deterministic_fields"])
+
+    def test_input_contract_lists_registered_specialized_types(self) -> None:
+        content = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("social_card | carousel | icon", content)
+        self.assertIn("social_skill_catalog | plugin_icon", content)
+        self.assertIn("build_social_catalog_facts.py", content)
+        self.assertIn("validate_social_catalog_delivery.py", content)
+
+    def test_social_contract_has_mobile_platform_limits(self) -> None:
+        contract = yaml.safe_load(
+            (SKILL / "references" / "social-card-contract.yml").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            contract["platforms"]["rednote"]["layout_modes"]["carousel"]["max_catalog_items_per_slide"],
+            6,
+        )
+        self.assertEqual(
+            contract["platforms"]["rednote"]["layout_modes"]["carousel"]["preferred_slide_counts"],
+            [2, 3],
+        )
+        self.assertEqual(
+            contract["platforms"]["wechat-moments"]["layout_modes"]["single"]["max_catalog_items_per_slide"],
+            4,
+        )
+        self.assertIn("ocr_exact_match", contract["required_quality_evidence"])
 
     def test_cornell_template_has_no_external_source_reference(self) -> None:
         content = (SKILL / "references" / "prompt-cornell-notes-infographic.md").read_text(encoding="utf-8")

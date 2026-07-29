@@ -1,4 +1,4 @@
 interface:
   display_name: "Article Image Generator"
-  short_description: "为文章生成封面、正文小结卡、学习笔记图和视觉隐喻海报"
-  default_prompt: "Use $soia-media-generate-article-image to select an article-image preset, save the prompt, generate a real bitmap, and verify it visually."
+  short_description: "生成文章图片、技能库宣传卡和可核验的社交媒体轮播"
+  default_prompt: "Use $soia-media-generate-article-image to select a preset, ground facts, generate the visual, and verify the final bitmap and exact text."

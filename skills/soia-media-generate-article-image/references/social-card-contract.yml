@@ -1,0 +1,61 @@
+schema_version: 1
+
+platforms:
+  rednote:
+    layout_modes:
+      carousel:
+        aspect: "4:5"
+        min_slides: 2
+        max_slides: 12
+        preferred_slide_counts: [2, 3]
+        max_catalog_items_per_slide: 6
+        required_roles: [cover, catalog, cta]
+        optional_roles: [highlight]
+      single:
+        aspect: "4:5"
+        min_slides: 1
+        max_slides: 1
+        max_catalog_items_per_slide: 4
+        required_roles: [cover, catalog, cta]
+  wechat-moments:
+    layout_modes:
+      single:
+        aspect: "4:5"
+        min_slides: 1
+        max_slides: 1
+        max_catalog_items_per_slide: 4
+        required_roles: [cover, catalog, cta]
+      carousel:
+        aspect: "4:5"
+        min_slides: 2
+        max_slides: 9
+        preferred_slide_counts: [2, 3]
+        max_catalog_items_per_slide: 6
+        required_roles: [cover, catalog, cta]
+        optional_roles: [highlight]
+  general:
+    layout_modes:
+      carousel:
+        aspect: "4:5"
+        min_slides: 2
+        max_slides: 12
+        preferred_slide_counts: [2, 3]
+        max_catalog_items_per_slide: 6
+        required_roles: [cover, catalog, cta]
+        optional_roles: [highlight]
+
+deterministic_fields:
+  - claim
+  - skill_labels
+  - install_command
+  - repository_url
+  - qr_code
+  - brand_logos
+
+required_quality_evidence:
+  - deterministic_text
+  - ocr_exact_match
+  - approved_brand_assets
+  - mobile_preview
+  - view_image
+  - hero_art_reviewed

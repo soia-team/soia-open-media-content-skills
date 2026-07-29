@@ -7,7 +7,7 @@
 | 技能名 | 一句话简介 |
 |---|---|
 | `soia-media-compose-article-draft` | 将提炼后的用户观点组织成可继续编辑和发布的文章草稿。 |
-| `soia-media-generate-article-image` | 用可扩展模板生成文章封面、正文小结卡、康奈尔笔记图和视觉隐喻海报。 |
+| `soia-media-generate-article-image` | 用可扩展模板生成文章封面、正文小结卡、学习笔记图、视觉隐喻海报和可核验的技能库宣传卡/轮播。 |
 | `soia-media-publish-rednote-card` | 将文章草稿改写为供人工发布的小红书标题、正文、标签与配图建议。 |
 | `soia-media-publish-wechat-draft` | 将文章排版为公众号兼容 HTML 并推入草稿箱，不自动群发。 |
 | `soia-media-publish-x-article` | 将 Markdown 长文写入 X Articles 草稿箱并完成机械校验，不自动发布。 |
