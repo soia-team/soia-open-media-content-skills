@@ -1,9 +1,9 @@
 ---
 name: soia-media-generate-article-image
 description: 为文章生成封面、小结卡、学习笔记、视觉隐喻海报或技能库宣传卡/轮播，并完成事实清单、Prompt、确定性文字与位图验收。触发：「生成文章图片」「正文小结图」「康奈尔笔记图」「技能库宣传图」「朋友圈配图」「小红书轮播」
-version: 3.4.0
+version: 3.5.0
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-07-29 14:59:08
+updated_at: 2026-07-29 17:30:00
 created_by: claude opus 4.6
 updated_by: gpt-5.6-sol
 ---
@@ -30,7 +30,7 @@ updated_by: gpt-5.6-sol
 1. 提供文章路径、完整正文、明确主题或技能仓路径；给出用途、平台、比例和必须逐字出现的文字。
 2. 如有参考图，明确每张图是“风格参考”“构图参考”还是“编辑目标”。
 3. 指定 `image_type`、`preset` 和 `output_dir`；省略时由 Agent 依据文章与用途推荐，并在生成前说明假设。客户说“直接生成”时可跳过确认。
-4. Agent 读取 [模板注册表](references/template-registry.yml) 和所选模板；宣传卡先从实际仓库生成 `facts.yml`，再生成无文字主视觉和确定性排版终稿。
+4. Agent 读取 [模板注册表](references/template-registry.yml) 和所选模板；宣传卡先从实际仓库生成 `facts.yml`，再为每一张图写完整成品 Prompt。默认由 imagegen 直出整张海报；只有高风险精确字段未通过时才局部确定性校正。
 5. 多仓系列先用 [批次清单样例](references/social-card-batch.example.yml) 明确纳入与排除范围；脚本拒绝同一仓同时出现在两边。
 6. 生成后必须用 `view_image` 检查比例、构图和参考图；密集宣传卡还要核对 OCR、CTA、二维码、移动端缩略图和事实指纹。失败时重生主视觉或重跑确定性合成源，不直接涂改位图。
 
@@ -56,7 +56,7 @@ npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-
 |---|---|---|
 | 支持 imagegen 的 Agent / Codex 内置 `image_gen` | 强能力依赖 | 停止生成并说明缺失；不得切换为 HTML、SVG、canvas 或 Pillow 绘图 |
 | `view_image` 或等价位图查看能力 | 强验收依赖 | 不得声称视觉验收通过；明确交给客户人工复核 |
-| 确定性图形合成器与 OCR/二维码解码器 | `social_skill_catalog`、`plugin_icon` 条件强依赖 | 其他模板不受影响；两阶段模板停止终稿交付并说明缺失，不让 imagegen 代画确定性字段 |
+| 确定性图形合成器与 OCR/二维码解码器 | `social_skill_catalog` 的 `hybrid_exact_text`、`plugin_icon` 条件强依赖 | direct_poster 可先重生；需要零错字校正或二维码时缺失则停止对应终稿交付 |
 | `soia-media-publish-wechat-draft` | 下游衔接，非安装依赖 | 仅在客户要推公众号草稿时，把已验收封面/正文图交给它 |
 
 配置路径：
@@ -126,6 +126,7 @@ purpose: <wechat-cover | x-cover | rednote | wechat-moments | article-inline | p
 platform: <rednote | wechat-moments | general>
 layout_mode: <single | carousel | auto>
 slide_count: <1 | 2 | 3 | auto>
+render_mode: <direct_poster | hybrid_exact_text | auto>
 aspect: <2.35:1 | 16:9 | 3:2 | 4:5 | 9:16 | 1:1 | A4-portrait | custom>
 series_id: <optional-batch-id>
 facts_source:
@@ -185,7 +186,7 @@ quick: false
 6. `aspect_and_output`：写明目标比例、用途和位图格式；生成后记录实际像素与比例，不用 Prompt 中的目标值冒充结果。
 7. `constraints_and_avoid`：只保留会改变结果的约束，删除互相重复、不可验证或与当前模板无关的规则。
 
-`social_skill_catalog` 先运行 `build_social_catalog_facts.py`，把 `facts.yml` 的事实指纹写入 manifest；Prompt 的 `source_facts` 只引用该文件，不手写第二份技能列表。注册表标记为 `deterministic_fields` 的字段不得进入 imagegen Prompt，只进入确定性合成源。
+`social_skill_catalog` 先运行 `build_social_catalog_facts.py`，把 `facts.yml` 的事实指纹写入 manifest。每一张图必须有独立、完整的成品 Prompt，按模板写清固定构图、逐字文案、主视觉、能力组、重点区、场景区和 CTA；不得只写无字主视觉。`direct_poster` 把精确字段写入 imagegen Prompt；`hybrid_exact_text` 同样在落盘 Prompt 中保留完整文案与排版规格，但执行时允许把命令、URL、二维码和失败的少量中文交给确定性文字层。
 
 需要多个概念时，保持同一 preset，每版只改变主体、构图、配色、场景中的 2–4 项，并分别落盘；不要同时更换模板和全部风格轴，导致版本无法比较。
 
@@ -275,13 +276,15 @@ python3 scripts/build_social_catalog_batch.py \
 
 生成前创建 `prompts/NN-<preset>-<slug>.md`，按注册表 required blocks 写全：来源边界、主要任务、构图、视觉语言、逐字文字、目标比例/用途和禁止项；有参考图时再写逐张角色。未落盘不得调用生图。
 
-### 4. 生成主视觉与两阶段终稿
+### 4. 用完整 Prompt 生成终稿
 
 - 默认使用 Agent 内置 imagegen / `image_gen`。
 - 参考图是风格或构图参考时，按索引逐张写明角色；不要把它们误当成编辑目标。
 - 生图工具不可用时停止；不得使用 HTML/CSS、SVG、canvas、Pillow、ImageMagick 或截图方式冒充主视觉。
-- `two_stage: true` 的模板是唯一例外：imagegen 产出无文字设计稿/主视觉后，使用确定性图形工具排版注册表声明的字段。代码渲染不能代替主视觉生成，也不能修改非确定性插画内容。
-- `social_skill_catalog` 的文字、命令、URL、二维码和批准 Logo 全部在第二阶段加入；二维码必须由目标 URL 编码生成，禁止扩散模型生成伪二维码。
+- `social_skill_catalog` 默认 `direct_poster`：imagegen 根据完整 Prompt 生成整张海报，不先生成孤立主视觉，也不用通用排版器批量换字。
+- direct_poster 的标题、数量、能力组、重点要点、命令和 URL 必须全部进入 Prompt 的 `Content source` 与 `Text accuracy`；每张轮播都单独写全，不得写“沿用上一张”。
+- 首轮只有少量精确字段失败时，可切换 `hybrid_exact_text`：保留 imagegen 的完整主视觉与版式，只对命令、URL、二维码或失败文字区做确定性校正。不得把整张图替换成扁平模板。
+- 二维码必须由真实 URL 编码生成；禁止扩散模型生成伪二维码。
 - 不要求位图后端把 Markdown、wikilink、文件路径或内部说明画进图片。
 - 每次调用创建唯一 `<run-id>` 临时目录；将选中位图复制到最终交付目录后，无论成功或失败都清理临时目录。
 - Provider 自有缓存不属于技能产物，不写入 manifest，也不把 provider 缓存目录当交付目录。
@@ -293,8 +296,8 @@ python3 scripts/build_social_catalog_batch.py \
 ### 6. 失败重生
 
 - 主视觉偏离或风格不符：只改一个主要问题，写新 Prompt，生成新位图。
-- 非两阶段模板出现中文错误时重生，不在位图上描字、补字、遮盖或局部代码修图。
-- 两阶段模板出现确定性字段错误时，修正事实/合成源并整体重跑；不得直接涂改最终位图。
+- direct_poster 出现主视觉、结构或大面积文字问题时，针对单一问题重生；不得用通用代码模板覆盖整张画面。
+- hybrid_exact_text 出现精确字段错误时，修正事实/文字层并重跑对应区域；不得修改已经通过的非确定性插画内容。
 - 最多连续重生两次；仍失败时交付最佳版本并准确列出未通过项。
 
 ## 私有配置样例

@@ -25,7 +25,7 @@ class ArticleImageContractTest(unittest.TestCase):
 
     def test_registry_declares_atomic_prompt_blocks(self) -> None:
         registry = yaml.safe_load((SKILL / "references" / "template-registry.yml").read_text(encoding="utf-8"))
-        self.assertEqual(registry["schema_version"], 3)
+        self.assertEqual(registry["schema_version"], 4)
         self.assertEqual(
             registry["prompt_blocks"]["required"],
             [
@@ -39,16 +39,28 @@ class ArticleImageContractTest(unittest.TestCase):
             ],
         )
 
-    def test_social_catalog_is_two_stage_and_deterministic(self) -> None:
+    def test_social_catalog_defaults_to_complete_direct_poster_with_exact_text_fallback(self) -> None:
         registry = yaml.safe_load((SKILL / "references" / "template-registry.yml").read_text(encoding="utf-8"))
         templates = {item["id"]: item for item in registry["templates"]}
         social = templates["social_skill_catalog"]
         self.assertEqual(social["image_type"], ["social_card", "carousel"])
-        self.assertTrue(social["two_stage"])
+        self.assertEqual(
+            social["render_modes"],
+            ["direct_poster", "hybrid_exact_text"],
+        )
+        self.assertEqual(social["default_render_mode"], "direct_poster")
         self.assertEqual(social["default_aspect"], "4:5")
         self.assertIn("skill_labels", social["deterministic_fields"])
         self.assertIn("install_command", social["deterministic_fields"])
         self.assertIn("qr_code", social["deterministic_fields"])
+
+    def test_social_catalog_prompt_requires_a_complete_poster_prompt(self) -> None:
+        content = (SKILL / "references" / "prompt-social-skill-catalog.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("每一张图都要写清楚来源、画面任务、固定空间关系", content)
+        self.assertIn("direct_poster`（默认）", content)
+        self.assertIn("不要只画一个孤立的 3D 主视觉", content)
 
     def test_input_contract_lists_registered_specialized_types(self) -> None:
         content = (SKILL / "SKILL.md").read_text(encoding="utf-8")

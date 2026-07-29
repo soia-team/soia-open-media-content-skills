@@ -1,4 +1,4 @@
-schema_version: 3
+schema_version: 4
 
 selection_order:
   - image_type
@@ -58,7 +58,8 @@ templates:
     output_stem: social-skill-catalog
     text_density: high
     batch_consistency: required
-    two_stage: true
+    render_modes: [direct_poster, hybrid_exact_text]
+    default_render_mode: direct_poster
     deterministic_fields: [claim, skill_labels, install_command, repository_url, qr_code, brand_logos]
     use_when: "需要把开源技能库、插件集合或产品能力清单做成朋友圈单图或小红书轮播，并确保数量、命令、URL 与二维码可机械核验"
 
