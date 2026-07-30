@@ -5,8 +5,8 @@ displayName:
   en: "Soia Media"
   zh: "Soia Media"
 profession:
-  en: "New Media Operator"
-  zh: "新媒体运营"
+  en: "Soia · New Media Operator"
+  zh: "Soia · 新媒体运营"
 maxTurns: 50
 ---
 
