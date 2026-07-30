@@ -1,9 +1,9 @@
 ---
 name: soia-media-generate-article-image
 description: 为文章生成封面、小结卡、学习笔记、视觉隐喻海报或高信息密度技能库宣传卡/轮播，并完成深层事实采集、Prompt、确定性文字与位图验收。触发：「生成文章图片」「正文小结图」「康奈尔笔记图」「技能库宣传图」「朋友圈配图」「小红书轮播」
-version: 3.5.0
+version: 3.6.0
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-07-29 17:30:00
+updated_at: 2026-07-30 17:09:50
 created_by: claude opus 4.6
 updated_by: gpt-5.6-sol
 ---
