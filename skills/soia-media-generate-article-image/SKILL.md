@@ -1,6 +1,6 @@
 ---
 name: soia-media-generate-article-image
-description: 为文章生成封面、小结卡、学习笔记、视觉隐喻海报或技能库宣传卡/轮播，并完成事实清单、Prompt、确定性文字与位图验收。触发：「生成文章图片」「正文小结图」「康奈尔笔记图」「技能库宣传图」「朋友圈配图」「小红书轮播」
+description: 为文章生成封面、小结卡、学习笔记、视觉隐喻海报或高信息密度技能库宣传卡/轮播，并完成深层事实采集、Prompt、确定性文字与位图验收。触发：「生成文章图片」「正文小结图」「康奈尔笔记图」「技能库宣传图」「朋友圈配图」「小红书轮播」
 version: 3.5.0
 created_at: 2026-07-09 20:56:44
 updated_at: 2026-07-29 17:30:00
@@ -30,9 +30,9 @@ updated_by: gpt-5.6-sol
 1. 提供文章路径、完整正文、明确主题或技能仓路径；给出用途、平台、比例和必须逐字出现的文字。
 2. 如有参考图，明确每张图是“风格参考”“构图参考”还是“编辑目标”。
 3. 指定 `image_type`、`preset` 和 `output_dir`；省略时由 Agent 依据文章与用途推荐，并在生成前说明假设。客户说“直接生成”时可跳过确认。
-4. Agent 读取 [模板注册表](references/template-registry.yml) 和所选模板；宣传卡先从实际仓库生成 `facts.yml`，再为每一张图写完整成品 Prompt。默认由 imagegen 直出整张海报；只有高风险精确字段未通过时才局部确定性校正。
+4. Agent 读取 [模板注册表](references/template-registry.yml) 和所选模板；宣传卡先从实际仓库生成 `facts.yml`。若任务是“推荐一个仓库并重点推荐一个技能”，还要完整读取仓库 `README.md` 与重点技能 `SKILL.md`，生成可追溯的 `content-facts.yml`，再为每一张图写完整成品 Prompt。默认由 imagegen 直出整张海报；只有高风险精确字段未通过时才局部确定性校正。
 5. 多仓系列先用 [批次清单样例](references/social-card-batch.example.yml) 明确纳入与排除范围；脚本拒绝同一仓同时出现在两边。
-6. 生成后必须用 `view_image` 检查比例、构图和参考图；密集宣传卡还要核对 OCR、CTA、二维码、移动端缩略图和事实指纹。失败时重生主视觉或重跑确定性合成源，不直接涂改位图。
+6. 生成后必须用 `view_image` 检查比例、构图和参考图；密集宣传卡还要核对语义密度、OCR、CTA、二维码、移动端缩略图、事实指纹和伪证据。失败时重生主视觉或重跑确定性合成源，不直接涂改位图。
 
 插件市场安装：
 
@@ -126,6 +126,7 @@ purpose: <wechat-cover | x-cover | rednote | wechat-moments | article-inline | p
 platform: <rednote | wechat-moments | general>
 layout_mode: <single | carousel | auto>
 slide_count: <1 | 2 | 3 | auto>
+narrative_mode: <repository_feature_pair | catalog | auto>
 render_mode: <direct_poster | hybrid_exact_text | auto>
 aspect: <2.35:1 | 16:9 | 3:2 | 4:5 | 9:16 | 1:1 | A4-portrait | custom>
 series_id: <optional-batch-id>
@@ -188,6 +189,8 @@ quick: false
 
 `social_skill_catalog` 先运行 `build_social_catalog_facts.py`，把 `facts.yml` 的事实指纹写入 manifest。每一张图必须有独立、完整的成品 Prompt，按模板写清固定构图、逐字文案、主视觉、能力组、重点区、场景区和 CTA；不得只写无字主视觉。`direct_poster` 把精确字段写入 imagegen Prompt；`hybrid_exact_text` 同样在落盘 Prompt 中保留完整文案与排版规格，但执行时允许把命令、URL、二维码和失败的少量中文交给确定性文字层。
 
+把“字多”和“信息密度高”分开验收。每个版面区域必须增加一种新的决策信息，不用“能力地图、典型场景、完整闭环”等抽象词重复仓库简介。推荐型双页默认采用五级以上阅读层级：品牌 → 痛点/结果钩子 → 可核验规模与能力结构 → 重点技能 → 输入/工作流/交付/验收 → CTA。标题优先使用痛点、反差或结果，不用“最近整理了”“一套技能覆盖……”作为主钩子。
+
 需要多个概念时，保持同一 preset，每版只改变主体、构图、配色、场景中的 2–4 项，并分别落盘；不要同时更换模板和全部风格轴，导致版本无法比较。
 
 ## 输出目录（C 类交付物）
@@ -202,6 +205,8 @@ quick: false
 6. 跨平台默认：用户 Downloads 下的 `soia-media-generate-article-image/<source-stem>/`。
 
 禁止把 cwd、技能仓或 vault 根 `outputs/` 当默认目录。Obsidian 等产品已有派生产物规范时，由调用方通过 `output_dir` 或 `SOIA_DERIVED_OUTPUT_DIR` 传入，本技能不硬编码任何 vault 目录名。
+
+未明确提供 `output_dir` 时，必须先运行 `resolve_output_dir.py --source <source> --json` 并采用其结果；不得在 cwd 或相邻代码工作区自行创建 `<topic>-delivery-<date>`、`outputs/`、`artifacts/` 等临时交付根。manifest 必须记录 `output_dir_origin`，完成回执只指向解析后的正式交付目录。
 
 最终交付目录保持以下结构：
 
@@ -232,6 +237,8 @@ quick: false
 └── manifest.yml
 ```
 
+多仓 `repository_feature_pair` 系列在同一 `<output-dir>` 下增加 `batch-facts.yml`、`content-facts.yml`、系列 manifest 与联系表；每仓正式选片只保留 `01-repository-recommendation.png` 和 `02-featured-skill.png`。版本化候选放临时运行目录或单独的 `candidates/`，不得与正式选片混放后再靠人工猜文件。
+
 上图是四角色展开示例，不是固定页数。可按内容生成 1、2、3 张或更多：多个角色允许合并到同一张，manifest 用 `roles` 数组记录；单图必须同时承担 `cover`、`catalog`、`cta`。`auto` 优先选择 2–3 张，技能总数仍超出每页上限时继续增加能力页。确定性源可以保留以便复现，最终对外图片必须是位图。
 
 重生使用 `02-...md` 与 `...-v2.png`，不覆盖旧版本。未选中的候选图不进入最终交付目录，除非客户明确要求保留对比版本。普通模板的正式产物不包含 HTML；两阶段模板可保留确定性合成源，但终稿必须是位图。
@@ -243,7 +250,7 @@ quick: false
 - `cover`：抓一个最强视觉隐喻，标题必须逐字使用客户/原文标题。
 - `summary_card`：抓一句主命题、1–3 个关键词和必要补充解释，不把整篇文章塞进图。
 - `learning_note`：先生成问题—答案覆盖表，再组织为左侧线索、右侧笔记、底部回顾。
-- `social_card` / `carousel`：先锁定平台、`slide_count`、`claim_mode` 和 `cta_mode`；允许 1、2、3 张或自动分页，全量能力超过每页密度上限时继续拆页，不缩小文字硬塞。
+- `social_card` / `carousel`：先锁定平台、`slide_count`、`narrative_mode`、`claim_mode` 和 `cta_mode`。客户要求“推荐仓库 + 重点技能”时选 `repository_feature_pair`，默认严格两页；只有真实效果证据确实需要独立展示时才增加证据页，不生成抽象能力地图凑页数。普通目录型轮播允许自动分页，全量能力超过每页密度上限时继续拆页，不缩小文字硬塞。
 - `icon`：只提炼一个字形隐喻；图标家族参数与终稿规格见模板。
 - 不代写客户观点；输入缺少结论时标注缺失，不凭空补事实。
 
@@ -261,6 +268,8 @@ python3 scripts/build_social_catalog_facts.py \
 ```
 
 核对 `displayed_skill_count`、技能名/展示标签、版本、CTA 和仓库 URL。展示标签默认来自 `agents/openai.yaml`；需要中文短名时另加 `--label-map <label-map.yml>`，不在版面阶段临时改名。客户提供的数字与仓库不一致时，以事实清单为准并明确提示；不得继续把旧数字画进图。
+
+`repository_feature_pair` 还必须完整读取仓库 `README.md` 和重点技能 `SKILL.md`，把来源路径、钩子、输入、能力、优势、工作流、交付物、验证方式、安全边界和可核验数字写入 `<output-dir>/content-facts.yml`。不要只根据技能名或一句简介扩写卖点；仓库文档没有声明的功能、格式、版本或效果不得进入 Prompt。
 
 多仓系列先复制 [social-card-batch.example.yml](references/social-card-batch.example.yml)，逐项写明 `include` 与 `exclude`，再运行：
 
@@ -291,7 +300,7 @@ python3 scripts/build_social_catalog_batch.py \
 
 ### 5. 真实验收
 
-按 [quality-gates.md](references/quality-gates.md) 检查：文件类型、尺寸、逐字文字、布局、视觉质量、参考图相似性和来源保真。必须实际 `view_image`；只看命令退出码不算通过。社交宣传卡还必须运行 `validate_social_catalog_delivery.py`，并保留 OCR、二维码解码和移动端缩略预览证据。
+按 [quality-gates.md](references/quality-gates.md) 检查：文件类型、尺寸、逐字文字、布局、视觉质量、参考图相似性、语义密度和来源保真。必须实际 `view_image`；只看命令退出码不算通过。社交宣传卡还必须运行 `validate_social_catalog_delivery.py`，并保留 OCR、二维码解码、移动端缩略预览、伪证据扫描与人工高风险文字复核。
 
 ### 6. 失败重生
 

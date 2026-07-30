@@ -77,6 +77,46 @@ def validate_delivery(
             continue
         displayed.extend(str(item) for item in skills)
 
+    narrative_mode = nested(delivery, "presentation", "narrative_mode")
+    if narrative_mode:
+        narrative_contract = nested(contract, "narrative_modes", str(narrative_mode))
+        if not isinstance(narrative_contract, dict):
+            errors.append(f"unsupported narrative_mode: {narrative_mode!r}")
+        else:
+            expected_count = int(narrative_contract.get("default_slide_count", 0))
+            if expected_count and len(slides) != expected_count:
+                errors.append(
+                    f"narrative_mode {narrative_mode!r} requires exactly "
+                    f"{expected_count} slides; got {len(slides)}"
+                )
+            slide_contracts = narrative_contract.get("slides", []) or []
+            for index, expected_slide in enumerate(slide_contracts, start=1):
+                if index > len(slides) or not isinstance(expected_slide, dict):
+                    continue
+                slide = slides[index - 1]
+                if not isinstance(slide, dict):
+                    continue
+                actual_roles = slide.get("roles") or [slide.get("role")]
+                expected_role = expected_slide.get("role")
+                if expected_role not in actual_roles:
+                    errors.append(
+                        f"narrative slide {index} missing required role: {expected_role}"
+                    )
+                actual_sections = set(slide.get("sections", []) or [])
+                required_sections = set(expected_slide.get("required_sections", []) or [])
+                missing_sections = sorted(required_sections - actual_sections)
+                if missing_sections:
+                    errors.append(
+                        f"narrative slide {index} missing required sections: "
+                        + ", ".join(missing_sections)
+                    )
+            source_evidence = nested(delivery, "source", "evidence")
+            if not isinstance(source_evidence, dict):
+                source_evidence = {}
+            for source_name in narrative_contract.get("required_sources", []) or []:
+                if source_evidence.get(source_name) is not True:
+                    errors.append(f"source.evidence.{source_name} must be true")
+
     if Counter(displayed) != Counter(expected_skills):
         errors.append("displayed skill names/counts do not exactly match the facts manifest")
     duplicates = sorted(name for name, count in Counter(displayed).items() if count > 1)

@@ -25,7 +25,8 @@ class ArticleImageContractTest(unittest.TestCase):
 
     def test_registry_declares_atomic_prompt_blocks(self) -> None:
         registry = yaml.safe_load((SKILL / "references" / "template-registry.yml").read_text(encoding="utf-8"))
-        self.assertEqual(registry["schema_version"], 4)
+        self.assertEqual(registry["schema_version"], 5)
+        self.assertIn("narrative_mode", registry["selection_order"])
         self.assertEqual(
             registry["prompt_blocks"]["required"],
             [
@@ -61,6 +62,33 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertIn("每一张图都要写清楚来源、画面任务、固定空间关系", content)
         self.assertIn("direct_poster`（默认）", content)
         self.assertIn("不要只画一个孤立的 3D 主视觉", content)
+        self.assertIn("repository_feature_pair", content)
+        self.assertIn("信息密度指“每一块都帮助读者做判断”", content)
+        self.assertIn("content-facts.yml", content)
+        self.assertIn("结构示意", content)
+
+    def test_repository_feature_pair_contract_requires_semantic_density_and_sources(self) -> None:
+        contract = yaml.safe_load(
+            (SKILL / "references" / "social-card-contract.yml").read_text(encoding="utf-8")
+        )
+        self.assertEqual(contract["schema_version"], 2)
+        pair = contract["narrative_modes"]["repository_feature_pair"]
+        self.assertEqual(pair["default_slide_count"], 2)
+        self.assertEqual(
+            [slide["role"] for slide in pair["slides"]],
+            ["repository_recommendation", "featured_skill_deep_dive"],
+        )
+        self.assertIn("featured_skill_md", pair["required_sources"])
+        self.assertIn("content_facts_yml", pair["required_sources"])
+        self.assertTrue(pair["forbid_abstract_extra_slide_without_real_evidence"])
+        self.assertIn("semantic_density_review", contract["required_quality_evidence"])
+        self.assertIn("hallucinated_evidence_scan", contract["required_quality_evidence"])
+
+    def test_skill_forbids_ad_hoc_delivery_roots(self) -> None:
+        content = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("resolve_output_dir.py --source <source> --json", content)
+        self.assertIn("<topic>-delivery-<date>", content)
+        self.assertIn("output_dir_origin", content)
 
     def test_input_contract_lists_registered_specialized_types(self) -> None:
         content = (SKILL / "SKILL.md").read_text(encoding="utf-8")

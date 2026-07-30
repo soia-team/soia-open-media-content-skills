@@ -58,7 +58,7 @@ Skills marked 🟡 need a platform session or image-generation capability; each 
 | Skill | Responsibility | Ready to use |
 |---|---|---|
 | `soia-media-compose-article-draft` | Turn distilled opinions into a finished article draft ready for the publishing skills. | ✅ |
-| `soia-media-generate-article-image` | Generate covers, summary cards, note graphics, or catalog promo cards, with a fact list and bitmap acceptance. | 🟡 |
+| `soia-media-generate-article-image` | Generate covers, summary cards, note graphics, or semantically dense catalog promo cards, with deep source grounding, a two-slide recommendation narrative, and bitmap acceptance. | 🟡 |
 | `soia-media-publish-rednote-card` | Rewrite a draft as a Rednote note: catchy title, short paragraphs, hashtags, and image suggestions. | ✅ |
 | `soia-media-publish-wechat-draft` | Format as inline-styled WeChat HTML and push to the draft box — drafts only, never mass-sent. | 🟡 |
 | `soia-media-publish-x-article` | Upload a Markdown draft to X Articles, validate formatting, and save as a draft only. | 🟡 |

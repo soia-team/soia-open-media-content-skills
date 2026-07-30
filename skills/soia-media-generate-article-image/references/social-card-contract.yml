@@ -1,4 +1,16 @@
-schema_version: 1
+schema_version: 2
+
+narrative_modes:
+  repository_feature_pair:
+    default_slide_count: 2
+    slides:
+      - role: repository_recommendation
+        required_sections: [hook, proof_scale, capability_structure, featured_skill, deliverable_shape, cta]
+      - role: featured_skill_deep_dive
+        required_sections: [hook, inputs, capabilities, advantages, workflow, deliverables, validation, guardrails, cta]
+    required_sources: [repository_readme, featured_skill_md, facts_yml, content_facts_yml]
+    forbid_abstract_extra_slide_without_real_evidence: true
+    forbid_unsourced_evidence_values: true
 
 platforms:
   rednote:
@@ -59,3 +71,6 @@ required_quality_evidence:
   - mobile_preview
   - view_image
   - hero_art_reviewed
+  - semantic_density_review
+  - source_claim_traceability
+  - hallucinated_evidence_scan
