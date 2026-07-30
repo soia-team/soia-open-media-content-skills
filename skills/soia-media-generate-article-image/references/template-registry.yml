@@ -1,4 +1,4 @@
-schema_version: 4
+schema_version: 5
 
 selection_order:
   - image_type
@@ -6,6 +6,7 @@ selection_order:
   - platform
   - layout_mode
   - slide_count
+  - narrative_mode
   - visual_style
   - scene_or_symbol
 
@@ -61,7 +62,7 @@ templates:
     render_modes: [direct_poster, hybrid_exact_text]
     default_render_mode: direct_poster
     deterministic_fields: [claim, skill_labels, install_command, repository_url, qr_code, brand_logos]
-    use_when: "需要把开源技能库、插件集合或产品能力清单做成朋友圈单图或小红书轮播，并确保数量、命令、URL 与二维码可机械核验"
+    use_when: "需要把开源技能库、插件集合或产品能力清单做成高信息密度朋友圈单图/小红书轮播，或用双页结构推荐仓库与重点技能，并确保事实、数量、命令、URL 与二维码可核验"
 
   - id: plugin_icon
     image_type: [icon]

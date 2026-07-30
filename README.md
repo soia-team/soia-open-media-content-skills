@@ -58,7 +58,7 @@
 | 技能 | 一句话职责 | 开箱可用 |
 |---|---|---|
 | `soia-media-compose-article-draft` | 把 distill 提炼出的观点写成成文草稿。 | ✅ |
-| `soia-media-generate-article-image` | 为文章生成封面、小结卡、笔记图或技能库宣传卡，含事实清单与位图验收。 | 🟡 |
+| `soia-media-generate-article-image` | 为文章生成封面、小结卡、笔记图或高信息密度技能库宣传卡，含深层事实采集、双页推荐叙事与位图验收。 | 🟡 |
 | `soia-media-publish-rednote-card` | 改写成小红书笔记：吸睛标题、短段落、话题标签与配图建议。 | ✅ |
 | `soia-media-publish-wechat-draft` | 排版成公众号内联样式 HTML 并推入草稿箱，只建草稿绝不群发。 | 🟡 |
 | `soia-media-publish-x-article` | 将 Markdown 成文上传到 X Articles 草稿箱并校验格式，只保存草稿。 | 🟡 |

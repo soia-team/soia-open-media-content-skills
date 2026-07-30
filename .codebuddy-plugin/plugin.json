@@ -1,0 +1,67 @@
+{
+  "name": "soia-media-content",
+  "version": "1.0.0",
+  "description": "New-media content operator: turns your own opinions into a draft, generates covers and card images, and adapts one draft into WeChat, Rednote and X formats — drafts only, never publishes.",
+  "author": {
+    "name": "soia-team"
+  },
+  "agents": [
+    "./agents/soia-media-content.md"
+  ],
+  "skills": [
+    "./skills/soia-media-compose-article-draft",
+    "./skills/soia-media-generate-article-image",
+    "./skills/soia-media-publish-rednote-card",
+    "./skills/soia-media-publish-wechat-draft",
+    "./skills/soia-media-publish-x-article",
+    "./skills/soia-media-publish-x-thread"
+  ],
+  "expertType": "agent",
+  "agentName": "soia-media-content",
+  "displayName": {
+    "en": "Soia Media",
+    "zh": "Soia Media"
+  },
+  "profession": {
+    "en": "New Media Operator",
+    "zh": "新媒体运营"
+  },
+  "displayDescription": {
+    "en": "Turns your opinions into a full draft with imagery, then adapts it for WeChat, Rednote and X — drafts only, never auto-publishes.",
+    "zh": "把你的观点写成成文草稿并配图，再改写成公众号、小红书与 X 版本；只建草稿，不自动群发。"
+  },
+  "avatar": "assets/icon.png",
+  "categoryId": "05-MarketingGrowth",
+  "defaultInitPrompt": {
+    "en": "I have a point of view I want to write up and adapt for several platforms. Take it from draft to platform-ready — drafts only, I will hit publish myself.",
+    "zh": "我有个观点想写成文章并分发到几个平台，帮我从草稿做到各平台可发状态；只建草稿，我自己点发布。"
+  },
+  "tags": [
+    {
+      "en": "WeChat Publishing",
+      "zh": "公众号运营"
+    },
+    {
+      "en": "Rednote Notes",
+      "zh": "小红书笔记"
+    },
+    {
+      "en": "Multi-platform Adaptation",
+      "zh": "多平台改写"
+    }
+  ],
+  "quickPrompts": [
+    {
+      "en": "I have a point of view I want to write up and adapt for several platforms. Take it from draft to platform-ready — drafts only, I will hit publish myself.",
+      "zh": "我有个观点想写成文章并分发到几个平台，帮我从草稿做到各平台可发状态；只建草稿，我自己点发布。"
+    },
+    {
+      "en": "Rewrite this draft as a Rednote note with a catchy title and topic tags.",
+      "zh": "把这篇草稿改写成小红书笔记，起个吸睛标题并配好话题标签。"
+    },
+    {
+      "en": "Generate a cover image and summary cards for this article.",
+      "zh": "给这篇文章生成封面图和小结卡片。"
+    }
+  ]
+}

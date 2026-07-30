@@ -109,6 +109,9 @@ class SocialCatalogTest(unittest.TestCase):
                 "mobile_preview": True,
                 "view_image": True,
                 "hero_art_reviewed": True,
+                "semantic_density_review": True,
+                "source_claim_traceability": True,
+                "hallucinated_evidence_scan": True,
                 "qr_decoded_target": facts["cta"]["repository_url"],
             },
         }
@@ -345,6 +348,42 @@ class SocialCatalogTest(unittest.TestCase):
         errors = VALIDATOR.validate_delivery(facts, delivery, CONTRACT)
         self.assertIn("quality.view_image must be true", errors)
         self.assertIn("quality.renderer must be deterministic-compositor", errors)
+
+    def test_missing_semantic_density_review_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            facts = self.make_facts(Path(temp))
+        delivery = self.make_delivery(facts)
+        delivery["quality"]["semantic_density_review"] = False
+        errors = VALIDATOR.validate_delivery(facts, delivery, CONTRACT)
+        self.assertIn("quality.semantic_density_review must be true", errors)
+
+    def test_repository_feature_pair_requires_two_sourced_role_complete_slides(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            facts = self.make_facts(Path(temp), count=2)
+        delivery = self.make_delivery(facts)
+        skills = [item["name"] for item in facts["catalog"]["displayed_skills"]]
+        pair = CONTRACT["narrative_modes"]["repository_feature_pair"]
+        delivery["presentation"]["narrative_mode"] = "repository_feature_pair"
+        delivery["presentation"]["slides"] = [
+            {
+                "roles": ["repository_recommendation", "cover", "catalog"],
+                "sections": list(pair["slides"][0]["required_sections"]),
+                "displayed_skills": skills,
+            },
+            {
+                "roles": ["featured_skill_deep_dive", "highlight", "cta"],
+                "sections": list(pair["slides"][1]["required_sections"]),
+                "displayed_skills": [],
+            },
+        ]
+        delivery["source"]["evidence"] = {
+            name: True for name in pair["required_sources"]
+        }
+        self.assertEqual(VALIDATOR.validate_delivery(facts, delivery, CONTRACT), [])
+
+        delivery["presentation"]["slides"][1]["sections"].remove("validation")
+        errors = VALIDATOR.validate_delivery(facts, delivery, CONTRACT)
+        self.assertTrue(any("missing required sections: validation" in item for item in errors))
 
     def test_duplicate_skill_on_two_slides_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
