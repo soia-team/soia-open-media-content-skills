@@ -1,129 +1,97 @@
-# SOIA Social Content Skills
+<div align="center">
 
-[中文](README.md) · English
+<img src="assets/icon.png" width="88" alt="">
 
-From a point of view to multi-platform publishing: draft, illustrate, reformat per platform — drafts only, never auto-send.
+# SOIA Open Media Content Skills
 
-## What this is
+**One draft, adapted for three platforms — you always press publish**
 
-`soia-open-media-content-skills` covers the last mile of content production:
+6 skills for drafting, imagery and per-platform adaptation. Drafts only, never an automatic broadcast
 
-```text
-Your point of view / material
-    ↓
-Article draft (compose)
-    ↓
-Imagery (cover / summary card / metaphor poster)
-    ↓
-Per-platform rewrite (WeChat HTML · X thread · X Article · Rednote note)
-    ↓
-Draft box (you confirm and publish)
+[中文](README.md) · English · [Ecosystem portal](https://github.com/soia-team/soia-open-skills)
+
+</div>
+
+---
+
+## What it solves
+
+You finish a piece, and then WeChat wants inline styles, Rednote wants short paragraphs with topic tags, X wants numbered parts — the same content reworked three times by hand. What's missing is **a pipeline from opinion to per-platform drafts**, not a bot that presses publish for you.
+
+```mermaid
+flowchart LR
+    A["Your opinion<br/>+ vault excerpts"] --> B["Draft<br/>full article"]
+    B --> C["Imagery<br/>cover · summary cards · poster"]
+    B --> D["WeChat<br/>inline-style HTML"]
+    B --> E["Rednote<br/>title · short paras · tags"]
+    B --> F["X<br/>thread / Article"]
+    D --> G["Draft box"]
+    F --> G
+    E --> H["You paste it manually"]
 ```
 
-**Publishing stays in your hands**: WeChat only creates drafts and never mass-sends, X only saves drafts and never clicks publish, Rednote produces text you paste yourself.
+## 6 skills
 
-### When to use it
+### 01 Drafting and imagery　`Opinion and material → a full draft plus visuals`
 
-- "Write these points up as an article."
-- "Generate a cover image for this piece."
-- "Format it for WeChat and push it to the draft box."
-- "Split it into an X thread, respect the character limit."
-- "Rewrite it as a Rednote note with hashtags."
+| Skill | Responsibility | Ready |
+|---|---|:-:|
+| `soia-media-compose-article-draft` | Writes a full draft with your opinion as the spine and vault excerpts as material; WeChat / Zhihu / essay styles | ✅ |
+| `soia-media-generate-article-image` | Covers, summary cards, Cornell-notes images and metaphor posters, with prompt provenance and bitmap acceptance | 🟡 |
 
-### What it does not do
+### 02 Adaptation and drafts　`One draft → publish-ready on three platforms`
 
-- Does not publish. Every publishing skill stops at the draft box; the final step is yours on the platform.
-- Does not invent facts. Both imagery and prose require a fact list first; anything uncertain is marked "unverified" rather than guessed.
-- Does not pick topics or distill opinions — that is the distill family in [soia-open-pkm-vault-skills](https://github.com/soia-team/soia-open-pkm-vault-skills).
-- Does not take over your accounts. Platform sessions stay in their official flows — never in the repo or logs.
+| Skill | Responsibility | Ready |
+|---|---|:-:|
+| `soia-media-publish-wechat-draft` | Formats to WeChat-compliant inline-style HTML, mechanically validated before entering the draft box | 🟡 |
+| `soia-media-publish-rednote-card` | Rewrites into a Rednote note: catchy title, 3–5 short paragraphs, topic tags, image suggestions | ✅ |
+| `soia-media-publish-x-thread` | Rewrites into a numbered, length-compliant X thread; saves a draft when authorized | 🟡 |
+| `soia-media-publish-x-article` | Uploads a Markdown piece to the X Articles draft box and validates the format | 🟡 |
 
-## Where to start
-
-The typical flow is compose → illustrate → publish per platform:
-
-| Your task | Use | Done when |
-|---|---|---|
-| Write points up as an article | `soia-media-compose-article-draft` | A draft ready for the publishing skills |
-| Generate imagery | `soia-media-generate-article-image` | Prompt persisted, bitmap acceptance passed |
-| Publish to WeChat | `soia-media-publish-wechat-draft` | Inline-styled HTML in the draft box, not sent |
-| Publish to X | `soia-media-publish-x-thread` or `-x-article` | Draft saved, publish not clicked |
-| Publish to Rednote | `soia-media-publish-rednote-card` | Title, body, tags, and image suggestions complete |
-
-Skills marked 🟡 need a platform session or image-generation capability; each checks before running.
-
-## Skill catalog
-
-> **Ready to use**: ✅ works right after install · 🟡 needs an API key or a third-party login first
-
-| Skill | Responsibility | Ready to use |
-|---|---|---|
-| `soia-media-compose-article-draft` | Turn distilled opinions into a finished article draft ready for the publishing skills. | ✅ |
-| `soia-media-generate-article-image` | Generate covers, summary cards, note graphics, or semantically dense catalog promo cards, with deep source grounding, a two-slide recommendation narrative, and bitmap acceptance. | 🟡 |
-| `soia-media-publish-rednote-card` | Rewrite a draft as a Rednote note: catchy title, short paragraphs, hashtags, and image suggestions. | ✅ |
-| `soia-media-publish-wechat-draft` | Format as inline-styled WeChat HTML and push to the draft box — drafts only, never mass-sent. | 🟡 |
-| `soia-media-publish-x-article` | Upload a Markdown draft to X Articles, validate formatting, and save as a draft only. | 🟡 |
-| `soia-media-publish-x-thread` | Split a draft into a numbered, length-compliant X thread; saves a draft only when authorized. | 🟡 |
-
-## Trigger phrases
-
-Once installed, just speak naturally — the agent routes to a skill by these phrases (the full trigger list lives in each skill's `SKILL.md` `description`).
-
-> Trigger phrases are listed in the language the skill actually matches on. Most are Chinese because that is what these skills were written to recognize; describing the same intent in English works too — the agent matches on meaning, not on the literal string.
-
-| You say | Skill |
-|---|---|
-| `把这些观点写成一篇` / `把 X 主题写成文章` / `compose 这篇` / `写成草稿` | `soia-media-compose-article-draft` |
-| `生成文章图片` / `正文小结图` / `康奈尔笔记图` / `技能库宣传图` | `soia-media-generate-article-image` |
-| `发成小红书` / `小红书笔记` / `改成 rednote` / `rednote 这篇` | `soia-media-publish-rednote-card` |
-| `把这篇发成公众号` / `排版这篇公众号` / `推到公众号草稿箱` / `公众号 draft` | `soia-media-publish-wechat-draft` |
-| `发成 X Article` / `推到 X 文章草稿箱` | `soia-media-publish-x-article` |
-| `发成 X thread` / `拆成推文串` / `thread 这篇` | `soia-media-publish-x-thread` |
+✅ Works right after install　🟡 Needs platform authorization or an API key first; the skill tells you what is missing before it runs
 
 ## Install
 
-Installing the whole domain plugin is recommended — it brings every skill in this repo:
+Any of three hosts. Installing the domain plugin brings all 6 skills at once.
 
 ```bash
-claude plugin marketplace add soia-team/soia-open-skills
+claude plugin marketplace add soia-team/soia-open-skills && claude plugin install soia-media-content@soia
 ```
 
 ```bash
-claude plugin install soia-media-content@soia
+codex plugin marketplace add soia-team/soia-open-skills && codex plugin add soia-media-content@soia
 ```
 
-For Codex:
+WorkBuddy is a desktop app with no CLI, so a skill does the work — tell your agent "install into WorkBuddy", or run:
 
 ```bash
-codex plugin marketplace add soia-team/soia-open-skills
-codex plugin add soia-media-content@soia
+python3 <soia-open-skills>/skills/soia-meta-skill-release/scripts/install_workbuddy_experts.py soia-media-content
 ```
 
-For a single skill you can use the npx route. Note the skill lands in the shared
-source `~/.agents/skills`; if the plugin is installed too, the same skill shows up
-twice and the two copies drift apart — pick one:
+Restart the client, then summon **Soia · 新媒体运营** under Experts → My Experts.
+
+> **Always-on cost ~728 tok**. `claude plugin disable soia-media-content@soia` drops it to zero; enable it again any time.
+> For a single skill use npx: `npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s <skill-name> -y` — pick one route or the other; running both puts the same skill in the index twice and the copies drift apart.
+
+## What it does not do
+
+This is the most important section in this repo — read it before using anything here.
+
+- **Never publishes automatically.** WeChat gets a draft and **never a broadcast**; X gets a saved draft, never a post; Rednote gets text you paste yourself. This is a hard boundary — urgency does not move it, and blanket pre-authorization ("just stop asking me") is not accepted.
+- **Does not write your opinions.** The skills organize expression; they do not manufacture a position. If you cannot articulate one, distill it first in the [vault domain](https://github.com/soia-team/soia-open-pkm-vault-skills).
+- **Does not invent facts on images.** Before generating, it lists the facts that will appear and checks them with you.
+- **Does not store platform credentials.** WeChat and X sessions stay in their official flows — never in the repo or the logs.
+
+## Contributing
+
+Before committing a skill change:
 
 ```bash
-npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s <skill-name> -y
+python3 -m unittest discover -s tests -p 'test_*.py' && python3 scripts/audit_skills.py --strict && python3 scripts/generate_expert_manifest.py --check
 ```
 
-## Validate & contribute
-
-After changing a skill, run before committing:
-
-```bash
-python3 -m unittest discover -s tests -p 'test_*.py'
-python3 scripts/generate_skill_catalog.py --check
-python3 scripts/audit_skills.py --strict
-```
-
-Contribution flow, the skill contract, and release steps are in the portal's
-[CONTRIBUTING.md](https://github.com/soia-team/soia-open-skills/blob/main/CONTRIBUTING.md).
-
-## Ecosystem
-
-Specifications, the full ecosystem catalog, and install guides live in [soia-team/soia-open-skills](https://github.com/soia-team/soia-open-skills).
-The full maintenance workflow is in [CONTRIBUTING.md](https://github.com/soia-team/soia-open-skills/blob/main/CONTRIBUTING.md).
+Full workflow in the portal's [CONTRIBUTING.md](https://github.com/soia-team/soia-open-skills/blob/main/CONTRIBUTING.md).
 
 ## License
 
-MIT License — see [LICENSE](./LICENSE).
+MIT — see [LICENSE](./LICENSE).
