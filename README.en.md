@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/hero.webp" width="640" alt="">
+<img src="assets/icon.png" width="88" alt="">
 
 # SOIA Open Media Content Skills
 
@@ -36,17 +36,17 @@ flowchart LR
 
 | Skill | Responsibility | Ready |
 |---|---|:-:|
-| `soia-media-compose-article-draft` | Writes a full draft with your opinion as the spine and vault excerpts as material; WeChat / Zhihu / essay styles | ✅ |
-| `soia-media-generate-article-image` | Covers, summary cards, Cornell-notes images and metaphor posters, with prompt provenance and bitmap acceptance | 🟡 |
+| [`soia-media-compose-article-draft`](https://github.com/soia-team/soia-open-skills/blob/main/docs/skills/soia-media-compose-article-draft.md) | Writes a full draft with your opinion as the spine and vault excerpts as material; WeChat / Zhihu / essay styles | ✅ |
+| [`soia-media-generate-article-image`](https://github.com/soia-team/soia-open-skills/blob/main/docs/skills/soia-media-generate-article-image.md) | Covers, summary cards, Cornell-notes images and metaphor posters, with prompt provenance and bitmap acceptance | 🟡 |
 
 ### 02 Adaptation and drafts　`One draft → publish-ready on three platforms`
 
 | Skill | Responsibility | Ready |
 |---|---|:-:|
-| `soia-media-publish-wechat-draft` | Formats to WeChat-compliant inline-style HTML, mechanically validated before entering the draft box | 🟡 |
-| `soia-media-publish-rednote-card` | Rewrites into a Rednote note: catchy title, 3–5 short paragraphs, topic tags, image suggestions | ✅ |
-| `soia-media-publish-x-thread` | Rewrites into a numbered, length-compliant X thread; saves a draft when authorized | 🟡 |
-| `soia-media-publish-x-article` | Uploads a Markdown piece to the X Articles draft box and validates the format | 🟡 |
+| [`soia-media-publish-wechat-draft`](https://github.com/soia-team/soia-open-skills/blob/main/docs/skills/soia-media-publish-wechat-draft.md) | Formats to WeChat-compliant inline-style HTML, mechanically validated before entering the draft box | 🟡 |
+| [`soia-media-publish-rednote-card`](https://github.com/soia-team/soia-open-skills/blob/main/docs/skills/soia-media-publish-rednote-card.md) | Rewrites into a Rednote note: catchy title, 3–5 short paragraphs, topic tags, image suggestions | ✅ |
+| [`soia-media-publish-x-thread`](https://github.com/soia-team/soia-open-skills/blob/main/docs/skills/soia-media-publish-x-thread.md) | Rewrites into a numbered, length-compliant X thread; saves a draft when authorized | 🟡 |
+| [`soia-media-publish-x-article`](https://github.com/soia-team/soia-open-skills/blob/main/docs/skills/soia-media-publish-x-article.md) | Uploads a Markdown piece to the X Articles draft box and validates the format | 🟡 |
 
 ✅ Works right after install　🟡 Needs platform authorization or an API key first; the skill tells you what is missing before it runs
 

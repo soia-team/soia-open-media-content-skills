@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/hero.webp" width="640" alt="">
+<img src="assets/icon.png" width="88" alt="">
 
 # SOIA Open Media Content Skills
 
@@ -36,17 +36,17 @@ flowchart LR
 
 | 技能 | 职责 | 开箱 |
 |---|---|:-:|
-| `soia-media-compose-article-draft` | 以你的观点为骨、vault 摘抄为料写成完整草稿；可指定公众号/知乎/随笔风格 | ✅ |
-| `soia-media-generate-article-image` | 生成封面、正文小结卡、康奈尔笔记图或视觉隐喻海报，含 Prompt 落盘与位图验收 | 🟡 |
+| [`soia-media-compose-article-draft`](https://github.com/soia-team/soia-open-skills/blob/main/docs/skills/soia-media-compose-article-draft.md) | 以你的观点为骨、vault 摘抄为料写成完整草稿；可指定公众号/知乎/随笔风格 | ✅ |
+| [`soia-media-generate-article-image`](https://github.com/soia-team/soia-open-skills/blob/main/docs/skills/soia-media-generate-article-image.md) | 生成封面、正文小结卡、康奈尔笔记图或视觉隐喻海报，含 Prompt 落盘与位图验收 | 🟡 |
 
 ### 02 平台改写与落草稿　`一份成文 → 三平台可发状态`
 
 | 技能 | 职责 | 开箱 |
 |---|---|:-:|
-| `soia-media-publish-wechat-draft` | 排版成符合公众号限制的内联样式 HTML，机械校验通过后推入草稿箱 | 🟡 |
-| `soia-media-publish-rednote-card` | 改写成小红书笔记：吸睛标题、3–5 段短文、话题标签与配图建议 | ✅ |
-| `soia-media-publish-x-thread` | 改写为带编号、符合字数限制的 X thread，可按授权存草稿 | 🟡 |
-| `soia-media-publish-x-article` | 把 Markdown 成文上传到 X Articles 草稿箱并校验格式 | 🟡 |
+| [`soia-media-publish-wechat-draft`](https://github.com/soia-team/soia-open-skills/blob/main/docs/skills/soia-media-publish-wechat-draft.md) | 排版成符合公众号限制的内联样式 HTML，机械校验通过后推入草稿箱 | 🟡 |
+| [`soia-media-publish-rednote-card`](https://github.com/soia-team/soia-open-skills/blob/main/docs/skills/soia-media-publish-rednote-card.md) | 改写成小红书笔记：吸睛标题、3–5 段短文、话题标签与配图建议 | ✅ |
+| [`soia-media-publish-x-thread`](https://github.com/soia-team/soia-open-skills/blob/main/docs/skills/soia-media-publish-x-thread.md) | 改写为带编号、符合字数限制的 X thread，可按授权存草稿 | 🟡 |
+| [`soia-media-publish-x-article`](https://github.com/soia-team/soia-open-skills/blob/main/docs/skills/soia-media-publish-x-article.md) | 把 Markdown 成文上传到 X Articles 草稿箱并校验格式 | 🟡 |
 
 ✅ 装完即用　🟡 需先完成平台授权或申请 API key，技能会在执行前告诉你缺什么
 
