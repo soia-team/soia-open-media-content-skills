@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import runpy
 import struct
 import unittest
 from pathlib import Path
@@ -25,8 +26,10 @@ class ArticleImageContractTest(unittest.TestCase):
 
     def test_registry_declares_atomic_prompt_blocks(self) -> None:
         registry = yaml.safe_load((SKILL / "references" / "template-registry.yml").read_text(encoding="utf-8"))
-        self.assertEqual(registry["schema_version"], 6)
+        self.assertEqual(registry["schema_version"], 7)
         self.assertIn("narrative_mode", registry["selection_order"])
+        for axis in ("family", "information_structure", "asset_role", "visual_mechanism", "aesthetic_system", "text_strategy", "model_adapter"):
+            self.assertIn(axis, registry["selection_order"])
         self.assertEqual(
             registry["prompt_blocks"]["required"],
             [
@@ -81,7 +84,11 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertNotIn("editorial_typographic_mask_batch", templates)
         self.assertEqual(registry["composition_index"], "prompt-composition-index.yml")
         index = yaml.safe_load((SKILL / "references" / registry["composition_index"]).read_text(encoding="utf-8"))
-        self.assertEqual(index["schema_version"], 1)
+        self.assertEqual(index["schema_version"], 2)
+        self.assertIn("family", index["axes"])
+        self.assertIn("information_structure", index["axes"])
+        self.assertIn("asset_role", index["axes"])
+        self.assertIn("text_strategy", index["axes"])
         self.assertIn("model_adapter", index["axes"])
         self.assertIn("use_case", index["axes"])
         self.assertIn("visual_mechanism", index["axes"])
@@ -91,10 +98,69 @@ class ArticleImageContractTest(unittest.TestCase):
             "typographic_mask",
         )
         self.assertIn("GPT2", index["examples"][0]["query"])
+        self.assertEqual(index["family_catalog"], "prompt-family-catalog.md")
+        support = index["support_catalog"]
+        self.assertEqual(support["counts"]["delivery_presets"], 6)
+        registry_presets = {
+            item["id"]
+            for item in registry["templates"]
+        }
+        catalog_presets = {
+            item["id"]
+            for item in support["supported_delivery_presets"]
+        }
+        self.assertEqual(len(catalog_presets), support["counts"]["delivery_presets"])
+        self.assertEqual(catalog_presets, registry_presets)
+        self.assertEqual(support["delivery_presets_source"], "template-registry.yml#templates")
+        self.assertEqual(support["counts"]["prompt_families"], 10)
+        self.assertEqual(len(support["supported_families"]), support["counts"]["prompt_families"])
+        self.assertEqual(support["counts"]["information_structures"], len(index["axes"]["information_structure"]["options"]))
+        self.assertEqual(support["counts"]["visual_mechanisms"], len(index["axes"]["visual_mechanism"]["options"]))
+        self.assertEqual(support["counts"]["aesthetic_systems"], len(index["axes"]["aesthetic_system"]["options"]))
+        self.assertEqual(support["counts"]["text_strategies"], len(index["axes"]["text_strategy"]["options"]))
+        self.assertEqual(support["counts"]["asset_roles"], len(index["axes"]["asset_role"]["options"]))
+        self.assertIn("ambiguous_when", support["selection_policy"])
+        self.assertIn("first_response", support["selection_policy"])
+        family_catalog = (SKILL / "references" / index["family_catalog"]).read_text(encoding="utf-8")
+        for family_id in (
+            "morning_city",
+            "presentation_grid",
+            "portrait_identity",
+            "celebration_ceremony",
+            "archival_print",
+        ):
+            self.assertIn(family_id, family_catalog)
         mechanism = (SKILL / "references" / "prompt-visual-mechanism-typographic-mask.md").read_text(
             encoding="utf-8"
         )
         self.assertIn("不是独立 preset", mechanism)
+
+    def test_prompt_composition_resolver_maps_multiple_observed_families(self) -> None:
+        resolver = runpy.run_path(
+            str(SKILL / "scripts" / "resolve_prompt_composition.py")
+        )
+        index = yaml.safe_load((SKILL / "references" / "prompt-composition-index.yml").read_text(encoding="utf-8"))
+        morning = resolver["resolve_query"]("GPT2 x 早安 x 字体蒙版 x 美学提示词", index)
+        self.assertEqual(morning["normalized"]["family"], "morning_city")
+        self.assertEqual(morning["normalized"]["visual_mechanism"], "typographic_mask")
+        self.assertEqual(morning["normalized"]["information_structure"], "knowledge_card")
+        wedding = resolver["resolve_query"]("GPT2 x 婚礼 x 请柬 x 婚纱 x 美学提示词", index)
+        self.assertEqual(wedding["normalized"]["family"], "celebration_ceremony")
+        self.assertEqual(wedding["normalized"]["use_case"], "wedding")
+        self.assertEqual(wedding["normalized"]["batch_strategy"], "campaign_pack")
+        self.assertIn(
+            {"axis": "visual_mechanism", "value": "mirror_reflection"},
+            wedding["defaulted"],
+        )
+        self.assertIn("prompt-structure-campaign-pack.md", wedding["references"])
+        self.assertIn("prompt-visual-mechanism-mirror-reflection.md", wedding["references"])
+        self.assertIn("prompt-aesthetic-ceremonial-soft-system.md", wedding["references"])
+        self.assertNotIn("aesthetic_system", {item["axis"] for item in wedding["matched"]})
+        self.assertNotIn("use_case", {item["axis"] for item in wedding["defaulted"]})
+        self.assertNotIn("model_adapter", {item["axis"] for item in wedding["defaulted"]})
+        archival = resolver["resolve_query"]("GPT2 x 票据 x 拓印 x 古籍气质", index)
+        self.assertEqual(archival["normalized"]["family"], "archival_print")
+        self.assertEqual(archival["normalized"]["visual_mechanism"], "archival_collage")
 
     def test_social_catalog_prompt_requires_a_complete_poster_prompt(self) -> None:
         content = (SKILL / "references" / "prompt-social-skill-catalog.md").read_text(
@@ -166,7 +232,15 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertIn("editorial_research_minimal", content)
         self.assertIn("visual_mechanism", content)
         self.assertIn("aesthetic_system", content)
+        self.assertIn("information_structure", content)
+        self.assertIn("text_strategy", content)
+        self.assertIn("prompt-family-catalog.md", content)
         self.assertIn("model_adapter", content)
+        self.assertIn("渐进式选择与加载", content)
+        self.assertIn("--list-supported", content)
+        self.assertIn("L0：支持目录", content)
+        self.assertIn("6 个交付模板和 10 个 Prompt 家族", content)
+        self.assertIn("L3：生成与验收", content)
         self.assertIn("prompt-composition-index.yml", content)
         self.assertIn("build_social_catalog_facts.py", content)
         self.assertIn("validate_social_catalog_delivery.py", content)
