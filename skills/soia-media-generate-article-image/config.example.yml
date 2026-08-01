@@ -12,11 +12,16 @@ paths:
 defaults:
   image_type: auto
   preset: auto
+  family: auto
   use_case: auto
+  information_structure: auto
+  asset_role: auto
   visual_mechanism: auto
   aesthetic_system: auto
+  text_strategy: auto
   model_adapter: auto
   batch_strategy: auto
+  output_mode: auto
   platform: general
   layout_mode: auto
   aspect: auto

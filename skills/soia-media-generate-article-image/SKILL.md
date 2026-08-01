@@ -1,9 +1,9 @@
 ---
 name: soia-media-generate-article-image
 description: 为文章生成封面、小结卡、学习笔记、视觉隐喻海报或高信息密度技能库宣传卡/轮播；按使用场景、视觉机制、美学系统和模型能力组合 Prompt，并完成事实、文字与位图验收。触发：「生成文章图片」「提示词组合」「正文小结图」「康奈尔笔记图」「技能库宣传图」「朋友圈配图」「小红书轮播」
-version: 3.8.0
+version: 3.9.0
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-08-01 16:30:00
+updated_at: 2026-08-01 18:00:00
 created_by: claude opus 4.6
 updated_by: gpt-5.6-sol
 ---
@@ -29,10 +29,46 @@ updated_by: gpt-5.6-sol
 
 1. 提供文章路径、完整正文、明确主题或技能仓路径；给出用途、平台、比例和必须逐字出现的文字。
 2. 如有参考图，明确每张图是“风格参考”“构图参考”还是“编辑目标”。
-3. 指定 `image_type`、交付家族 `preset`、`use_case`、`visual_mechanism`、`aesthetic_system`、模型适配和 `output_dir`；省略时由 Agent 依据文章与用途推荐，并在生成前说明假设。客户说“直接生成”时可跳过确认。
-4. Agent 读取 [模板注册表](references/template-registry.yml)、[组合索引](references/prompt-composition-index.yml) 和对应机制/美学词条；宣传卡先从实际仓库生成 `facts.yml`。若任务是“推荐一个仓库并重点推荐一个技能”，还要完整读取仓库 `README.md` 与重点技能 `SKILL.md`，生成可追溯的 `content-facts.yml`，再为每一张图写完整成品 Prompt。默认由 imagegen 直出整张海报；只有高风险精确字段未通过时才局部确定性校正。
+3. 指定 `image_type`、交付家族 `preset`、Prompt 家族 `family`、使用场景、信息结构、视觉机制、美学系统、模型适配和 `output_dir`；请求明确但省略某个轴时由 Agent 依据文章与用途推荐，并在生成前说明假设。请求含糊时必须先展示 L0 支持目录，由客户选择后再生成；只有组合足够明确时，“直接生成”才可跳过确认。
+4. Agent 读取 [模板注册表](references/template-registry.yml)、[组合索引](references/prompt-composition-index.yml)、[家族目录](references/prompt-family-catalog.md) 和对应机制/结构/文字/美学词条；宣传卡先从实际仓库生成 `facts.yml`。若任务是“推荐一个仓库并重点推荐一个技能”，还要完整读取仓库 `README.md` 与重点技能 `SKILL.md`，生成可追溯的 `content-facts.yml`，再为每一张图写完整成品 Prompt。默认由 imagegen 直出整张海报；只有高风险精确字段未通过时才局部确定性校正。
 5. 多仓系列先用 [批次清单样例](references/social-card-batch.example.yml) 明确纳入与排除范围；脚本拒绝同一仓同时出现在两边。
 6. 生成后必须用 `view_image` 检查比例、构图和参考图；密集宣传卡还要核对语义密度、OCR、CTA、二维码、移动端缩略图、事实指纹和伪证据。失败时重生主视觉或重跑确定性合成源，不直接涂改位图。
+
+### 渐进式选择与加载（必须遵守）
+
+本技能不在首次请求时加载全部长 Prompt。按以下层级推进：
+
+**L0：支持目录。** 只读取 `template-registry.yml` 与 `prompt-composition-index.yml` 的
+`support_catalog`。目录同时列出 6 个交付模板和 10 个 Prompt 家族；客户只说“生成图片/做海报/做得好看”，或没有说明用途、输出形态和主题家族时，
+先运行：
+
+```bash
+python3 scripts/resolve_prompt_composition.py --list-supported
+```
+
+向客户展示支持数量、交付模板和家族摘要，让客户选择 `preset` 或 `family`；不要默认套用早安、字体蒙版或
+`editorial_research_minimal`。
+
+**L1：选家族。** 客户选择后，只确认 `family`、用途、信息结构和输出形态。例如：
+
+```text
+选择 presentation_grid；生成 10 页 PPT；主题是“AI 工作流”；比例 16:9。
+```
+
+或：
+
+```text
+family=celebration_ceremony，use_case=wedding，output_mode=campaign_pack，生成 4 张请柬物料。
+```
+
+**L2：选组合块。** 根据客户选择，只加载一个 family、一个 information_structure、一个
+visual_mechanism、一个 aesthetic_system 和一个 text_strategy 的词条；未指定的轴从该家族
+的 `default_*` 和 `common_*` 中给出 1 个明确建议，并让客户确认或直接生成。
+
+**L3：生成与验收。** 选定组合后才读取长 Prompt、来源事实、品牌资产、社交卡契约和质量门；
+落盘完整组合轴后调用 imagegen，完成 `view_image`、文字和移动端验收。
+
+客户可以随时说“返回上一步换家族”或“保留家族，只换视觉机制”，不得因此复制一套新 preset。
 
 插件市场安装：
 
@@ -122,11 +158,16 @@ SOIA_MEDIA_ARTICLE_IMAGE_OUTPUT_DIR=<custom-output-directory>
 source: <article-path | full-text | topic>
 image_type: <cover | summary_card | learning_note | poster | social_card | carousel | icon | auto>
 preset: <godot_pixel_metaphor | editorial_summary_card | editorial_research_minimal | cornell_notes | social_skill_catalog | plugin_icon | auto>
+family: <auto | morning_city | poster_type_stage | presentation_grid | travel_publication | portrait_identity | event_people | celebration_ceremony | hospitality_food | archival_print | pixel_play>
 use_case: <auto | good_morning | presentation | repository_recommendation | featured_skill | event_poster | birthday_poster | hospitality_poster>
+information_structure: <auto | single_hook | knowledge_card | deck_page | deck_series | carousel_sequence | portrait_brief | campaign_pack>
+asset_role: <auto | none | reference_subject | identity_reference | brand_asset | proof_screenshot | foreground_subject>
 visual_mechanism: <auto | typographic_mask | oversized_type | oversized_type_whitespace | color_field_stage | modular_grid | travel_editorial_narrative | pixel_dissolution>
-aesthetic_system: <auto | editorial_aesthetic | bright_modern | archival_historical | travel_publication>
+aesthetic_system: <auto | editorial_aesthetic | bright_modern | archival_historical | travel_publication | portrait_editorial | ceremonial_soft | hospitality_premium | playful_pixel>
+text_strategy: <auto | exact_text | cjk_exact_text | hero_typography | quote_led | latin_hero_type>
 model_adapter: <auto | builtin_imagegen | external_gpt_image_label | text_orchestrator_only | text_orchestrator_or_provider_dependent>
 batch_strategy: <single | series | auto>
+output_mode: <poster | slide | carousel | campaign_pack | auto>
 purpose: <wechat-cover | x-cover | rednote | wechat-moments | article-inline | poster | plugin-icon>
 platform: <rednote | wechat-moments | general>
 layout_mode: <single | carousel | auto>
@@ -159,9 +200,10 @@ output_dir: <optional-directory>
 quick: false
 ```
 
-`image_type` 决定交付用途，`preset` 决定交付家族；`use_case`、`visual_mechanism` 和
-`aesthetic_system` 共同决定视觉与 Prompt 组合。模型标签只进入 `model_adapter`，不把
-某个第三方模型写成技能依赖。常见交付家族映射：
+`image_type` 决定交付用途，`preset` 决定交付契约；`family` 是 Prompt 检索家族；
+`use_case`、`information_structure`、`visual_mechanism`、`aesthetic_system`、
+`text_strategy` 和 `batch_strategy` 共同决定 Prompt 组合。模型标签只进入 `model_adapter`，
+不把某个第三方模型写成技能依赖。常见交付家族映射：
 
 - `cover + godot_pixel_metaphor`：像素风视觉隐喻封面。
 - `cover|summary_card + editorial_research_minimal`：研究编辑极简风封面/小结卡；固定基础视觉系统，再按主题佐料与系列变量生成变化。
@@ -172,12 +214,13 @@ quick: false
 
 ## 模板路由
 
-1. 读取 [template-registry.yml](references/template-registry.yml) 和 [prompt-composition-index.yml](references/prompt-composition-index.yml)。
-2. 客户指定 preset 时严格使用；未指定时根据 `image_type`、用途和文章结构选最匹配交付家族。
-3. 解析 `use_case × visual_mechanism × aesthetic_system × model_adapter`；只加载命中的机制与美学词条：
+1. L0 只读取 [template-registry.yml](references/template-registry.yml) 和 [prompt-composition-index.yml](references/prompt-composition-index.yml) 的 `support_catalog`；未选择前不加载全部家族长文。
+2. 客户指定 preset/family 时严格使用；未指定且请求明确时，根据 `image_type`、用途和文章结构给出 1 个建议；请求含糊时先展示支持目录让客户选择。
+3. 客户选定后解析 `family × use_case × information_structure × visual_mechanism × aesthetic_system × text_strategy × model_adapter`；只加载命中的家族、机制、结构、文字和美学词条：
    - [组合式 Prompt 框架](references/prompt-composition-framework.md)
+   - [家族目录](references/prompt-family-catalog.md)
    - [字体蒙版机制](references/prompt-visual-mechanism-typographic-mask.md)
-   - 其他机制/美学词条见 `prompt-composition-index.yml` 的 `reference`
+   - 其他家族、机制、结构、文字和美学词条见 `prompt-composition-index.yml` 的 `reference`
 4. 只加载所选交付家族模板：
    - [Godot 像素视觉隐喻](references/prompt-godot-pixel-metaphor.md)
    - [编辑式正文小结卡](references/prompt-editorial-summary-card.md)
@@ -192,7 +235,7 @@ quick: false
 
 先按组合索引归一化请求，再按注册表 `prompt_blocks.required` 的顺序编译最终 Prompt；不从案例库整段复制成品 Prompt：
 
-0. `composition_axes`：记录 `preset / use_case / visual_mechanism / aesthetic_system / batch_strategy / model_adapter` 的解析结果。像“GPT2 x 早安 x 字体蒙版 x 美学提示词”是组合查询，不是一个 preset。
+0. `composition_axes`：记录 `preset / family / use_case / information_structure / asset_role / visual_mechanism / aesthetic_system / text_strategy / batch_strategy / model_adapter` 的解析结果。像“GPT2 x 早安 x 字体蒙版 x 美学提示词”是组合查询，不是一个 preset。
 1. `source_grounding`：列出允许使用的文章事实、禁止代写的观点和缺失信息。
 2. `primary_task`：只写一个主要视觉任务，避免把封面、小结图、信息图混成一张。
 3. `composition_and_layout`：写清主体、焦点、空间关系、留白与移动端阅读顺序。
@@ -205,7 +248,7 @@ quick: false
 
 把“字多”和“信息密度高”分开验收。每个版面区域必须增加一种新的决策信息，不用“能力地图、典型场景、完整闭环”等抽象词重复仓库简介。推荐型双页默认采用五级以上阅读层级：品牌 → 痛点/结果钩子 → 可核验规模与能力结构 → 重点技能 → 输入/工作流/交付/验收 → CTA。标题优先使用痛点、反差或结果，不用“最近整理了”“一套技能覆盖……”作为主钩子。
 
-需要多个概念时，保持同一 preset、视觉机制和美学系统，每版只改变主体、构图、配色、场景中的 2–4 项，并分别落盘；不要同时更换全部风格轴，导致版本无法比较。
+需要多个概念时，保持同一 preset、family、信息结构、视觉机制和美学系统，每版只改变主体、构图、配色、场景中的 2–4 项，并分别落盘；不要同时更换全部风格轴，导致版本无法比较。
 
 ### Prompt 分层：基础视觉系统 + 主题佐料 + 系列变量
 
@@ -216,7 +259,7 @@ quick: false
 - **系列变量**用于候选探索，单次最多改变 2–4 个轴（主体、构图方向、色彩强调、局部标记或裁切位置），并保留 `v1/v2` 文件。
 - **事实层**永远独立于视觉层：标题、数量、技能名、命令、URL、二维码和证据路径进入 `facts.yml` / `content-facts.yml`，逐字核验；不能因为追求风格而改写。
 
-`editorial_research_minimal` 适合文章封面和小结的留白叙事；字体蒙版、巨字留白、模块网格和旅行刊物叙事是可叠加的视觉机制；`social_skill_catalog` 仍然负责仓库推荐/重点技能宣传卡的高信息密度，不得用极简封面交付家族取代能力结构、工作流、交付物和 CTA。
+`editorial_research_minimal` 适合文章封面和小结的留白叙事；字体蒙版、巨字留白、模块网格、旅行刊物、身份锁定、镜面倒影、档案拼贴和材质特写都是可叠加的视觉机制；`social_skill_catalog` 仍然负责仓库推荐/重点技能宣传卡的高信息密度，不得用极简封面交付家族取代能力结构、工作流、交付物和 CTA。
 
 ### 组合查询示例
 
@@ -224,10 +267,13 @@ quick: false
 
 ```yaml
 preset: auto
+family: morning_city
 model_adapter: external_gpt_image_label
 use_case: good_morning
+information_structure: knowledge_card
 visual_mechanism: typographic_mask
 aesthetic_system: editorial_aesthetic
+text_strategy: cjk_exact_text
 batch_strategy: series
 ```
 
@@ -336,7 +382,7 @@ python3 scripts/build_social_catalog_batch.py \
 
 ### 3. 编译并落盘最终 Prompt
 
-生成前创建 `prompts/NN-<preset>-<mechanism>-<slug>.md`，先写组合轴，再按注册表 required blocks 写全：来源边界、主要任务、构图、视觉语言、逐字文字、目标比例/用途和禁止项；有参考图时再写逐张角色。未落盘不得调用生图。
+生成前创建 `prompts/NN-<preset>-<family>-<mechanism>-<slug>.md`，先写组合轴，再按注册表 required blocks 写全：来源边界、主要任务、构图、视觉语言、逐字文字、目标比例/用途和禁止项；有参考图时再写逐张角色。未落盘不得调用生图。
 
 ### 4. 用完整 Prompt 生成终稿
 

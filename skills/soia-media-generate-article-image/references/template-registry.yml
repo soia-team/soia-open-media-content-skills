@@ -1,21 +1,28 @@
-schema_version: 6
+schema_version: 7
 
 selection_order:
   - image_type
   - preset
+  - family
   - use_case
+  - information_structure
+  - asset_role
   - visual_mechanism
   - aesthetic_system
+  - text_strategy
   - platform
   - layout_mode
   - slide_count
   - narrative_mode
   - batch_strategy
   - model_adapter
+  - output_mode
   - render_mode
 
 composition_index: prompt-composition-index.yml
 composition_framework: prompt-composition-framework.md
+family_catalog: prompt-family-catalog.md
+support_catalog: prompt-composition-index.yml#support_catalog
 
 prompt_blocks:
   required:
