@@ -43,6 +43,15 @@ templates:
     text_density: medium
     use_when: "正文需要一张观点小结图，突出主命题、关键词与补充解释"
 
+  - id: editorial_research_minimal
+    image_type: [cover, summary_card]
+    reference: prompt-editorial-research-minimal.md
+    default_aspect: "3:2"
+    output_stem: editorial-research-minimal
+    text_density: medium
+    batch_consistency: optional
+    use_when: "文章封面或小结需要研究编辑式留白、强标题、主题隐喻与克制配色"
+
   - id: cornell_notes
     image_type: [learning_note, summary_card]
     reference: prompt-cornell-notes-infographic.md

@@ -50,6 +50,24 @@ python3 scripts/build_social_catalog_facts.py \
 
 文案钩子优先从三类中选择一种：痛点（“别让 AI 用‘应该没问题’交差”）、反差（“命令能跑，不等于环境能用”）、结果（“把散落资料变成能用的知识资产”）。避免“最近整理了”“一套技能覆盖”“形成完整闭环”等平铺开场。
 
+### 统一 Prompt Deck：底座、佐料与系列变量
+
+仓库推荐与重点技能宣传卡现在必须保存三份 Prompt：
+
+```text
+prompts/00-series-bible.md
+prompts/01-repository-recommendation.md
+prompts/02-featured-skill-deep-dive.md
+```
+
+- `00-series-bible.md` 是**基础视觉系统**：锁定蓝白橙品牌角色（或本系列批准的颜色角色）、字体阶梯、网格、圆角、间距、光线、信息层级和移动端安全区。
+- 每张正式卡都要写自己的完整 `source_grounding / primary_task / composition_and_layout / visual_style_and_materials / exact_text / aspect_and_output / constraints_and_avoid`；不得只写“沿用上一张”。
+- 每张卡的**主题佐料**来自 `facts.yml` 与 `content-facts.yml`：仓库页突出规模、能力结构、重点技能和交付形态；技能页突出输入、工作流、优势、交付物、验收和边界。
+- 需要候选探索时使用**系列变量矩阵**，每个候选只改变 2–4 个轴（主视觉隐喻、构图方向、局部强调色、能力网格或裁切位置），保留 `v1/v2`；不要为了“看起来不一样”整套换风格。
+- 第三方账号或品牌案例只提取可观察的版式、留白、裁切、颜色角色和字体层级，不复制其 Logo、专用字体、原图或逐字提示词。
+
+这套“基础视觉系统 + 主题佐料”规则让系列保持统一，但不会把信息密度压扁成换标题的空模板；事实层、CTA、二维码和 OCR 验收仍以本契约为准。
+
 ## 最终 Prompt 母本
 
 ```text
