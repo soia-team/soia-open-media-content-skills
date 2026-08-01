@@ -1,7 +1,7 @@
 ---
 name: soia-media-generate-article-image
 description: 为文章生成封面、小结卡、学习笔记、视觉隐喻海报或高信息密度技能库宣传卡/轮播；按使用场景、视觉机制、美学系统和模型能力组合 Prompt，并完成事实、文字与位图验收。触发：「生成文章图片」「提示词组合」「正文小结图」「康奈尔笔记图」「技能库宣传图」「朋友圈配图」「小红书轮播」
-version: 3.9.0
+version: 3.10.0
 created_at: 2026-07-09 20:56:44
 updated_at: 2026-08-01 18:00:00
 created_by: claude opus 4.6
@@ -63,7 +63,9 @@ family=celebration_ceremony，use_case=wedding，output_mode=campaign_pack，生
 
 **L2：选组合块。** 根据客户选择，只加载一个 family、一个 information_structure、一个
 visual_mechanism、一个 aesthetic_system 和一个 text_strategy 的词条；未指定的轴从该家族
-的 `default_*` 和 `common_*` 中给出 1 个明确建议，并让客户确认或直接生成。
+的 `default_*` 和 `common_*` 中给出 1 个明确建议，并让客户确认或直接生成。每个命中的词条
+还必须读取 [组合块执行契约](references/prompt-block-contract.yml)，把 `compile_fields` 变成
+本次 Prompt 的真实值；只写“高级、电影感、信息密度高”视为未编译。
 
 **L3：生成与验收。** 选定组合后才读取长 Prompt、来源事实、品牌资产、社交卡契约和质量门；
 落盘完整组合轴后调用 imagegen，完成 `view_image`、文字和移动端验收。
@@ -218,6 +220,7 @@ quick: false
 2. 客户指定 preset/family 时严格使用；未指定且请求明确时，根据 `image_type`、用途和文章结构给出 1 个建议；请求含糊时先展示支持目录让客户选择。
 3. 客户选定后解析 `family × use_case × information_structure × visual_mechanism × aesthetic_system × text_strategy × model_adapter`；只加载命中的家族、机制、结构、文字和美学词条：
    - [组合式 Prompt 框架](references/prompt-composition-framework.md)
+   - [组合块执行契约](references/prompt-block-contract.yml)
    - [家族目录](references/prompt-family-catalog.md)
    - [字体蒙版机制](references/prompt-visual-mechanism-typographic-mask.md)
    - 其他家族、机制、结构、文字和美学词条见 `prompt-composition-index.yml` 的 `reference`
@@ -249,6 +252,25 @@ quick: false
 把“字多”和“信息密度高”分开验收。每个版面区域必须增加一种新的决策信息，不用“能力地图、典型场景、完整闭环”等抽象词重复仓库简介。推荐型双页默认采用五级以上阅读层级：品牌 → 痛点/结果钩子 → 可核验规模与能力结构 → 重点技能 → 输入/工作流/交付/验收 → CTA。标题优先使用痛点、反差或结果，不用“最近整理了”“一套技能覆盖……”作为主钩子。
 
 需要多个概念时，保持同一 preset、family、信息结构、视觉机制和美学系统，每版只改变主体、构图、配色、场景中的 2–4 项，并分别落盘；不要同时更换全部风格轴，导致版本无法比较。
+
+### 组合块的“提示词够不够”判定
+
+组合索引里的结构、机制、美学词条是可复用组件，不是把几个形容词拼在一起。最终 Prompt
+至少要为每个已选块填写以下七类字段；缺一类就先补齐或标记 `BLOCKED`，不得直接生成并写“通过”：
+
+| 字段 | 必须回答的问题 |
+|---|---|
+| `source_grounding` | 哪些事实允许进入图片？哪些字段是 `synthetic_test_data`？ |
+| `role_in_frame` | 这个块在画面中承担标题、主体、证据、动线还是 CTA？ |
+| `composition_parameters` | 区域、比例、列数、边距、阅读顺序和系列变量是什么？ |
+| `visual_parameters` | 色彩角色、材质、光线、字体角色和主体细节是什么？ |
+| `exact_text_policy` | 哪些文字逐字出现、优先级如何、何时切 `hybrid_exact_text`？ |
+| `constraints_and_avoid` | 禁止随机品牌、URL、数字、人物身份、二维码或装饰噪声中的哪些项？ |
+| `acceptance_checks` | 生成后如何用 `view_image`、OCR、缩略图或事实清单判断通过？ |
+
+本轮 18 张真实位图的覆盖记录见 [Prompt 前向测试矩阵](references/prompt-forward-test-matrix.yml)。
+它证明“能出图”与“事实可交付”是两个门槛：高密度目录卡仍须 facts/OCR/二维码验收，不能
+只因一张视觉样张好看就跳过确定性文字层。
 
 ### Prompt 分层：基础视觉系统 + 主题佐料 + 系列变量
 
@@ -430,3 +452,4 @@ python3 scripts/build_social_catalog_batch.py \
 - 仓库：`python3 -m unittest discover -s tests -p 'test_*.py'`
 - 目录：普通模板存在 Prompt + 位图 + manifest；两阶段模板还存在 facts、可复现合成源和机器验收证据。最终交付必须包含位图。
 - 视觉：实际打开最终位图逐项核对，不把“已生成”写成“已通过”。
+- 前向组合契约：`python3 -m unittest tests/test_prompt_forward_matrix.py`，并逐张查看矩阵中登记的真实位图。

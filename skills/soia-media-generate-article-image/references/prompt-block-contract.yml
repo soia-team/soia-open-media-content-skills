@@ -1,0 +1,161 @@
+schema_version: 1
+
+# The index selects blocks; this contract makes every selected block executable.
+# A short style label is never sufficient input to imagegen.
+purpose: "把结构、机制、美学和文字词条编译成带事实、参数、约束和验收的可执行 Prompt"
+
+required_fields:
+  - source_grounding
+  - role_in_frame
+  - composition_parameters
+  - visual_parameters
+  - exact_text_policy
+  - constraints_and_avoid
+  - acceptance_checks
+
+compile_rules:
+  - "每个选择的块都必须填入本契约的 compile_fields；禁止只输出块名或形容词。"
+  - "source_grounding、exact_text_policy 和 constraints_and_avoid 必须逐图落盘。"
+  - "没有来源的数字、地名、人物身份、价格、URL、品牌和效果承诺必须删除或标注 synthetic_test_data。"
+  - "移动端/缩略图任务必须写出阅读顺序和最小可读字段。"
+  - "高风险中文、命令、URL、二维码使用 hybrid_exact_text 或确定性文字层，不把模型看似写对当成事实证明。"
+
+information_structures:
+  single_hook:
+    reference: prompt-structure-single-hook.md
+    compile_fields: [primary_hook, support_facts_1_to_3, cta_or_source, mobile_read_order]
+    acceptance: [one_primary_judgement, no_competing_panels, title_readable_at_thumbnail]
+  knowledge_card:
+    reference: prompt-structure-knowledge-card.md
+    compile_fields: [primary_claim, knowledge_points_3_to_5, evidence_or_examples, source_label]
+    acceptance: [each_region_adds_new_information, hierarchy_is_obvious, no_fabricated_facts]
+  deck_page:
+    reference: prompt-structure-deck-page.md
+    compile_fields: [page_role, title, focal_visual, body_points_3_to_5, footer_baseline]
+    acceptance: [one_page_role, shared_baseline, readable_title_and_body]
+  deck_series:
+    reference: prompt-structure-deck-series.md
+    compile_fields: [series_bible, page_role_table_10, per_page_points_3_to_5, rhythm_variables]
+    acceptance: [non_repeating_roles, fixed_visual_base, page_to_page_consistency]
+  carousel_sequence:
+    reference: prompt-structure-carousel-sequence.md
+    compile_fields: [slide_count, hook_slide, teaching_slides, cta_slide, mobile_safe_area]
+    acceptance: [first_slide_stops_scroll, sequence_has_progression, cta_is_traceable]
+  portrait_brief:
+    reference: prompt-structure-portrait-brief.md
+    compile_fields: [subject_identity, age_boundary, pose_expression, wardrobe, light_lens_scene, intended_use]
+    acceptance: [identity_scope_is_authorized, anatomy_is_plausible, negative_space_is_preserved]
+  campaign_pack:
+    reference: prompt-structure-campaign-pack.md
+    compile_fields: [shared_facts, approved_assets, shared_visual_base, role_table, cta]
+    acceptance: [each_asset_has_role, facts_are_consistent, no_duplicate_filler_pages]
+
+text_strategies:
+  exact_text:
+    reference: prompt-text-exact-layer.md
+    compile_fields: [verbatim_fields, field_priority, fallback_render_mode]
+    acceptance: [title_numbers_names_urls_checked, failed_fields_isolated]
+  cjk_exact_text:
+    reference: prompt-text-cjk-exact-layer.md
+    compile_fields: [short_cjk_fields, font_size_hierarchy, hybrid_exact_text_trigger]
+    acceptance: [cjk_is_legible, punctuation_preserved, no_random_glyphs]
+  hero_typography:
+    reference: prompt-text-hero-typography.md
+    compile_fields: [hero_text, type_scale, tracking_leading, safe_area, secondary_text_slots]
+    acceptance: [hero_is_first_read, glyphs_are_complete, body_is_not_oversized]
+  latin_hero_type:
+    reference: prompt-text-latin-hero-type.md
+    compile_fields: [latin_word, case_spelling, glyph_material, cjk_fact_slots]
+    acceptance: [latin_spelling_exact, cjk_facts_separate, word_remains_readable]
+  quote_led:
+    reference: prompt-text-quote-led.md
+    compile_fields: [source_quote, attribution_boundary, short_supporting_line, source_marker]
+    acceptance: [quote_is_sourced, attribution_not_invented, no_fake_authority]
+
+visual_mechanisms:
+  typographic_mask:
+    reference: prompt-visual-mechanism-typographic-mask.md
+    compile_fields: [mask_word, image_inside_letters, mask_occupancy_35_to_55_percent, anchor_positions, series_variants]
+    acceptance: [word_readable, image_stays_in_mask, facts_not_fabricated]
+  oversized_type:
+    reference: prompt-visual-mechanism-oversized-type.md
+    compile_fields: [short_title, title_scale, whitespace_boundary, one_controlled_image_zone]
+    acceptance: [title_is_first_read, no_information_wall, margins_safe]
+  color_field_stage:
+    reference: prompt-visual-mechanism-color-field-stage.md
+    compile_fields: [field_color, field_area_ratio, subject_layer, title_block_position]
+    acceptance: [field_has_structural_role, contrast_is_sufficient, no_random_gradient]
+  modular_grid:
+    reference: prompt-visual-mechanism-modular-grid.md
+    compile_fields: [column_count, gutters, card_radius, baseline, focal_module, per_card_facts]
+    acceptance: [grid_is_scannable, cards_add_distinct_information, mobile_readability]
+  travel_editorial_narrative:
+    reference: prompt-visual-mechanism-travel-editorial.md
+    compile_fields: [horizontal_subject, horizon_line, reflection, oversized_title, annotation_rail]
+    acceptance: [subject_is_source_grounded, reading_path_is_clear, reflection_is_controlled]
+  mirror_reflection:
+    reference: prompt-visual-mechanism-mirror-reflection.md
+    compile_fields: [reflection_boundary, subject, clarity_drop, ceremony_or_space_role]
+    acceptance: [reflection_preserves_identity, symmetry_is_not_random, title_unobscured]
+  foreground_depth:
+    reference: prompt-visual-mechanism-foreground-depth.md
+    compile_fields: [foreground_object, occlusion_amount, focal_subject, depth_light_order]
+    acceptance: [foreground_has_semantic_role, title_and_key_features_clear, depth_is_visible]
+  identity_lock:
+    reference: prompt-visual-mechanism-identity-lock.md
+    compile_fields: [authorized_identity_attributes, pose, lens, light, background, reference_roles]
+    acceptance: [authorization_is_explicit, no_celebrity_substitution, identity_scope_respected]
+  cinematic_lighting:
+    reference: prompt-visual-mechanism-cinematic-lighting.md
+    compile_fields: [key_light_direction, fill_ratio, shadow_boundary, lens_depth, emotional_purpose]
+    acceptance: [light_serves_subject, shadows_are_coherent, skin_or_material_not_destroyed]
+  commercial_stage:
+    reference: prompt-visual-mechanism-commercial-stage.md
+    compile_fields: [product_or_people, stage_context, light, color_field, cta_fact_source]
+    acceptance: [product_is_primary, claims_are_sourced, no_random_brand_or_price]
+  material_closeup:
+    reference: prompt-visual-mechanism-material-closeup.md
+    compile_fields: [surface_detail, camera_distance, depth_of_field, light, factual_copy]
+    acceptance: [material_is_visible, copy_is_separate, no_unfounded_claims]
+  archival_collage:
+    reference: prompt-visual-mechanism-archival-collage.md
+    compile_fields: [source_objects, layer_order, paper_ink_treatment, source_label, historical_boundary]
+    acceptance: [collage_relations_are_intentional, source_is_visible, no_fake_history]
+  pixel_dissolution:
+    reference: prompt-visual-mechanism-pixel-dissolution.md
+    compile_fields: [subject, dissolution_direction, preserved_identity_zone, pixel_density, background_safe_area]
+    acceptance: [transition_is_controlled, subject_remains_identifiable, no_random_noise]
+
+aesthetic_systems:
+  editorial_aesthetic:
+    reference: prompt-aesthetic-editorial-system.md
+    compile_fields: [background_role, image_role, theme_color, structure_color, material, type_contrast]
+    acceptance: [low_saturation_order, readable_type, theme_has_color_roles]
+  bright_modern:
+    reference: prompt-aesthetic-bright-modern-system.md
+    compile_fields: [background_value, accent_color, support_color, structure_color, contrast_order]
+    acceptance: [high_key_base, one_dominant_accent, distant_readability]
+  archival_historical:
+    reference: prompt-aesthetic-archival-system.md
+    compile_fields: [paper_palette, ink_color, accent_color, print_wear, source_boundary]
+    acceptance: [material_not_fake_history, restrained_wear, source_is_grounded]
+  ceremonial_soft:
+    reference: prompt-aesthetic-ceremonial-soft-system.md
+    compile_fields: [base_saturation, subject_highlight, halo_limit, neutral_text_color, emotional_purpose]
+    acceptance: [soft_light_is_controlled, subject_and_title_prioritized, not_wedding_template_noise]
+  hospitality_premium:
+    reference: prompt-aesthetic-hospitality-premium-system.md
+    compile_fields: [surface_palette, appetite_color, product_light, dark_structure, claim_boundary]
+    acceptance: [material_depth, product_hierarchy, no_unfounded_service_claim]
+  playful_pixel:
+    reference: prompt-aesthetic-playful-pixel-system.md
+    compile_fields: [background, pixel_density, accent_palette, outline_color, preserved_subject_zone]
+    acceptance: [consistent_pixel_scale, subject_recognizable, no_extra_3d_noise]
+  portrait_editorial:
+    reference: prompt-aesthetic-portrait-editorial-system.md
+    compile_fields: [skin_texture, key_light, background, clothing_color_role, shadow_role]
+    acceptance: [natural_skin, age_is_plausible, identity_not_replaced]
+  travel_publication:
+    reference: prompt-aesthetic-travel-publication-system.md
+    compile_fields: [cool_environment, warm_subject, neutral_type, accent_mark, print_treatment]
+    acceptance: [sky_and_white_clean, subject_contrast, annotation_is_controlled]
