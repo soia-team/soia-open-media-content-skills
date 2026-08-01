@@ -55,6 +55,26 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertIn("install_command", social["deterministic_fields"])
         self.assertIn("qr_code", social["deterministic_fields"])
 
+    def test_editorial_research_minimal_is_registered_for_covers_and_summaries(self) -> None:
+        registry = yaml.safe_load((SKILL / "references" / "template-registry.yml").read_text(encoding="utf-8"))
+        templates = {item["id"]: item for item in registry["templates"]}
+        template = templates["editorial_research_minimal"]
+        self.assertEqual(template["image_type"], ["cover", "summary_card"])
+        self.assertEqual(template["reference"], "prompt-editorial-research-minimal.md")
+        prompt = (SKILL / "references" / template["reference"]).read_text(encoding="utf-8")
+        for block in (
+            "source_grounding",
+            "primary_task",
+            "composition_and_layout",
+            "visual_style_and_materials",
+            "exact_text",
+            "aspect_and_output",
+            "constraints_and_avoid",
+        ):
+            self.assertIn(block, prompt)
+        self.assertIn("基础视觉系统", prompt)
+        self.assertIn("主题佐料", prompt)
+
     def test_social_catalog_prompt_requires_a_complete_poster_prompt(self) -> None:
         content = (SKILL / "references" / "prompt-social-skill-catalog.md").read_text(
             encoding="utf-8"
@@ -66,6 +86,25 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertIn("信息密度指“每一块都帮助读者做判断”", content)
         self.assertIn("content-facts.yml", content)
         self.assertIn("结构示意", content)
+
+    def test_repository_feature_pair_prompt_deck_is_explicit_and_complete(self) -> None:
+        content = (SKILL / "references" / "prompt-social-skill-catalog.md").read_text(
+            encoding="utf-8"
+        )
+        for filename in (
+            "00-series-bible.md",
+            "01-repository-recommendation.md",
+            "02-featured-skill-deep-dive.md",
+        ):
+            self.assertIn(filename, content)
+        self.assertIn("基础视觉系统", content)
+        self.assertIn("主题佐料", content)
+        for reference in (
+            "prompt-social-series-bible.md",
+            "prompt-social-repository-recommendation.md",
+            "prompt-social-featured-skill-deep-dive.md",
+        ):
+            self.assertTrue((SKILL / "references" / reference).is_file(), reference)
 
     def test_repository_feature_pair_contract_requires_semantic_density_and_sources(self) -> None:
         contract = yaml.safe_load(
@@ -83,6 +122,15 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertTrue(pair["forbid_abstract_extra_slide_without_real_evidence"])
         self.assertIn("semantic_density_review", contract["required_quality_evidence"])
         self.assertIn("hallucinated_evidence_scan", contract["required_quality_evidence"])
+        self.assertEqual(
+            pair["prompt_deck"]["required_files"],
+            [
+                "00-series-bible.md",
+                "01-repository-recommendation.md",
+                "02-featured-skill-deep-dive.md",
+            ],
+        )
+        self.assertTrue(pair["prompt_deck"]["each_slide_must_be_complete"])
 
     def test_skill_forbids_ad_hoc_delivery_roots(self) -> None:
         content = (SKILL / "SKILL.md").read_text(encoding="utf-8")
@@ -94,6 +142,7 @@ class ArticleImageContractTest(unittest.TestCase):
         content = (SKILL / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("social_card | carousel | icon", content)
         self.assertIn("social_skill_catalog | plugin_icon", content)
+        self.assertIn("editorial_research_minimal", content)
         self.assertIn("build_social_catalog_facts.py", content)
         self.assertIn("validate_social_catalog_delivery.py", content)
 

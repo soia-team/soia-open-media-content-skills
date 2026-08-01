@@ -1,9 +1,9 @@
 ---
 name: soia-media-generate-article-image
 description: 为文章生成封面、小结卡、学习笔记、视觉隐喻海报或高信息密度技能库宣传卡/轮播，并完成深层事实采集、Prompt、确定性文字与位图验收。触发：「生成文章图片」「正文小结图」「康奈尔笔记图」「技能库宣传图」「朋友圈配图」「小红书轮播」
-version: 3.6.0
+version: 3.7.0
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-07-30 17:09:50
+updated_at: 2026-08-01 15:00:00
 created_by: claude opus 4.6
 updated_by: gpt-5.6-sol
 ---
@@ -18,7 +18,7 @@ updated_by: gpt-5.6-sol
 
 | 客户想要 | `image_type` / `preset` | 客户能看到 |
 |---|---|---|
-| 公众号、X、小红书文章封面 | `cover` / `godot_pixel_metaphor` 或 `auto` | 完整 Prompt、PNG/JPG 封面、视觉验收回执 |
+| 公众号、X、小红书文章封面 | `cover` / `editorial_research_minimal`、`godot_pixel_metaphor` 或 `auto` | 完整 Prompt、PNG/JPG 封面、视觉验收回执 |
 | 正文段落或章节小结图 | `summary_card` / `editorial_summary_card` | 可嵌入正文的编辑式小结卡 |
 | 把文章总结成康奈尔笔记 | `learning_note` / `cornell_notes` | A4 竖版康奈尔笔记信息图 |
 | 技能库、插件集合宣传图 | `social_card` 或 `carousel` / `social_skill_catalog` | 事实清单、朋友圈单图或小红书轮播、机器验收回执 |
@@ -121,7 +121,7 @@ SOIA_MEDIA_ARTICLE_IMAGE_OUTPUT_DIR=<custom-output-directory>
 ```yaml
 source: <article-path | full-text | topic>
 image_type: <cover | summary_card | learning_note | poster | social_card | carousel | icon | auto>
-preset: <godot_pixel_metaphor | editorial_summary_card | cornell_notes | social_skill_catalog | plugin_icon | auto>
+preset: <godot_pixel_metaphor | editorial_summary_card | editorial_research_minimal | cornell_notes | social_skill_catalog | plugin_icon | auto>
 purpose: <wechat-cover | x-cover | rednote | wechat-moments | article-inline | poster | plugin-icon>
 platform: <rednote | wechat-moments | general>
 layout_mode: <single | carousel | auto>
@@ -157,6 +157,7 @@ quick: false
 `image_type` 决定交付用途，`preset` 决定视觉与提示词模板。常见映射：
 
 - `cover + godot_pixel_metaphor`：像素风视觉隐喻封面。
+- `cover|summary_card + editorial_research_minimal`：研究编辑极简风封面/小结卡；固定基础视觉系统，再按主题佐料与系列变量生成变化。
 - `summary_card + editorial_summary_card`：正文小结卡。
 - `learning_note + cornell_notes`：康奈尔笔记学习信息图。
 - `social_card|carousel + social_skill_catalog`：来源可核验的技能库宣传卡；朋友圈单图默认最多 4 项，小红书轮播优先 2–3 张并可自动分页。
@@ -169,8 +170,9 @@ quick: false
 3. 只加载所选模板：
    - [Godot 像素视觉隐喻](references/prompt-godot-pixel-metaphor.md)
    - [编辑式正文小结卡](references/prompt-editorial-summary-card.md)
+   - [研究编辑极简风](references/prompt-editorial-research-minimal.md)
    - [康奈尔笔记信息图](references/prompt-cornell-notes-infographic.md)
-   - [技能库社交宣传卡](references/prompt-social-skill-catalog.md)，并同时读取 [社交卡机器契约](references/social-card-contract.yml)
+   - [技能库社交宣传卡](references/prompt-social-skill-catalog.md)，并同时读取 [系列视觉底座](references/prompt-social-series-bible.md)、[仓库推荐页](references/prompt-social-repository-recommendation.md)、[重点技能深挖页](references/prompt-social-featured-skill-deep-dive.md) 与 [社交卡机器契约](references/social-card-contract.yml)
    - [插件/应用图标](references/prompt-plugin-icon.md)
 4. 模板是母本，不是最终 Prompt。把文章事实、逐字标题、比例和参考图角色填入后，写出本次完整 Prompt。
 5. 新增模板时：新增一个直接引用的 `references/prompt-*.md`，在注册表增加一项，并补一个真实前向测试；不要把长模板堆进本文件。
@@ -192,6 +194,17 @@ quick: false
 把“字多”和“信息密度高”分开验收。每个版面区域必须增加一种新的决策信息，不用“能力地图、典型场景、完整闭环”等抽象词重复仓库简介。推荐型双页默认采用五级以上阅读层级：品牌 → 痛点/结果钩子 → 可核验规模与能力结构 → 重点技能 → 输入/工作流/交付/验收 → CTA。标题优先使用痛点、反差或结果，不用“最近整理了”“一套技能覆盖……”作为主钩子。
 
 需要多个概念时，保持同一 preset，每版只改变主体、构图、配色、场景中的 2–4 项，并分别落盘；不要同时更换模板和全部风格轴，导致版本无法比较。
+
+### Prompt 分层：基础视觉系统 + 主题佐料 + 系列变量
+
+封面和社交卡都必须先落盘可复用的 Prompt 资产，但复用的边界不同：
+
+- **基础视觉系统**锁定字体角色、颜色角色、网格、间距、圆角、材质、光线和阅读顺序。
+- **主题佐料**从来源事实提取主命题、对象、隐喻、能力组和 CTA；它决定本张图为什么不是换标题的空模板。
+- **系列变量**用于候选探索，单次最多改变 2–4 个轴（主体、构图方向、色彩强调、局部标记或裁切位置），并保留 `v1/v2` 文件。
+- **事实层**永远独立于视觉层：标题、数量、技能名、命令、URL、二维码和证据路径进入 `facts.yml` / `content-facts.yml`，逐字核验；不能因为追求风格而改写。
+
+`editorial_research_minimal` 适合文章封面和小结的留白叙事；`social_skill_catalog` 仍然负责仓库推荐/重点技能宣传卡的高信息密度，不得用极简封面 preset 取代能力结构、工作流、交付物和 CTA。
 
 ## 输出目录（C 类交付物）
 
@@ -238,6 +251,17 @@ quick: false
 ```
 
 多仓 `repository_feature_pair` 系列在同一 `<output-dir>` 下增加 `batch-facts.yml`、`content-facts.yml`、系列 manifest 与联系表；每仓正式选片只保留 `01-repository-recommendation.png` 和 `02-featured-skill.png`。版本化候选放临时运行目录或单独的 `candidates/`，不得与正式选片混放后再靠人工猜文件。
+
+每个 `repository_feature_pair` 系列还必须保存统一 Prompt Deck：
+
+```text
+prompts/
+├── 00-series-bible.md
+├── 01-repository-recommendation.md
+└── 02-featured-skill-deep-dive.md
+```
+
+`00-series-bible.md` 只锁定基础视觉系统；两张正式图片各自拥有完整 Prompt，不能写“沿用上一张”。仓库页与技能页可以共享 Bible，但事实、画面任务、逐字文字、工作流和 CTA 必须分别展开。
 
 上图是四角色展开示例，不是固定页数。可按内容生成 1、2、3 张或更多：多个角色允许合并到同一张，manifest 用 `roles` 数组记录；单图必须同时承担 `cover`、`catalog`、`cta`。`auto` 优先选择 2–3 张，技能总数仍超出每页上限时继续增加能力页。确定性源可以保留以便复现，最终对外图片必须是位图。
 

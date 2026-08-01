@@ -11,6 +11,13 @@ narrative_modes:
     required_sources: [repository_readme, featured_skill_md, facts_yml, content_facts_yml]
     forbid_abstract_extra_slide_without_real_evidence: true
     forbid_unsourced_evidence_values: true
+    prompt_deck:
+      required_files:
+        - 00-series-bible.md
+        - 01-repository-recommendation.md
+        - 02-featured-skill-deep-dive.md
+      each_slide_must_be_complete: true
+      shared_reference_allowed_only: [00-series-bible.md]
 
 platforms:
   rednote:
