@@ -12,6 +12,11 @@ paths:
 defaults:
   image_type: auto
   preset: auto
+  use_case: auto
+  visual_mechanism: auto
+  aesthetic_system: auto
+  model_adapter: auto
+  batch_strategy: auto
   platform: general
   layout_mode: auto
   aspect: auto
