@@ -25,7 +25,7 @@ class ArticleImageContractTest(unittest.TestCase):
 
     def test_registry_declares_atomic_prompt_blocks(self) -> None:
         registry = yaml.safe_load((SKILL / "references" / "template-registry.yml").read_text(encoding="utf-8"))
-        self.assertEqual(registry["schema_version"], 5)
+        self.assertEqual(registry["schema_version"], 6)
         self.assertIn("narrative_mode", registry["selection_order"])
         self.assertEqual(
             registry["prompt_blocks"]["required"],
@@ -74,6 +74,27 @@ class ArticleImageContractTest(unittest.TestCase):
             self.assertIn(block, prompt)
         self.assertIn("基础视觉系统", prompt)
         self.assertIn("主题佐料", prompt)
+
+    def test_composition_index_is_axis_based_not_a_new_preset(self) -> None:
+        registry = yaml.safe_load((SKILL / "references" / "template-registry.yml").read_text(encoding="utf-8"))
+        templates = {item["id"]: item for item in registry["templates"]}
+        self.assertNotIn("editorial_typographic_mask_batch", templates)
+        self.assertEqual(registry["composition_index"], "prompt-composition-index.yml")
+        index = yaml.safe_load((SKILL / "references" / registry["composition_index"]).read_text(encoding="utf-8"))
+        self.assertEqual(index["schema_version"], 1)
+        self.assertIn("model_adapter", index["axes"])
+        self.assertIn("use_case", index["axes"])
+        self.assertIn("visual_mechanism", index["axes"])
+        self.assertIn("aesthetic_system", index["axes"])
+        self.assertEqual(
+            index["examples"][0]["normalized"]["visual_mechanism"],
+            "typographic_mask",
+        )
+        self.assertIn("GPT2", index["examples"][0]["query"])
+        mechanism = (SKILL / "references" / "prompt-visual-mechanism-typographic-mask.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("不是独立 preset", mechanism)
 
     def test_social_catalog_prompt_requires_a_complete_poster_prompt(self) -> None:
         content = (SKILL / "references" / "prompt-social-skill-catalog.md").read_text(
@@ -143,6 +164,10 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertIn("social_card | carousel | icon", content)
         self.assertIn("social_skill_catalog | plugin_icon", content)
         self.assertIn("editorial_research_minimal", content)
+        self.assertIn("visual_mechanism", content)
+        self.assertIn("aesthetic_system", content)
+        self.assertIn("model_adapter", content)
+        self.assertIn("prompt-composition-index.yml", content)
         self.assertIn("build_social_catalog_facts.py", content)
         self.assertIn("validate_social_catalog_delivery.py", content)
 

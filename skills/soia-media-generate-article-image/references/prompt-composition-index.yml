@@ -1,0 +1,147 @@
+schema_version: 1
+
+# This is a lookup index, not a list of finished prompts.  A request is
+# normalized into axes and then compiled through the common prompt blocks.
+purpose: "让模型标签、使用场景、视觉机制和美学系统可以自由组合，而不是为每个组合新增 preset"
+
+axes:
+  model_adapter:
+    required: false
+    default: auto
+    aliases:
+      gpt2: external_gpt_image_label
+      gpt-image2: external_gpt_image_label
+      builtin-imagegen: builtin_imagegen
+      claude-code: text_orchestrator_only
+      deepcode: text_orchestrator_only
+      agy: text_orchestrator_or_provider_dependent
+    options:
+      builtin_imagegen:
+        role: "当前 Agent 可直接调用的真实位图生成后端"
+        supports: [image_generation, view_image]
+        exact_text: "必须经过位图视觉验收；高风险字段可切换 hybrid_exact_text"
+      external_gpt_image_label:
+        role: "外部帖子使用的 GPT-image 标签；不是本技能的硬依赖"
+        supports: [image_generation_if_provider_exposes_it]
+        exact_text: "按实际 provider 能力验收，不把标签当作可用性证明"
+      text_orchestrator_only:
+        role: "只负责理解/编译 Prompt 的文本代理，不能单独交付位图"
+        supports: [prompt_compilation]
+        exact_text: "没有 imagegen + view_image 时必须标记 BLOCKED"
+      text_orchestrator_or_provider_dependent:
+        role: "CLI 是否能读文件、调用图像后端取决于运行时授权与工具"
+        supports: [prompt_compilation]
+        exact_text: "没有实际位图和视觉验收不得写‘生成通过’"
+
+  use_case:
+    required: true
+    aliases:
+      早安: good_morning
+      早安海报: good_morning
+      ppt: presentation
+      小红书: rednote_card
+      仓库推荐: repository_recommendation
+      重点技能: featured_skill
+      活动海报: event_poster
+      生日海报: birthday_poster
+      酒店海报: hospitality_poster
+    options:
+      good_morning: "从来源事实提取日期、地点/对象、今日宜忌或问候语"
+      presentation: "先组织每页 Markdown 与知识点，再编译为页面视觉"
+      repository_recommendation: "必须来自仓库 README、事实清单和可核验 CTA"
+      featured_skill: "必须来自重点技能 SKILL.md、输入/工作流/交付/验收"
+      event_poster: "锁定活动时间、地点、主办方和行动入口，不虚构"
+      birthday_poster: "锁定祝福对象、日期和情绪，不把人物身份写成事实"
+
+  visual_mechanism:
+    required: true
+    aliases:
+      字体蒙版: typographic_mask
+      巨字: oversized_type
+      大字留白: oversized_type_whitespace
+      色块: color_field_stage
+      模块网格: modular_grid
+      旅行刊物: travel_editorial_narrative
+      像素解体: pixel_dissolution
+    options:
+      typographic_mask:
+        reference: prompt-visual-mechanism-typographic-mask.md
+        tags: [giant_type, image_inside_letterforms, controlled_crop, series_consistency]
+      oversized_type:
+        reference: prompt-visual-mechanism-oversized-type.md
+        tags: [large_type, whitespace, color_field, high_contrast]
+      modular_grid:
+        reference: prompt-visual-mechanism-modular-grid.md
+        tags: [grid, baseline, cards, information_hierarchy]
+      travel_editorial_narrative:
+        reference: prompt-visual-mechanism-travel-editorial.md
+        tags: [horizon, reflection, magazine_density, handwritten_overlay]
+
+  aesthetic_system:
+    required: true
+    aliases:
+      美学提示词: editorial_aesthetic
+      编辑感: editorial_aesthetic
+      清爽现代: bright_modern
+      厚重历史: archival_historical
+      旅行刊物叙事感: travel_publication
+    options:
+      editorial_aesthetic:
+        reference: prompt-aesthetic-editorial-system.md
+        roles: [background, image_support, subject_color, structural_dark]
+      bright_modern:
+        reference: prompt-aesthetic-bright-modern-system.md
+        roles: [high_key_background, accent, support, structure]
+      archival_historical:
+        reference: prompt-aesthetic-archival-system.md
+        roles: [paper, ink, earth_red, muted_blue, structure]
+      travel_publication:
+        reference: prompt-aesthetic-travel-publication-system.md
+        roles: [cool_environment, warm_subject, neutral_text, acid_accent]
+
+  batch_strategy:
+    required: false
+    default: single
+    aliases:
+      批量: series
+      10张: series
+      10个城市: series
+    options:
+      single: "单张图，主题和知识点一次闭环"
+      series: "锁定视觉底座；每页只改变 2–4 个变量，并保留逐页 facts"
+
+compile:
+  order:
+    - source_grounding
+    - use_case
+    - visual_mechanism
+    - aesthetic_system
+    - composition_and_layout
+    - exact_text
+    - aspect_and_output
+    - model_adapter
+    - constraints_and_avoid
+  rules:
+    - "preset 只表示交付家族（cover、social_skill_catalog 等），不表示每一种风格组合"
+    - "model_adapter 只改变可执行能力、文字策略和验收，不改写核心视觉语义"
+    - "use_case 提供事实与信息任务，visual_mechanism 提供构图规则，aesthetic_system 提供材质/色彩/层级"
+    - "同一系列必须固定机制和美学系统，主题佐料进入 facts 与 exact_text"
+    - "未找到词条时回退到 auto，并在 Prompt 中显式写出假设；不得默默复制案例 Prompt"
+
+examples:
+  - query: "GPT2 x 早安 x 字体蒙版 x 美学提示词"
+    normalized:
+      model_adapter: external_gpt_image_label
+      use_case: good_morning
+      visual_mechanism: typographic_mask
+      aesthetic_system: editorial_aesthetic
+      batch_strategy: series
+    note: "这是组合查询，不是名为 GPT2 或 editorial_typographic_mask_batch 的 preset"
+  - query: "仓库推荐 x 巨字留白 x 清爽现代"
+    normalized:
+      model_adapter: auto
+      use_case: repository_recommendation
+      visual_mechanism: oversized_type_whitespace
+      aesthetic_system: bright_modern
+      batch_strategy: single
+    note: "仍使用 social_skill_catalog 交付家族，并叠加机制与美学层"

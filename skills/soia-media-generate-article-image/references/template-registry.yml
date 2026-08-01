@@ -1,14 +1,21 @@
-schema_version: 5
+schema_version: 6
 
 selection_order:
   - image_type
   - preset
+  - use_case
+  - visual_mechanism
+  - aesthetic_system
   - platform
   - layout_mode
   - slide_count
   - narrative_mode
-  - visual_style
-  - scene_or_symbol
+  - batch_strategy
+  - model_adapter
+  - render_mode
+
+composition_index: prompt-composition-index.yml
+composition_framework: prompt-composition-framework.md
 
 prompt_blocks:
   required:
@@ -20,6 +27,8 @@ prompt_blocks:
     - aspect_and_output
     - constraints_and_avoid
   optional:
+    - composition_axes
+    - model_adapter
     - reference_image_roles
     - source_facts
     - brand_asset_roles
