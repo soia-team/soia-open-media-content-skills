@@ -5,6 +5,8 @@ schema_version: 2
 purpose: "让模型标签、家族、使用场景、信息结构、视觉机制、美学系统和批量策略可以自由组合，而不是为每个组合新增 preset"
 
 family_catalog: prompt-family-catalog.md
+block_contract: prompt-block-contract.yml
+forward_test_matrix: prompt-forward-test-matrix.yml
 
 # 客户选择入口：这是渐进式加载的第一层，先展示摘要，选定后才读取详细词条。
 support_catalog:

@@ -1,0 +1,42 @@
+schema_version: 1
+purpose: "真实 imagegen + view_image 前向覆盖矩阵；不是静态语法测试"
+run_id: prompt-forward-test-v1
+backend: builtin_imagegen
+visual_acceptance: view_image
+coverage:
+  delivery_presets: 6
+  prompt_families: 10
+  generated_assets: 18
+  note: "social_skill_catalog 用仓库推荐、重点技能和目录总览三个实例覆盖不同密度；poster_type_stage 另有独立家族样张。"
+delivery:
+  - {id: delivery-01, preset: editorial_research_minimal, asset: 01-editorial-research-minimal.png, result: pass}
+  - {id: delivery-02, preset: editorial_summary_card, asset: 02-editorial-summary-card.png, result: pass}
+  - {id: delivery-03, preset: cornell_notes, asset: 03-cornell-notes.png, result: pass}
+  - {id: delivery-04, preset: godot_pixel_metaphor, asset: 04-godot-pixel-metaphor.png, result: pass}
+  - {id: delivery-05, preset: social_skill_catalog, variant: repository_recommendation, asset: 05-social-repository-recommendation.png, result: pass_with_guardrail}
+  - {id: delivery-06, preset: social_skill_catalog, variant: featured_skill_deep_dive, asset: 06-social-featured-skill-deep-dive.png, result: pass_with_guardrail}
+  - {id: delivery-07, preset: plugin_icon, asset: 07-plugin-icon.png, result: pass}
+  - {id: delivery-08, preset: social_skill_catalog, variant: catalog_overview, asset: 08-social-series-overview.png, result: pass_with_guardrail}
+families:
+  - {id: family-01, family: morning_city, asset: 09-morning-city.png, result: pass}
+  - {id: family-02, family: presentation_grid, asset: 10-presentation-grid.png, result: pass}
+  - {id: family-03, family: travel_publication, asset: 11-travel-publication.png, result: pass}
+  - {id: family-04, family: portrait_identity, asset: 12-portrait-identity.png, result: pass}
+  - {id: family-05, family: event_people, asset: 13-event-people.png, result: pass_with_synthetic_data_label}
+  - {id: family-06, family: celebration_ceremony, asset: 14-celebration-ceremony.png, result: pass}
+  - {id: family-07, family: hospitality_food, asset: 15-hospitality-food.png, result: pass}
+  - {id: family-08, family: archival_print, asset: 16-archival-print.png, result: pass_with_synthetic_source_label}
+  - {id: family-09, family: pixel_play, asset: 17-pixel-play.png, result: pass}
+  - {id: family-10, family: poster_type_stage, asset: 18-poster-type-stage.png, result: pass}
+acceptance_dimensions:
+  - actual_bitmap_exists
+  - view_image_completed
+  - aspect_and_layout
+  - title_and_high_risk_text
+  - semantic_density
+  - source_or_synthetic_label
+  - avoid_random_brand_url_qr
+known_limitations:
+  - "imagegen 可生成可读海报，但不能替代 facts.yml、OCR/二维码机器核验。"
+  - "模型可能为高密度目录卡补写示例条目；生产路径必须使用 source_grounding + hybrid_exact_text。"
+  - "肖像家族没有参考图时只能验收单张内部一致性，不能声称跨图身份锁定。"
