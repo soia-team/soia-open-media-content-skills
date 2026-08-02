@@ -9,20 +9,43 @@
 未指定目录时必须运行：
 
 ```bash
-python3 scripts/resolve_output_dir.py --source <source> --json
+python3 scripts/resolve_output_dir.py --source <source-id> --json
 ```
 
 manifest 必须记录 `output_dir_origin`。禁止使用 cwd、技能仓、vault 根、`outputs/` 或 `<topic>-delivery-<date>` 作为默认交付根。
 
+### source-id 统一约定（所有 agent 必须一致）
+
+不同 agent 对 `<source-id>` 的不同解读会导致输出目录分叉。按下表规则推导，不得使用随机目录名或调用时的 cwd：
+
+| 输入类型 | source-id 规则 | 示例 |
+|---------|---------------|------|
+| X 推文 / Article URL | `x-{handle}-{status_id}` | `x-guansheng_ai-2083576296639283456` |
+| 本地 Markdown 文件 | 文件 stem（不含扩展名） | `2026-08-01-AI-Agent` |
+| 网页 URL | URL 最后路径段 slug | `ai-agent-engineering` |
+| 任意主题字符串 | 小写 + 只保留 `[a-z0-9\-]` | `ai-agent-engineering` |
+
+同一篇文章无论哪个 agent 执行，source-id 必须相同，输出目录唯一确定：`~/Downloads/soia-media-generate-article-image/<source-id>/`
+
 ## 目录结构
 
-普通模板：
+普通模板（`imagegen` 路径）：
 
 ```text
 <output-dir>/
 ├── prompts/01-<preset>-<mechanism>-<topic>.md
 ├── <preset>-<topic>.png
 └── manifest.yml
+```
+
+`html_render` 路径（`cornell_notes`、`editorial_summary_card`、`editorial_research_minimal`）：
+
+```text
+<output-dir>/
+├── html/01-<preset>-<topic>.html      ← HTML 模板源文件
+├── prompts/01-<preset>-<mechanism>-<topic>.md
+├── <preset>-<topic>.png               ← puppeteer 截图产物
+└── manifest.yml                       ← render_engine: html_render
 ```
 
 品牌 Logo 两阶段交付：

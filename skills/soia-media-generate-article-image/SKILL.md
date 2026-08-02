@@ -1,11 +1,11 @@
 ---
 name: soia-media-generate-article-image
 description: 将文章、开源项目、品牌 Logo 或公开 X Prompt Deck 编译为可验收的图片与矢量资产，按组合轴生成 Prompt 并完成事实、文字和视觉验收。
-version: 3.15.0
+version: 3.16.0
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-08-02 18:30:00
+updated_at: 2026-08-02 20:00:00
 created_by: claude opus 4.6
-updated_by: gpt-5.6-sol
+updated_by: claude sonnet 4.6
 ---
 
 # soia-media-generate-article-image
@@ -49,7 +49,7 @@ updated_by: gpt-5.6-sol
 
 ### 依赖与安装
 
-需要可调用的 imagegen 和 `view_image`；缺失时停止对应阶段，不用代码绘图替代。插件安装、配置文件和 provider 登录态按宿主文档处理，本技能不保存 API key、cookie 或 token。
+`imagegen` 路径需要可调用的 imagegen 和 `view_image`；`html_render` 路径只需 Node.js + puppeteer，不依赖 imagegen。插件安装、配置文件和 provider 登录态按宿主文档处理，本技能不保存 API key、cookie 或 token。
 
 ## 渐进式选择与加载（必须遵守）
 
@@ -118,7 +118,12 @@ python3 scripts/audit_x_profile_prompt_deck.py \
 1. **确认**：解析 L0–L2，并记录未指定轴的假设。
 2. **取证**：仅 `social_skill_catalog` 运行 `build_social_catalog_facts.py`；仓库推荐/重点技能还要读取仓库 README 与重点技能 SKILL.md。
 3. **编译**：创建 `prompts/NN-*.md`，写全七个 blocks 和来源证据；未落盘不得生图。
-4. **生成**：普通模板默认使用 Agent 内置 imagegen；`plugin_icon` 与 `brand_logo` 的第二阶段允许确定性 SVG/矢量脚本，不用 HTML、canvas、Pillow 或截图冒充终稿。
+4. **生成**：按 `render_engine` 路由（manifest 须记录该字段）：
+   - `imagegen`（默认）：视觉海报、隐喻图、social 封面、logo 方向稿 → 调用 Agent 内置 imagegen
+   - `html_render`：文字密度高的信息图（`cornell_notes`、`editorial_summary_card`、`editorial_research_minimal`）→ 写 `html/` 目录下的模板 → puppeteer 截图 → 输出 PNG；view_image 对截图文件执行
+   - `svg_deterministic`：`plugin_icon` 与 `brand_logo` 终稿矢量重绘
+
+   禁止用 Pillow 或 canvas 代码绘图冒充终稿；`html_render` 路径的 Puppeteer 截图是正式产物，不是替代品。
 5. **验收**：按 [质量门](references/quality-gates.md) 实际 `view_image`；社交卡再运行 `validate_social_catalog_delivery.py`，检查事实、OCR、二维码、缩略图和语义密度。
 6. **重生**：只改一个主要问题，使用新 Prompt 和新文件名，最多连续重生两次；不要覆盖已通过版本。
 
@@ -143,7 +148,7 @@ python3 scripts/resolve_output_dir.py --source <source> --json
 - 不伪造二维码、安装命令、项目 URL、已有品牌 Logo、数字或人物身份；`brand_logo` 只用于客户明确要求的新品牌识别，不能冒充第三方或已存在品牌。
 - 不把脚本返回 0 当作图片通过；Prompt 编译通过也不等于位图通过。
 - 不读取无关私人目录，不把 provider 缓存、cookie、token 或临时路径写入公开交付。
-- 缺少 imagegen 或 `view_image` 时，普通图片和 Logo 方向稿停止并明确说明；Logo 第二阶段只有在已有批准路径、矢量规格和可视验收条件齐全时才能执行确定性 SVG，不得用代码输出冒充方向稿。
+- `imagegen` 路径缺少 imagegen 时停止并明确说明；`html_render` 路径不依赖 imagegen，可继续执行；所有路径缺少 `view_image` 时停止。Logo 第二阶段只有在已有批准路径、矢量规格和可视验收条件齐全时才能执行确定性 SVG，不得用代码输出冒充方向稿。
 
 ## 验证
 
