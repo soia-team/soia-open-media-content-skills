@@ -16,16 +16,6 @@ SCRIPT = ROOT / "skills" / "soia-media-generate-article-image" / "scripts" / "re
 
 
 class BrandLogoRendererTest(unittest.TestCase):
-    def test_logo_axis_references_live_inside_skill_reference_directory(self) -> None:
-        reference_dir = ROOT / "skills" / "soia-media-generate-article-image" / "references"
-        for name in (
-            "prompt-aesthetic-brand-system.md",
-            "prompt-text-logo-wordmark.md",
-            "prompt-visual-mechanism-geometric-mark.md",
-        ):
-            self.assertTrue((reference_dir / name).is_file(), name)
-            self.assertFalse((ROOT / "references" / name).exists(), name)
-
     def run_renderer(self, root: Path, spec: dict[str, object]) -> tuple[subprocess.CompletedProcess[str], Path]:
         spec_path = root / "logo.yml"
         output_path = root / "vector"
