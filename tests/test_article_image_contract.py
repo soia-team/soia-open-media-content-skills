@@ -24,6 +24,25 @@ class ArticleImageContractTest(unittest.TestCase):
             raise AssertionError(f"not a PNG: {path}")
         return struct.unpack(">II", signature[16:24])
 
+    def test_skill_entrypoint_is_concise_and_description_has_no_trigger_list(self) -> None:
+        content = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+        frontmatter = yaml.safe_load(content.split("---", 2)[1])
+        description = frontmatter["description"]
+        self.assertLess(len(description), 160)
+        self.assertNotIn("触发", description)
+        self.assertNotIn("生成文章图片", description)
+        self.assertLessEqual(len(content.splitlines()), 180)
+        self.assertIn("references/input-contract.md", content)
+        self.assertIn("references/delivery-contract.md", content)
+
+    def test_ambiguous_requests_require_customer_clarification(self) -> None:
+        content = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("需求不明确时：先反问，不生成", content)
+        self.assertIn("我们目前支持", content)
+        self.assertIn("请回复：", content)
+        self.assertIn("用途：封面、小结、笔记、海报、宣传卡、轮播、插件图标还是品牌 Logo？", content)
+        self.assertIn("客户明确说“直接生成”", content)
+
     def test_registry_declares_atomic_prompt_blocks(self) -> None:
         registry = yaml.safe_load((SKILL / "references" / "template-registry.yml").read_text(encoding="utf-8"))
         self.assertEqual(registry["schema_version"], 7)
@@ -100,7 +119,7 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertIn("GPT2", index["examples"][0]["query"])
         self.assertEqual(index["family_catalog"], "prompt-family-catalog.md")
         support = index["support_catalog"]
-        self.assertEqual(support["counts"]["delivery_presets"], 6)
+        self.assertEqual(support["counts"]["delivery_presets"], 7)
         registry_presets = {
             item["id"]
             for item in registry["templates"]
@@ -112,7 +131,7 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertEqual(len(catalog_presets), support["counts"]["delivery_presets"])
         self.assertEqual(catalog_presets, registry_presets)
         self.assertEqual(support["delivery_presets_source"], "template-registry.yml#templates")
-        self.assertEqual(support["counts"]["prompt_families"], 10)
+        self.assertEqual(support["counts"]["prompt_families"], 11)
         self.assertEqual(len(support["supported_families"]), support["counts"]["prompt_families"])
         self.assertEqual(support["counts"]["information_structures"], len(index["axes"]["information_structure"]["options"]))
         self.assertEqual(support["counts"]["visual_mechanisms"], len(index["axes"]["visual_mechanism"]["options"]))
@@ -128,6 +147,7 @@ class ArticleImageContractTest(unittest.TestCase):
             "portrait_identity",
             "celebration_ceremony",
             "archival_print",
+            "brand_identity",
         ):
             self.assertIn(family_id, family_catalog)
         mechanism = (SKILL / "references" / "prompt-visual-mechanism-typographic-mask.md").read_text(
@@ -161,6 +181,13 @@ class ArticleImageContractTest(unittest.TestCase):
         archival = resolver["resolve_query"]("GPT2 x 票据 x 拓印 x 古籍气质", index)
         self.assertEqual(archival["normalized"]["family"], "archival_print")
         self.assertEqual(archival["normalized"]["visual_mechanism"], "archival_collage")
+        logo = resolver["resolve_query"]("品牌 Logo x 字标 x 黑白反白 x 几何图形标", index)
+        self.assertEqual(logo["normalized"]["family"], "brand_identity")
+        self.assertEqual(logo["normalized"]["information_structure"], "logo_system")
+        self.assertEqual(logo["normalized"]["visual_mechanism"], "geometric_mark")
+        self.assertEqual(logo["normalized"]["text_strategy"], "logo_wordmark")
+        self.assertEqual(logo["normalized"]["output_mode"], "logo")
+        self.assertEqual(logo["normalized"]["logo_variant"], "all_variants")
 
     def test_social_catalog_prompt_requires_a_complete_poster_prompt(self) -> None:
         content = (SKILL / "references" / "prompt-social-skill-catalog.md").read_text(
@@ -234,7 +261,9 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertIn("非 GPT2", import_contract)
         self.assertIn("明确要求 GPT2", import_contract)
         self.assertIn("social_card | carousel | icon", content)
-        self.assertIn("social_skill_catalog | plugin_icon", content)
+        self.assertIn("social_skill_catalog", content)
+        self.assertIn("plugin_icon", content)
+        self.assertIn("brand_logo", content)
         self.assertIn("editorial_research_minimal", content)
         self.assertIn("visual_mechanism", content)
         self.assertIn("aesthetic_system", content)
@@ -245,11 +274,24 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertIn("渐进式选择与加载", content)
         self.assertIn("--list-supported", content)
         self.assertIn("L0：支持目录", content)
-        self.assertIn("6 个交付模板、10 个 Prompt 家族和 1 条外部提示词进化导入路线", content)
+        self.assertIn("7 个交付模板、11 个 Prompt 家族、4 个 Logo 变体和 1 条外部提示词进化导入路线", content)
         self.assertIn("L3：生成与验收", content)
         self.assertIn("prompt-composition-index.yml", content)
         self.assertIn("build_social_catalog_facts.py", content)
         self.assertIn("validate_social_catalog_delivery.py", content)
+
+    def test_brand_logo_template_is_two_stage_and_vector_bound(self) -> None:
+        registry = yaml.safe_load((SKILL / "references" / "template-registry.yml").read_text(encoding="utf-8"))
+        template = {item["id"]: item for item in registry["templates"]}["brand_logo"]
+        self.assertEqual(template["image_type"], ["logo"])
+        self.assertTrue(template["two_stage"])
+        self.assertEqual(template["render_modes"], ["concept_imagegen", "vector_two_stage"])
+        self.assertIn("mark_geometry", template["deterministic_fields"])
+        prompt = (SKILL / "references" / "prompt-brand-logo.md").read_text(encoding="utf-8")
+        self.assertIn("阶段 2：确定性矢量终稿", prompt)
+        self.assertIn("horizontal-lockup", prompt)
+        self.assertIn("SVG 母版", prompt)
+        self.assertTrue((SKILL / "scripts" / "render_brand_logo_svg.py").is_file())
 
     def test_social_contract_has_mobile_platform_limits(self) -> None:
         contract = yaml.safe_load(

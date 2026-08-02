@@ -13,6 +13,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "skills" / "soia-media-generate-article-image" / "scripts" / "import_x_profile_prompt_deck.py"
+AUDIT_SCRIPT = ROOT / "skills" / "soia-media-generate-article-image" / "scripts" / "audit_x_profile_prompt_deck.py"
 EVOLUTION = ROOT / "skills" / "soia-media-generate-article-image" / "references" / "x-profile-prompt-evolution.yml"
 
 
@@ -105,6 +106,17 @@ class XProfileEvolutionTest(unittest.TestCase):
             check=False,
         )
 
+    def run_audit(self, input_path: Path, output_path: Path) -> subprocess.CompletedProcess[str]:
+        env = dict(os.environ)
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
+        return subprocess.run(
+            [sys.executable, str(AUDIT_SCRIPT), "--input", str(input_path), "--output", str(output_path)],
+            text=True,
+            capture_output=True,
+            env=env,
+            check=False,
+        )
+
     def test_import_splits_base_seasoning_and_series_layers(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -122,6 +134,8 @@ class XProfileEvolutionTest(unittest.TestCase):
             self.assertIn("## topic_seasoning", prompt)
             self.assertIn("## series_variables", prompt)
             self.assertIn("## compiled_image_prompt", prompt)
+            self.assertIn("SOURCE EVIDENCE POLICY", prompt)
+            self.assertIn("raw_source_evidence_in_execution_prompt", prompt)
             self.assertTrue((output_path / "bibles" / "poster-type-stage.md").is_file())
 
     def test_import_blocks_missing_canonical_evidence(self) -> None:
@@ -143,10 +157,23 @@ class XProfileEvolutionTest(unittest.TestCase):
             self.assertEqual(result.returncode, 2)
             self.assertIn("coverage.selected", result.stderr)
 
+    def test_audit_reports_bounded_coverage_and_catalog_fit(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            input_path = self.write_deck(root)
+            output_path = root / "gap-report.md"
+            result = self.run_audit(input_path, output_path)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            report = output_path.read_text(encoding="utf-8")
+            self.assertIn("X Prompt Deck → image 技能差距审计", report)
+            self.assertIn("Prompt Deck 项目：1；GPT2 命中：1", report)
+            self.assertIn("当前筛选集的组合轴均可由 image 技能索引表达", report)
+
     def test_evolution_index_registers_one_source_route(self) -> None:
         index = yaml.safe_load(EVOLUTION.read_text(encoding="utf-8"))
         self.assertEqual(index["id"], "x_profile_prompt_evolution")
         self.assertEqual(index["compiler"]["variant_budget"], "每个系列单项最多改变 2–4 个变量；固定底座不可被主题佐料覆盖。")
+        self.assertIn("hybrid_exact_text", index["compiler"]["render_policy"])
         self.assertIn("base_visual_system", index["output_contract"]["prompt_layers"])
         self.assertIn("poster_type_stage", index["observed_families"])
 

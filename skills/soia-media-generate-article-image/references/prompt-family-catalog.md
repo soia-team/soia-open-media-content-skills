@@ -18,6 +18,7 @@
 | hospitality_food | 酒店、餐饮、饮料、菜单 | 产品/场景 + 卖点 + 价格/入口（若有事实） | `material_closeup` + `commercial_stage` | `hospitality_premium` | 单张、4 张物料或 300 套提示词批量 |
 | archival_print | 古籍、票据、拓印、书法金句、历史课件 | 金句/史实 + 来源 + 注释 | `archival_collage` + `oversized_type` | `archival_historical` | 单张或 10 页课件 |
 | pixel_play | 食物、产品或主题的像素解体实验 | 单一主体 + 视觉变化说明 | `pixel_dissolution` | `playful_pixel` | 4 张候选 |
+| brand_identity | 新品牌 Logo、图形标、字标和组合规范 | 图形标 + 字标 + lockup + 应用变体 | `geometric_mark` | `brand_system` | 2–4 个方向，选定后输出多变体 |
 
 ## 组合规则
 

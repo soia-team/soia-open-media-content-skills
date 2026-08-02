@@ -12,13 +12,14 @@ forward_test_matrix: prompt-forward-test-matrix.yml
 support_catalog:
   schema_version: 1
   counts:
-    delivery_presets: 6
-    prompt_families: 10
-    information_structures: 7
-    visual_mechanisms: 13
-    aesthetic_systems: 8
-    text_strategies: 5
+    delivery_presets: 7
+    prompt_families: 11
+    information_structures: 8
+    visual_mechanisms: 14
+    aesthetic_systems: 9
+    text_strategies: 6
     asset_roles: 6
+    logo_variants: 4
     prompt_source_routes: 1
   delivery_presets_source: "template-registry.yml#templates"
   supported_delivery_presets:
@@ -52,6 +53,11 @@ support_catalog:
       image_types: [icon]
       choose_when: "需要插件市场图标或技能库标识；最终图标还要确定性矢量重绘"
       usage: "preset=plugin_icon; output_mode=poster; asset_role=brand_asset"
+    - id: brand_logo
+      label: 品牌 Logo 系统
+      image_types: [logo]
+      choose_when: "需要新品牌的图形标、字标、组合锁定、黑白反白和应用变体"
+      usage: "preset=brand_logo; family=brand_identity; information_structure=logo_system; output_mode=logo"
   selection_policy:
     ambiguous_when:
       - "没有 image_type/purpose，且只说‘生成图片/做海报/做得好看’"
@@ -60,6 +66,7 @@ support_catalog:
     first_response:
       - "先展示 counts 和 supported_families 摘要，不读取全部长 Prompt"
       - "让客户选择 delivery_preset 或 family；可继续指定信息结构和输出形态"
+      - "选择 brand_logo 时，再确认品牌名称、图形概念、字标、Logo 变体和是否已有批准字体/路径"
       - "输入为 X profile Prompt Deck 时，展示 x_profile_prompt_evolution 路线，说明它会拆分底座/佐料/系列变量后再生图"
       - "客户选择后，只加载该选择对应的 mechanism/aesthetic/structure/text references"
     defaulting:
@@ -72,6 +79,9 @@ support_catalog:
       choose_when: "输入来自 soia-pkm-clip-x-profile 的 image-prompts.yml，需要把来源提示词转为 image 技能能力"
       usage: "python3 scripts/import_x_profile_prompt_deck.py --input <run>/image-prompts.yml --output <dir>/x-profile-evolution"
       outputs: [evolution.yml, series-index.yml, bibles/<family>.md, prompts/*.md, manifest.yml]
+      render_modes: [hybrid_exact_text]
+      render_policy: "X source route may use hybrid_exact_text across observed families; exact CJK fields still require bitmap and view_image checks."
+      audit: "python3 scripts/audit_x_profile_prompt_deck.py --input <run>/image-prompts.yml --output <dir>/gap-report.md"
       does_not_create: "账号/月份专属 preset；模型标签依赖；真实 X 抓取能力"
   supported_families:
     - id: morning_city
@@ -144,6 +154,13 @@ support_catalog:
       common_mechanisms: [pixel_dissolution, color_field_stage]
       common_aesthetics: [playful_pixel, bright_modern]
       usage: "family=pixel_play; visual_mechanism=pixel_dissolution"
+    - id: brand_identity
+      label: 品牌识别/Logo 系统
+      choose_when: "图形标、字标、横竖组合、应用变体和品牌规范"
+      default_structure: logo_system
+      common_mechanisms: [geometric_mark]
+      common_aesthetics: [brand_system, bright_modern]
+      usage: "family=brand_identity; information_structure=logo_system; visual_mechanism=geometric_mark; text_strategy=logo_wordmark"
 
 axes:
   model_adapter:
@@ -189,6 +206,10 @@ axes:
       酒店餐饮: hospitality_food
       古籍拓印: archival_print
       像素实验: pixel_play
+      Logo: brand_identity
+      logo: brand_identity
+      品牌Logo: brand_identity
+      品牌标识: brand_identity
     options:
       morning_city: "城市/地点早安系列；来源事实、日期和 3–5 个知识点"
       poster_type_stage: "单一钩子海报；大字、留白、色块和主题对象"
@@ -200,6 +221,7 @@ axes:
       hospitality_food: "酒店/食物/饮料；产品材质、卖点和场景"
       archival_print: "票据/拓印/古籍/历史课件；纸张、墨迹和来源"
       pixel_play: "像素解体等单一视觉实验"
+      brand_identity: "新品牌的图形标、字标、组合锁定和应用变体"
 
   use_case:
     required: true
@@ -223,6 +245,9 @@ axes:
       拓印: archival_print
       古籍: archival_print
       前景: foreground_story
+      Logo: brand_identity
+      logo: brand_identity
+      品牌Logo: brand_identity
     options:
       good_morning: "从来源事实提取日期、地点/对象、今日宜忌或问候语"
       presentation: "先组织每页 Markdown 与知识点，再编译为页面视觉"
@@ -236,6 +261,7 @@ axes:
       portrait: "锁定人物/宠物身份、姿态、光线、镜头和照片用途"
       archival_print: "锁定金句/史实/来源，把纸张、墨迹和印章当作材质机制"
       foreground_story: "用前景遮挡、景深和主体关系建立层次，不把前景当装饰"
+      brand_identity: "锁定品牌名称、图形概念、字标、组合变体和品牌使用边界"
 
   information_structure:
     required: true
@@ -250,6 +276,8 @@ axes:
       轮播: carousel_sequence
       人物写真: portrait_brief
       物料包: campaign_pack
+      Logo系统: logo_system
+      品牌Logo: logo_system
     options:
       single_hook:
         reference: prompt-structure-single-hook.md
@@ -272,6 +300,9 @@ axes:
       campaign_pack:
         reference: prompt-structure-campaign-pack.md
         contract: "同一主题生成 4/10 张不同物料角色，事实和品牌资产一致"
+      logo_system:
+        reference: prompt-structure-logo-system.md
+        contract: "图形标、字标、组合锁定和应用变体共享同一几何底座"
 
   asset_role:
     required: false
@@ -298,6 +329,8 @@ axes:
       逐字: exact_text
       中文字体: cjk_exact_text
       英文标题: latin_hero_type
+      Logo字标: logo_wordmark
+      字标: logo_wordmark
     options:
       exact_text:
         reference: prompt-text-exact-layer.md
@@ -314,6 +347,9 @@ axes:
       latin_hero_type:
         reference: prompt-text-latin-hero-type.md
         contract: "拉丁字可作为巨大主题词，但中文事实仍需单独验收"
+      logo_wordmark:
+        reference: prompt-text-logo-wordmark.md
+        contract: "字标逐字来自输入或批准资产，阶段 2 优先转为路径"
 
   visual_mechanism:
     required: true
@@ -332,6 +368,8 @@ axes:
       商业舞台: commercial_stage
       档案拼贴: archival_collage
       电影光线: cinematic_lighting
+      几何图形标: geometric_mark
+      几何Logo: geometric_mark
     options:
       typographic_mask:
         reference: prompt-visual-mechanism-typographic-mask.md
@@ -372,6 +410,9 @@ axes:
       cinematic_lighting:
         reference: prompt-visual-mechanism-cinematic-lighting.md
         tags: [key_light, shadow, lens, atmosphere]
+      geometric_mark:
+        reference: prompt-visual-mechanism-geometric-mark.md
+        tags: [geometry, silhouette, negative_space, vector]
 
   aesthetic_system:
     required: true
@@ -385,6 +426,7 @@ axes:
       仪式柔光: ceremonial_soft
       酒店高级: hospitality_premium
       玩趣像素: playful_pixel
+      品牌系统: brand_system
     options:
       editorial_aesthetic:
         reference: prompt-aesthetic-editorial-system.md
@@ -410,6 +452,9 @@ axes:
       playful_pixel:
         reference: prompt-aesthetic-playful-pixel-system.md
         roles: [base, pixel_subject, accent, outline]
+      brand_system:
+        reference: prompt-aesthetic-brand-system.md
+        roles: [primary_color, secondary_color, neutral_background, dark_background, monochrome]
 
   batch_strategy:
     required: false
@@ -431,11 +476,32 @@ axes:
       PPT页: slide
       小红书轮播: carousel
       物料包: campaign_pack
+      Logo: logo
     options:
       poster: "单张可发布位图"
       slide: "演示文稿页，优先 16:9"
       carousel: "移动端轮播页，优先 3:4 或 4:5"
       campaign_pack: "同一主题的一组物料，按角色逐张落盘"
+      logo: "品牌 Logo 系统；输出 SVG 矢量母版和 PNG 变体"
+
+  logo_variant:
+    required: false
+    default: all_variants
+    aliases:
+      彩色: color
+      彩色版: color
+      单色: monochrome
+      单色版: monochrome
+      黑白: monochrome
+      反白: reversed
+      反白版: reversed
+      黑白反白: all_variants
+      全套变体: all_variants
+    options:
+      color: "品牌主色版本"
+      monochrome: "单色版本"
+      reversed: "深色背景反白版本"
+      all_variants: "彩色、单色、反白全套版本"
 
 compile:
   order:
@@ -452,6 +518,7 @@ compile:
     - aspect_and_output
     - batch_strategy
     - model_adapter
+    - logo_variant
     - constraints_and_avoid
   rules:
     - "preset 只表示交付家族（cover、social_skill_catalog 等），不表示每一种风格组合"
@@ -494,3 +561,13 @@ examples:
       aesthetic_system: ceremonial_soft
       batch_strategy: campaign_pack
     note: "婚礼是使用场景，镜面/人物/柔光是机制与美学，不新增婚礼 preset"
+  - query: "品牌 Logo x 字标 x 黑白反白 x 几何图形标"
+    normalized:
+      family: brand_identity
+      use_case: brand_identity
+      information_structure: logo_system
+      visual_mechanism: geometric_mark
+      aesthetic_system: brand_system
+      text_strategy: logo_wordmark
+      output_mode: logo
+    note: "Logo 是独立两阶段交付契约；方向稿可用 imagegen，终稿必须确定性矢量重绘"

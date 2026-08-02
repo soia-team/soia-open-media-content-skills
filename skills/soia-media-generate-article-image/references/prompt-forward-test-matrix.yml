@@ -4,9 +4,10 @@ run_id: prompt-forward-test-v1
 backend: builtin_imagegen
 visual_acceptance: view_image
 coverage:
-  delivery_presets: 6
-  prompt_families: 10
+  delivery_presets: 7
+  prompt_families: 11
   generated_assets: 18
+  vector_contract_fixtures: 1
   note: "social_skill_catalog 用仓库推荐、重点技能和目录总览三个实例覆盖不同密度；poster_type_stage 另有独立家族样张。"
 delivery:
   - {id: delivery-01, preset: editorial_research_minimal, asset: 01-editorial-research-minimal.png, result: pass}
@@ -17,6 +18,7 @@ delivery:
   - {id: delivery-06, preset: social_skill_catalog, variant: featured_skill_deep_dive, asset: 06-social-featured-skill-deep-dive.png, result: pass_with_guardrail}
   - {id: delivery-07, preset: plugin_icon, asset: 07-plugin-icon.png, result: pass}
   - {id: delivery-08, preset: social_skill_catalog, variant: catalog_overview, asset: 08-social-series-overview.png, result: pass_with_guardrail}
+  - {id: delivery-09, preset: brand_logo, variant: vector_lockups, asset: brand-logo-spec.example.yml, result: pass_vector_contract}
 families:
   - {id: family-01, family: morning_city, asset: 09-morning-city.png, result: pass}
   - {id: family-02, family: presentation_grid, asset: 10-presentation-grid.png, result: pass}
@@ -28,8 +30,9 @@ families:
   - {id: family-08, family: archival_print, asset: 16-archival-print.png, result: pass_with_synthetic_source_label}
   - {id: family-09, family: pixel_play, asset: 17-pixel-play.png, result: pass}
   - {id: family-10, family: poster_type_stage, asset: 18-poster-type-stage.png, result: pass}
+  - {id: family-11, family: brand_identity, asset: brand-logo-spec.example.yml, result: pass_vector_contract}
 acceptance_dimensions:
-  - actual_bitmap_exists
+  - actual_bitmap_or_vector_contract_exists
   - view_image_completed
   - aspect_and_layout
   - title_and_high_risk_text
@@ -40,3 +43,4 @@ known_limitations:
   - "imagegen 可生成可读海报，但不能替代 facts.yml、OCR/二维码机器核验。"
   - "模型可能为高密度目录卡补写示例条目；生产路径必须使用 source_grounding + hybrid_exact_text。"
   - "肖像家族没有参考图时只能验收单张内部一致性，不能声称跨图身份锁定。"
+  - "brand_logo 的方向稿仍需 imagegen/view_image；本矩阵只锁定第二阶段 SVG 结构，不把 SVG 合同测试当作 PNG 视觉通过。"

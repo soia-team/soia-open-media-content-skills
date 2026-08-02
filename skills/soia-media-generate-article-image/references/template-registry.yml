@@ -17,6 +17,7 @@ selection_order:
   - batch_strategy
   - model_adapter
   - output_mode
+  - logo_variant
   - render_mode
 
 composition_index: prompt-composition-index.yml
@@ -98,3 +99,16 @@ templates:
     batch_consistency: required
     two_stage: true
     use_when: "需要插件市场图标、应用图标或技能库标识；本模板产出设计稿，终稿须矢量确定性重绘"
+
+  - id: brand_logo
+    image_type: [logo]
+    reference: prompt-brand-logo.md
+    default_aspect: "1:1"
+    output_stem: brand-logo
+    text_density: low
+    batch_consistency: required
+    two_stage: true
+    render_modes: [concept_imagegen, vector_two_stage]
+    default_render_mode: vector_two_stage
+    deterministic_fields: [mark_geometry, wordmark, tagline, color_variants, lockup_variants, clear_space, min_size]
+    use_when: "需要新品牌的图形标、字标、横竖组合、黑白反白和应用变体；阶段 1 探索方向，阶段 2 必须输出确定性 SVG 矢量母版"

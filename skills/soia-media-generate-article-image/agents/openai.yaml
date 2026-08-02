@@ -1,4 +1,4 @@
 interface:
   display_name: "Article Image Generator"
-  short_description: "生成文章图、X Prompt Deck 进化图与可验收技能宣传轮播"
-  default_prompt: "Use $soia-media-generate-article-image to compile source facts or an X Prompt Deck into a reusable base visual system, topic seasoning, series variables, and render plan; generate the bitmap and verify exact text and evidence."
+  short_description: "生成文章图、品牌 Logo、X Prompt Deck 进化图与可验收技能宣传轮播"
+  default_prompt: "Use $soia-media-generate-article-image to compile source facts, a brand-logo brief, or an X Prompt Deck into a reusable visual system; generate direction assets, finalize brand logos as deterministic SVG variants, and verify exact text and evidence."

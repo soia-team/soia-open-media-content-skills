@@ -1,0 +1,13 @@
+# 阶段 2 矢量重绘示例；mark_path/wordmark_path 应来自已批准或已选定的几何路径。
+brand_name: Example
+mark_concept: "两条轨道汇聚成一个开放节点"
+mark_viewbox: "0 0 100 100"
+mark_path: "M10 50 A40 40 0 1 0 90 50 A40 40 0 1 0 10 50 Z M35 50 A15 15 0 1 0 65 50 A15 15 0 1 0 35 50 Z"
+wordmark: Example
+approved_font: "Inter, Arial, sans-serif"
+primary_color: "#1D4ED8"
+dark_background: "#111827"
+clear_space_ratio: 0.25
+min_size_px: 24
+lockups: [mark-only, horizontal-lockup, stacked-lockup, app-icon]
+variants: [color, monochrome, reversed]
