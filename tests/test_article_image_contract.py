@@ -227,6 +227,12 @@ class ArticleImageContractTest(unittest.TestCase):
 
     def test_input_contract_lists_registered_specialized_types(self) -> None:
         content = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+        import_contract = (SKILL / "references" / "prompt-x-profile-import.md").read_text(encoding="utf-8")
+        self.assertIn("x-profile-export", content)
+        self.assertIn("prompt-x-profile-import.md", content)
+        self.assertIn("selection.filters", import_contract)
+        self.assertIn("非 GPT2", import_contract)
+        self.assertIn("明确要求 GPT2", import_contract)
         self.assertIn("social_card | carousel | icon", content)
         self.assertIn("social_skill_catalog | plugin_icon", content)
         self.assertIn("editorial_research_minimal", content)
@@ -239,7 +245,7 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertIn("渐进式选择与加载", content)
         self.assertIn("--list-supported", content)
         self.assertIn("L0：支持目录", content)
-        self.assertIn("6 个交付模板和 10 个 Prompt 家族", content)
+        self.assertIn("6 个交付模板、10 个 Prompt 家族和 1 条外部提示词进化导入路线", content)
         self.assertIn("L3：生成与验收", content)
         self.assertIn("prompt-composition-index.yml", content)
         self.assertIn("build_social_catalog_facts.py", content)

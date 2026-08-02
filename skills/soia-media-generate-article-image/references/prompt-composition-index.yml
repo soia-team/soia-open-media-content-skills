@@ -19,6 +19,7 @@ support_catalog:
     aesthetic_systems: 8
     text_strategies: 5
     asset_roles: 6
+    prompt_source_routes: 1
   delivery_presets_source: "template-registry.yml#templates"
   supported_delivery_presets:
     - id: editorial_research_minimal
@@ -59,11 +60,19 @@ support_catalog:
     first_response:
       - "先展示 counts 和 supported_families 摘要，不读取全部长 Prompt"
       - "让客户选择 delivery_preset 或 family；可继续指定信息结构和输出形态"
+      - "输入为 X profile Prompt Deck 时，展示 x_profile_prompt_evolution 路线，说明它会拆分底座/佐料/系列变量后再生图"
       - "客户选择后，只加载该选择对应的 mechanism/aesthetic/structure/text references"
     defaulting:
       - "只有客户明确说‘直接生成’且用途/输出形态足够明确时才自动选择"
       - "自动选择必须在回执中记录 assumptions，不得静默套用早安或字体蒙版"
     never: "不得因请求含有‘美学、质感、高级感’就自动创建新 preset"
+  prompt_source_routes:
+    - id: x_profile_prompt_evolution
+      label: X 公开提示词进化导入
+      choose_when: "输入来自 soia-pkm-clip-x-profile 的 image-prompts.yml，需要把来源提示词转为 image 技能能力"
+      usage: "python3 scripts/import_x_profile_prompt_deck.py --input <run>/image-prompts.yml --output <dir>/x-profile-evolution"
+      outputs: [evolution.yml, series-index.yml, bibles/<family>.md, prompts/*.md, manifest.yml]
+      does_not_create: "账号/月份专属 preset；模型标签依赖；真实 X 抓取能力"
   supported_families:
     - id: morning_city
       label: 城市早安
