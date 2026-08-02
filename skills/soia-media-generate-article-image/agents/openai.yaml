@@ -2,3 +2,28 @@ interface:
   display_name: "Article Image Generator"
   short_description: "生成文章图、品牌 Logo、X Prompt Deck 进化图与可验收技能宣传轮播"
   default_prompt: "Use $soia-media-generate-article-image to compile source facts, a brand-logo brief, or an X Prompt Deck into a reusable visual system; generate direction assets, finalize brand logos as deterministic SVG variants, and verify exact text and evidence."
+
+# ── render_engine 路由规则 ────────────────────────────────────────────────────
+# imagegen 路径：视觉海报、隐喻图、social 封面、logo 方向稿 → image_gen 工具
+#   禁止用 Pillow / canvas 代码绘图替代
+#
+# html_render 路径：cornell_notes / editorial_summary_card / editorial_research_minimal
+#   1. 在 html/ 目录写 HTML 模板（自包含，hardcode 颜色，系统中文字体栈）
+#   2. 用 puppeteer 截图（Node.js，waitUntil: networkidle0 + fonts.ready + 500ms）
+#      viewport 规格：
+#        A4 竖版  → width=827, height=1170, deviceScaleFactor=3 → 2481×3510px
+#        4:5 社交 → width=400, height=500,  deviceScaleFactor=3 → 1200×1500px
+#        高度自适应：load 后读 scrollHeight，若超出则扩展 viewport 再截图
+#   3. view_image 对截图文件执行验收
+#   manifest 记录 render_engine: html_render
+#
+# ── source-id 跨 agent 统一约定 ─────────────────────────────────────────────
+# 必须先推导 source-id，再调用 resolve_output_dir.py --source <source-id> --json
+#
+#   输入类型               source-id 格式
+#   X 推文 / Article      x-{handle}-{status_id}
+#   本地 .md 文件         文件 stem（不含扩展名）
+#   任意主题 / URL        小写 ASCII slug（a-z0-9 和连字符）
+#
+# 同一输入在所有 agent 中必须产生相同的 source-id，输出目录唯一确定
+# ─────────────────────────────────────────────────────────────────────────────
