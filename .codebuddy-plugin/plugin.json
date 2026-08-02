@@ -1,6 +1,6 @@
 {
   "name": "soia-media-content",
-  "version": "1.2.0-SNAPSHOT",
+  "version": "1.2.0",
   "description": "New-media content operator: turns your own opinions into a draft, generates covers and card images, and adapts one draft into WeChat, Rednote and X formats — drafts only, never publishes.",
   "author": {
     "name": "soia-team"
