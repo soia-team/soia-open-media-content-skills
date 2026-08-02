@@ -16,7 +16,7 @@
 | Skill | Description | Default Prompt |
 |---|---|---|
 | [`soia-media-compose-article-draft`](./soia-media-compose-article-draft/) | 把 distill 提炼出的观点写成成文草稿，生成可继续交给 publish-* 家族的文章。可指定公众号/知乎/随笔风格 | Use soia-media-compose-article-draft: 把 distill 提炼出的观点写成成文草稿，后续按目标平台交给 publish-* 家族。 |
-| [`soia-media-generate-article-image`](./soia-media-generate-article-image/) | 生成文章图、X Prompt Deck 进化图与可验收技能宣传轮播 | Use $soia-media-generate-article-image to compile source facts or an X Prompt Deck into a reusable base visual system, topic seasoning, series variables, and render plan; generate the bitmap and verify exact text and evidence. |
+| [`soia-media-generate-article-image`](./soia-media-generate-article-image/) | 生成文章图、品牌 Logo、X Prompt Deck 进化图与可验收技能宣传轮播 | Use $soia-media-generate-article-image to compile source facts, a brand-logo brief, or an X Prompt Deck into a reusable visual system; generate direction assets, finalize brand logos as deterministic SVG variants, and verify exact text and evidence. |
 | [`soia-media-publish-rednote-card`](./soia-media-publish-rednote-card/) | 把文章改写成小红书 rednote 笔记：标题、3–5 段短文、标签和配图建议。 | Use soia-media-publish-rednote-card: 把这篇文章改成小红书笔记，给我标题、短文、话题标签和配图建议。 |
 | [`soia-media-publish-wechat-draft`](./soia-media-publish-wechat-draft/) | 把文章排版成符合微信公众号限制的 HTML，校验后推入草稿箱；只建草稿，绝不自动群发。 | Use soia-media-publish-wechat-draft: 把这篇文章排版成公众号文章，校验后推到草稿箱。 |
 | [`soia-media-publish-x-article`](./soia-media-publish-x-article/) | 把 Markdown 成文直传 X Articles 草稿箱：富文本粘贴、封面与正文图按原位插入，只存草稿绝不发布。 | Use soia-media-publish-x-article: 把这篇 Markdown 长文上传到 X Articles 草稿箱，封面用文首第一张图，校验通过后给我草稿 URL。 |

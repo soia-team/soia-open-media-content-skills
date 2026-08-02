@@ -44,7 +44,9 @@ compiler:
     - compile_image_prompt
     - emit_series_bibles_and_manifest
   variant_budget: "每个系列单项最多改变 2–4 个变量；固定底座不可被主题佐料覆盖。"
-  source_prompt_policy: "原始 Prompt 只作为 evidence 保存；执行 Prompt 必须经过七块契约重编译。"
+  source_prompt_policy: "原始 Prompt 只作为 evidence 保存；执行 Prompt 必须经过七块契约重编译，原始长文本不得直接注入执行段。"
+  axis_drift_policy: "系列 Bible 只锁定家族内共同轴；比例、信息结构等有漂移的轴以 variant_axes 记录，按单条来源选择。"
+  render_policy: "X source route may use hybrid_exact_text across observed families; exact CJK fields still require bitmap and view_image checks."
   missing_evidence: "缺少 ALT、正文或来源 URL 时 BLOCKED，不以模型常识补写。"
 
 observed_families:

@@ -18,7 +18,7 @@
 2. 只读取当前筛选集里 `prompt_file` 存在的记录；若上游明确要求 GPT2，再额外要求 `is_gpt2=true`。没有来源 Prompt 或 ALT 证据时标记 `BLOCKED`，不自行补写。
 3. `GPT2` 只映射为 `model_adapter=external_gpt_image_label`；非 GPT2 来源可以保持 `auto`。它描述作者的模型线索，不限制本技能可用的 imagegen provider，也不默认画在图片里。
 4. 组合轴是可复用查询结果，不是新增 preset。若客户说“换成字体蒙版/巨字留白/模块网格”，只替换对应轴并保留来源事实。
-5. 生成前把 Prompt Deck 复制到本次正式输出目录；生成后必须执行 `view_image`、比例检查和需要时的 OCR。失败重生要使用新版本文件名，不覆盖原始来源证据。
+5. X source route 可以在不同 family 上统一使用 `hybrid_exact_text`，但这只是执行策略，不是新 preset；生成后必须执行 `view_image`、比例检查和需要时的 OCR。失败重生要使用新版本文件名，不覆盖原始来源证据。
 
 ## 二次编译（必须）
 
