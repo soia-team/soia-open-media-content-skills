@@ -1,9 +1,9 @@
 ---
 name: soia-media-generate-article-image
-description: 为文章生成封面、小结卡、学习笔记、视觉隐喻海报或高信息密度技能库宣传卡/轮播；按使用场景、视觉机制、美学系统和模型能力组合 Prompt，并完成事实、文字与位图验收。触发：「生成文章图片」「提示词组合」「正文小结图」「康奈尔笔记图」「技能库宣传图」「朋友圈配图」「小红书轮播」
-version: 3.10.0
+description: 为文章、公开 X Prompt Deck 和开源项目生成封面、小结卡、学习笔记、视觉隐喻海报或高信息密度技能库宣传卡/轮播；按使用场景、视觉机制、美学系统和模型能力组合 Prompt，并完成事实、文字与位图验收。触发：「生成文章图片」「把 X 提示词转成图片」「提示词组合」「正文小结图」「康奈尔笔记图」「技能库宣传图」「朋友圈配图」「小红书轮播」
+version: 3.13.0
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-08-01 18:00:00
+updated_at: 2026-08-02 16:00:00
 created_by: claude opus 4.6
 updated_by: gpt-5.6-sol
 ---
@@ -30,7 +30,7 @@ updated_by: gpt-5.6-sol
 1. 提供文章路径、完整正文、明确主题或技能仓路径；给出用途、平台、比例和必须逐字出现的文字。
 2. 如有参考图，明确每张图是“风格参考”“构图参考”还是“编辑目标”。
 3. 指定 `image_type`、交付家族 `preset`、Prompt 家族 `family`、使用场景、信息结构、视觉机制、美学系统、模型适配和 `output_dir`；请求明确但省略某个轴时由 Agent 依据文章与用途推荐，并在生成前说明假设。请求含糊时必须先展示 L0 支持目录，由客户选择后再生成；只有组合足够明确时，“直接生成”才可跳过确认。
-4. Agent 读取 [模板注册表](references/template-registry.yml)、[组合索引](references/prompt-composition-index.yml)、[家族目录](references/prompt-family-catalog.md) 和对应机制/结构/文字/美学词条；宣传卡先从实际仓库生成 `facts.yml`。若任务是“推荐一个仓库并重点推荐一个技能”，还要完整读取仓库 `README.md` 与重点技能 `SKILL.md`，生成可追溯的 `content-facts.yml`，再为每一张图写完整成品 Prompt。默认由 imagegen 直出整张海报；只有高风险精确字段未通过时才局部确定性校正。
+4. Agent 读取 [模板注册表](references/template-registry.yml)、[组合索引](references/prompt-composition-index.yml)、[家族目录](references/prompt-family-catalog.md) 和对应机制/结构/文字/美学词条；宣传卡先从实际仓库生成 `facts.yml`。若任务是“推荐一个仓库并重点推荐一个技能”，还要完整读取仓库 `README.md` 与重点技能 `SKILL.md`，生成可追溯的 `content-facts.yml`，再为每一张图写完整成品 Prompt。若输入来自 `soia-pkm-clip-x-profile` 的 `image-prompts.yml`，不能只复制 Prompt Deck：先读取 [X profile Prompt 导入契约](references/prompt-x-profile-import.md) 和 [X 提示词进化契约](references/x-profile-prompt-evolution.yml)，运行导入编译器，把来源提示词拆成基础视觉系统、主题佐料、系列变量和位图验收计划，再调用 imagegen。默认由 imagegen 直出整张海报；只有高风险精确字段未通过时才局部确定性校正。
 5. 多仓系列先用 [批次清单样例](references/social-card-batch.example.yml) 明确纳入与排除范围；脚本拒绝同一仓同时出现在两边。
 6. 生成后必须用 `view_image` 检查比例、构图和参考图；密集宣传卡还要核对语义密度、OCR、CTA、二维码、移动端缩略图、事实指纹和伪证据。失败时重生主视觉或重跑确定性合成源，不直接涂改位图。
 
@@ -39,14 +39,14 @@ updated_by: gpt-5.6-sol
 本技能不在首次请求时加载全部长 Prompt。按以下层级推进：
 
 **L0：支持目录。** 只读取 `template-registry.yml` 与 `prompt-composition-index.yml` 的
-`support_catalog`。目录同时列出 6 个交付模板和 10 个 Prompt 家族；客户只说“生成图片/做海报/做得好看”，或没有说明用途、输出形态和主题家族时，
+`support_catalog`。目录同时列出 6 个交付模板、10 个 Prompt 家族和 1 条外部提示词进化导入路线；客户只说“生成图片/做海报/做得好看”，或没有说明用途、输出形态和主题家族时，
 先运行：
 
 ```bash
 python3 scripts/resolve_prompt_composition.py --list-supported
 ```
 
-向客户展示支持数量、交付模板和家族摘要，让客户选择 `preset` 或 `family`；不要默认套用早安、字体蒙版或
+向客户展示支持数量、交付模板、家族摘要和外部提示词进化路线，让客户选择 `preset` 或 `family`；不要默认套用早安、字体蒙版或
 `editorial_research_minimal`。
 
 **L1：选家族。** 客户选择后，只确认 `family`、用途、信息结构和输出形态。例如：
@@ -157,7 +157,7 @@ SOIA_MEDIA_ARTICLE_IMAGE_OUTPUT_DIR=<custom-output-directory>
 ## 输入契约
 
 ```yaml
-source: <article-path | full-text | topic>
+source: <article-path | full-text | topic | x-profile-export>
 image_type: <cover | summary_card | learning_note | poster | social_card | carousel | icon | auto>
 preset: <godot_pixel_metaphor | editorial_summary_card | editorial_research_minimal | cornell_notes | social_skill_catalog | plugin_icon | auto>
 family: <auto | morning_city | poster_type_stage | presentation_grid | travel_publication | portrait_identity | event_people | celebration_ceremony | hospitality_food | archival_print | pixel_play>
@@ -214,6 +214,30 @@ quick: false
 - `social_card|carousel + social_skill_catalog`：来源可核验的技能库宣传卡；朋友圈单图默认最多 4 项，小红书轮播优先 2–3 张并可自动分页。
 - `icon + plugin_icon`：imagegen 只产出字形设计方向，终稿确定性矢量重绘。
 
+当 `source=x-profile-export` 时，`family`、`visual_mechanism`、`aesthetic_system` 和 `text_strategy`
+优先采用导入索引中的已编译组合轴；只有客户要求改风格或组合轴缺失时才重新路由。`source_prompt`
+必须保留来源 URL 和证据来源（帖子正文或图片 ALT），不能把作者写的 `GPT2` 变成 image 技能依赖。
+
+### X 提示词进化路由：不是“复制 Prompt”
+
+X profile 导入必须完成一次 image 技能内的二次编译。先运行：
+
+```bash
+python3 scripts/import_x_profile_prompt_deck.py \
+  --input <x-profile-run>/image-prompts.yml \
+  --output <image-output>/x-profile-evolution
+```
+
+导入编译器会检查来源窗口、状态 ID、ALT/正文证据和七个 canonical blocks，然后把每条来源拆成：
+
+1. `base_visual_system`：跨主题/跨页保持不变的网格、字体角色、色彩角色、材质、光线和阅读顺序；
+2. `topic_seasoning`：本条帖子的主题对象、金句/任务、事实和用途；
+3. `series_variables`：每张图允许改变的 2–4 个变量；
+4. `render_plan`：imagegen 后端、比例、文字策略、位图和 `view_image` 验收要求。
+
+输出必须包含 `evolution.yml`、`series-index.yml`、按家族生成的 `bibles/<family>.md` 和重新编译的
+`prompts/*.md`。没有这一步，只把上游 `prompts/*.md` 复制到输出目录，不算完成 image 技能转换。
+
 ## 模板路由
 
 1. L0 只读取 [template-registry.yml](references/template-registry.yml) 和 [prompt-composition-index.yml](references/prompt-composition-index.yml) 的 `support_catalog`；未选择前不加载全部家族长文。
@@ -223,6 +247,7 @@ quick: false
    - [组合块执行契约](references/prompt-block-contract.yml)
    - [家族目录](references/prompt-family-catalog.md)
    - [字体蒙版机制](references/prompt-visual-mechanism-typographic-mask.md)
+   - 若来源是 X profile 导出，再读取 [X profile Prompt 导入契约](references/prompt-x-profile-import.md) 和 [X 提示词进化契约](references/x-profile-prompt-evolution.yml)，运行 `scripts/import_x_profile_prompt_deck.py`
    - 其他家族、机制、结构、文字和美学词条见 `prompt-composition-index.yml` 的 `reference`
 4. 只加载所选交付家族模板：
    - [Godot 像素视觉隐喻](references/prompt-godot-pixel-metaphor.md)
@@ -347,6 +372,23 @@ batch_strategy: series
 └── manifest.yml
 ```
 
+X profile Prompt 进化导入使用扩展结构：
+
+```text
+<output-dir>/x-profile-evolution/
+├── evolution.yml
+├── series-index.yml
+├── bibles/
+│   └── <family>.md
+├── prompts/
+│   └── 001-<family>-<status-id>.md
+└── manifest.yml
+```
+
+`evolution.yml` 记录输入窗口和分层编译结果；`series-index.yml` 记录每个家族的稳定轴；
+`bibles/<family>.md` 只锁定基础视觉系统；每条 `prompts/*.md` 必须同时拥有主题佐料、系列变量、
+完整成品 Prompt 和来源证据。该目录仍然不是最终位图目录，生成 PNG/JPG 后必须继续完成视觉验收。
+
 多仓 `repository_feature_pair` 系列在同一 `<output-dir>` 下增加 `batch-facts.yml`、`content-facts.yml`、系列 manifest 与联系表；每仓正式选片只保留 `01-repository-recommendation.png` 和 `02-featured-skill.png`。版本化候选放临时运行目录或单独的 `candidates/`，不得与正式选片混放后再靠人工猜文件。
 
 每个 `repository_feature_pair` 系列还必须保存统一 Prompt Deck：
@@ -452,4 +494,5 @@ python3 scripts/build_social_catalog_batch.py \
 - 仓库：`python3 -m unittest discover -s tests -p 'test_*.py'`
 - 目录：普通模板存在 Prompt + 位图 + manifest；两阶段模板还存在 facts、可复现合成源和机器验收证据。最终交付必须包含位图。
 - 视觉：实际打开最终位图逐项核对，不把“已生成”写成“已通过”。
+- X profile 进化导入：`python3 scripts/import_x_profile_prompt_deck.py --input <run>/image-prompts.yml --output <dir>/x-profile-evolution`，核对 `base_visual_system`、`topic_seasoning`、`series_variables` 和 `render_plan`。
 - 前向组合契约：`python3 -m unittest tests/test_prompt_forward_matrix.py`，并逐张查看矩阵中登记的真实位图。

@@ -1,0 +1,183 @@
+schema_version: 1
+id: x_profile_prompt_evolution
+label: X 公开提示词进化导入
+purpose: "把公开 X 帖子的提示词从来源案例转换为 image 技能可执行的基础视觉系统、主题佐料、系列变量和验收计划；不是新增账号专属 preset。"
+
+source_contract: prompt-x-profile-import.md
+compiler_script: scripts/import_x_profile_prompt_deck.py
+
+required_input:
+  - image-prompts.yml
+  - prompts/*.md
+  - manifest.yml
+  - source URL / status ID
+  - selection filters
+  - composition_axes
+  - source_prompt evidence
+  - seven canonical prompt blocks
+
+output_contract:
+  required_files:
+    - evolution.yml
+    - series-index.yml
+    - prompts/*.md
+    - manifest.yml
+  optional_files:
+    - bibles/<family>.md
+  prompt_layers:
+    - source_grounding
+    - base_visual_system
+    - topic_seasoning
+    - series_variables
+    - exact_text_and_render_plan
+    - acceptance_checks
+
+model_label_policy:
+  gpt2: "只记录来源模型标签，映射到 model_adapter；不把 GPT2 写成 image 技能依赖。"
+  other: "保留来源标签或 auto；按当前可用 imagegen 后端重新验收。"
+
+compiler:
+  stages:
+    - verify_source_and_selection
+    - normalize_composition_axes
+    - separate_base_seasoning_and_variants
+    - compile_image_prompt
+    - emit_series_bibles_and_manifest
+  variant_budget: "每个系列单项最多改变 2–4 个变量；固定底座不可被主题佐料覆盖。"
+  source_prompt_policy: "原始 Prompt 只作为 evidence 保存；执行 Prompt 必须经过七块契约重编译。"
+  missing_evidence: "缺少 ALT、正文或来源 URL 时 BLOCKED，不以模型常识补写。"
+
+observed_families:
+  morning_city:
+    base_visual_system:
+      - "固定画布比例、城市标题/字形蒙版的阅读顺序、日期与小注安全区。"
+      - "固定字体角色、留白比例、色相角色和系列页边距。"
+    topic_seasoning:
+      - "城市、代表元素、日期、问候语、今日宜忌和 3–5 个知识点。"
+    series_variables:
+      - "城市/地点"
+      - "主色相与辅助色"
+      - "字腔内图像/主体裁切"
+      - "知识点的呈现方式"
+    route: "knowledge_card + typographic_mask 或 travel_editorial_narrative + series"
+  poster_type_stage:
+    base_visual_system:
+      - "大面积留白、黑白主体、单一纯色色场、深色标题块和明确第一阅读层。"
+      - "固定标题阶梯、引号/主题符号锚点、署名与小标记安全区。"
+    topic_seasoning:
+      - "金句/任务/主题对象、人物参考、色彩情绪和用途。"
+    series_variables:
+      - "主体位置与裁切"
+      - "色场颜色与穿插位置"
+      - "标题块方向"
+      - "副标题/署名位置"
+    route: "single_hook + oversized_type/color_field_stage + bright_modern"
+  presentation_grid:
+    base_visual_system:
+      - "固定列网、基线、页边距、标题层级、图文比例和页脚。"
+      - "固定跨页字体、色彩角色和缩略图阅读顺序。"
+    topic_seasoning:
+      - "主题、每页 Markdown、知识点、事实来源和页角色。"
+    series_variables:
+      - "页角色"
+      - "焦点视觉/图表类型"
+      - "局部色块"
+      - "章节节奏与信息密度"
+    route: "deck_series + modular_grid + bright_modern/editorial_aesthetic"
+  travel_publication:
+    base_visual_system:
+      - "固定地平线、主体与倒影关系、边注轨道、标题和日期位置。"
+    topic_seasoning:
+      - "地点、核心对象、旅行叙事、真实环境资料和栏目文案。"
+    series_variables:
+      - "地点/主体"
+      - "冷暖色相"
+      - "倒影清晰度"
+      - "边注密度"
+    route: "deck_series + travel_editorial_narrative + travel_publication"
+  portrait_identity:
+    base_visual_system:
+      - "固定身份范围、镜头/光线角色、背景留白和标题安全区。"
+    topic_seasoning:
+      - "授权参考图、姿态、服装、场景、年龄边界和用途。"
+    series_variables:
+      - "姿态/视线"
+      - "服装与道具"
+      - "光线方向"
+      - "裁切和背景色"
+    route: "portrait_brief + identity_lock/cinematic_lighting + portrait_editorial"
+  event_people:
+    base_visual_system:
+      - "固定活动物料层级、人物/主体舞台关系、CTA 和事实安全区。"
+    topic_seasoning:
+      - "活动名称、时间、地点、主办方、人物和行动入口。"
+    series_variables:
+      - "物料角色"
+      - "人物位置"
+      - "主色场"
+      - "CTA 形态"
+    route: "campaign_pack + commercial_stage/modular_grid + bright_modern"
+  celebration_ceremony:
+    base_visual_system:
+      - "固定仪式光线、主题对象位置、日期/祝福文字层级和留白。"
+    topic_seasoning:
+      - "对象、关系、日期、祝福语和物料角色。"
+    series_variables:
+      - "对象姿态"
+      - "色调"
+      - "暗影/反射关系"
+      - "祝福字形位置"
+    route: "campaign_pack + mirror_reflection/identity_lock + ceremonial_soft"
+  hospitality_food:
+    base_visual_system:
+      - "固定产品主次、材质近景、商业舞台、卖点与 CTA 层级。"
+    topic_seasoning:
+      - "产品、食材/材质、菜单/服务事实和使用场景。"
+    series_variables:
+      - "产品/菜品"
+      - "材质与光线"
+      - "背景色"
+      - "卖点/CTA"
+    route: "campaign_pack + material_closeup/commercial_stage + hospitality_premium"
+  archival_print:
+    base_visual_system:
+      - "固定纸张、墨色、套印、网点、注释和来源标记。"
+    topic_seasoning:
+      - "史实、金句、出处、对象和课程/出版用途。"
+    series_variables:
+      - "来源对象"
+      - "纸张/墨色"
+      - "标题裁切"
+      - "注释密度"
+    route: "knowledge_card + archival_collage/oversized_type + archival_historical"
+  pixel_play:
+    base_visual_system:
+      - "固定主体识别区、像素尺度、解体方向和安全背景。"
+    topic_seasoning:
+      - "主体、材质、动作和视觉实验目标。"
+    series_variables:
+      - "解体方向"
+      - "像素密度"
+      - "强调色"
+      - "保留主体区域"
+    route: "single_hook + pixel_dissolution + playful_pixel"
+
+fallback_family:
+  base_visual_system:
+    - "先锁定标题、主体、阅读顺序、比例和一个主视觉机制。"
+    - "只从来源证据提取颜色、材质、文字和系列变量。"
+  topic_seasoning:
+    - "主题标题、来源正文/ALT 和用途。"
+  series_variables:
+    - "主体、构图、色彩或局部信息标记中的 2–4 项。"
+  route: "single_hook + oversized_type + editorial_aesthetic"
+
+acceptance:
+  research_gate:
+    - "source URL/status ID、selection.filters、fetched/selected 和 evidence source 保留。"
+    - "Prompt Deck 不是位图；不能把编译通过写成图片通过。"
+  visual_gate:
+    - "实际调用 imagegen 并用 view_image 检查比例、层次、文字和主题佐料。"
+    - "系列抽样检查固定底座一致，逐图变量不超过 2–4 项。"
+  text_gate:
+    - "中文/数字/URL/CTA 逐字核对；高风险字段切换 hybrid_exact_text。"
