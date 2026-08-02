@@ -53,8 +53,37 @@ npx skills add soia-team/soia-open-media-content-skills -g --all
 
 ## Git Workflow
 
-- `dev` is the default integration branch: open PRs against `dev`, wait for the
-  `audit` check, then merge. Do not push directly to `dev` or `main`.
+### Protected branches — ABSOLUTE prohibition on direct push
+
+`dev` and `main` are protected. **Direct push to either branch is FORBIDDEN,
+even if the remote does not technically block it.** Both branches enforce a
+required `audit` status check; bypassing it corrupts governance history and
+must never happen.
+
+**If you are an AI agent**, follow these steps exactly — no shortcuts:
+
+1. Create a feature branch from `dev`:
+   ```bash
+   git checkout dev && git pull
+   git checkout -b feat/<short-description>
+   ```
+2. Make your commits on the feature branch.
+3. Push the feature branch to origin:
+   ```bash
+   git push origin feat/<short-description>
+   ```
+4. Open a PR targeting `dev` using `gh pr create --base dev`.
+5. Wait for `audit` CI to pass; do **not** merge yourself.
+
+**Never run `git push origin dev` or `git push origin main` from a feature or
+working branch.** If you find yourself about to do this, stop and open a PR
+instead. Bypassing branch protection — even accidentally — must be reported to
+the maintainer.
+
+### Branch purpose
+
+- `dev` is the default integration branch: all feature PRs merge here after
+  `audit` passes.
 - `main` always equals the latest formal release and only accepts release PRs
   from `dev`, driven by `soia-meta-skill-release`. Never open feature PRs
   against `main`.
