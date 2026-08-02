@@ -4,7 +4,9 @@
 The script is the second stage of ``brand_logo``. It does not invent a mark or
 trace a raster image; the caller supplies approved mark/wordmark path data after
 selecting a direction from imagegen. A text wordmark is allowed for preview but
-is marked as needing outline conversion in the manifest.
+is marked as needing outline conversion in the manifest. An optional accent path
+keeps a secondary color from the approved direction deterministic across every
+lockup and variant.
 """
 
 from __future__ import annotations
@@ -59,21 +61,48 @@ def slug(value: str) -> str:
     return re.sub(r"[^0-9A-Za-z-]+", "-", value).strip("-").lower() or "logo"
 
 
-def variant_colors(spec: dict[str, Any], variant: str) -> tuple[str, str]:
+def variant_colors(spec: dict[str, Any], variant: str) -> tuple[str, str, str]:
     if variant == "monochrome":
-        return "#000000", "#FFFFFF"
+        return "#000000", "#FFFFFF", "#000000"
     if variant == "reversed":
-        return "#FFFFFF", color(spec.get("dark_background"), "dark_background", "#111827")
-    return color(spec.get("primary_color"), "primary_color", "#1D4ED8"), "#FFFFFF"
+        return "#FFFFFF", color(spec.get("dark_background"), "dark_background", "#111827"), "#FFFFFF"
+    primary = color(spec.get("primary_color"), "primary_color", "#1D4ED8")
+    accent = color(spec.get("secondary_color"), "secondary_color", primary)
+    return primary, "#FFFFFF", accent
 
 
-def mark_element(path_data: str, viewbox: tuple[float, float, float, float], x: float, y: float, width: float, height: float, fill: str) -> str:
+def mark_element(
+    path_data: str,
+    viewbox: tuple[float, float, float, float],
+    x: float,
+    y: float,
+    width: float,
+    height: float,
+    fill: str,
+    accent_path: str = "",
+    accent_fill: str | None = None,
+    stroke_width: float | None = None,
+) -> str:
     _, _, view_width, view_height = viewbox
     scale_x = width / view_width
     scale_y = height / view_height
+    if stroke_width is not None and stroke_width > 0:
+        primary_attrs = (
+            f'fill="none" stroke="{fill}" stroke-width="{stroke_width:.3f}" '
+            'stroke-linecap="round" stroke-linejoin="round"'
+        )
+    else:
+        primary_attrs = f'fill="{fill}" fill-rule="evenodd" clip-rule="evenodd"'
+    paths = [f'<path d="{html.escape(path_data, quote=True)}" {primary_attrs}/>']
+    if accent_path:
+        paths.append(
+            f'<path d="{html.escape(accent_path, quote=True)}" fill="{accent_fill or fill}" '
+            'fill-rule="evenodd" clip-rule="evenodd"/>'
+        )
     return (
         f'<g transform="translate({x:.2f} {y:.2f}) scale({scale_x:.6f} {scale_y:.6f})">'
-        f'<path d="{html.escape(path_data, quote=True)}" fill="{fill}"/></g>'
+        + "".join(paths)
+        + "</g>"
     )
 
 
@@ -83,9 +112,12 @@ def wordmark_element(spec: dict[str, Any], x: float, y: float, max_width: float,
         viewbox = parse_viewbox(spec.get("wordmark_viewbox"), "wordmark_viewbox")
         _, _, view_width, view_height = viewbox
         scale = min(max_width / view_width, (font_size * 1.1) / view_height)
+        rendered_width = view_width * scale
+        origin_x = x - rendered_width / 2 if anchor == "middle" else x
         return (
-            f'<g transform="translate({x:.2f} {y - font_size:.2f}) scale({scale:.6f} {scale:.6f})">'
-            f'<path d="{html.escape(wordmark_path, quote=True)}" fill="{fill}"/></g>',
+            f'<g transform="translate({origin_x:.2f} {y - font_size:.2f}) scale({scale:.6f} {scale:.6f})">'
+            f'<path d="{html.escape(wordmark_path, quote=True)}" fill="{fill}" '
+            'fill-rule="nonzero" clip-rule="nonzero"/></g>',
             True,
         )
     wordmark = html.escape(require_text(spec, "wordmark"))
@@ -103,7 +135,7 @@ def layout(lockup: str) -> tuple[int, int, tuple[float, float, float, float], tu
     if lockup == "app-icon":
         return 1024, 1024, (230, 150, 564, 564), None, 1
     if lockup == "horizontal-lockup":
-        return 1600, 640, (80, 100, 440, 440), (640, 390, 820, 120), 0.92
+        return 1600, 640, (80, 100, 440, 440), (1100, 390, 820, 120), 0.92
     if lockup == "stacked-lockup":
         return 1024, 1024, (232, 80, 560, 560), (512, 790, 760, 110), 0.86
     if lockup == "wordmark-only":
@@ -113,14 +145,27 @@ def layout(lockup: str) -> tuple[int, int, tuple[float, float, float, float], tu
 
 def render_svg(spec: dict[str, Any], lockup: str, variant: str) -> tuple[str, bool, tuple[int, int]]:
     mark_path = require_text(spec, "mark_path")
+    accent_path = str(spec.get("mark_accent_path", "")).strip()
+    stroke_width_raw = spec.get("mark_stroke_width")
+    stroke_width = float(stroke_width_raw) if stroke_width_raw not in (None, "") else None
     mark_viewbox = parse_viewbox(spec.get("mark_viewbox"), "mark_viewbox")
-    foreground, reversed_background = variant_colors(spec, variant)
+    foreground, reversed_background, accent = variant_colors(spec, variant)
     width, height, mark_box, word_box, word_scale = layout(lockup)
     elements: list[str] = []
     if lockup == "app-icon":
         elements.append(f'<rect width="{width}" height="{height}" rx="220" fill="{reversed_background}"/>')
     if mark_box[2] > 0:
-        elements.append(mark_element(mark_path, mark_viewbox, *mark_box, foreground))
+        elements.append(
+            mark_element(
+                mark_path,
+                mark_viewbox,
+                *mark_box,
+                foreground,
+                accent_path,
+                accent,
+                stroke_width,
+            )
+        )
     outlined = True
     if word_box:
         x, y, max_width, font_size = word_box
@@ -177,7 +222,10 @@ def main() -> int:
         "brand_name": require_text(spec, "brand_name"),
         "status": "PASS" if all_outlined else "NEEDS_WORDMARK_OUTLINE",
         "wordmark_outlined": all_outlined,
+        "mark_accent_present": bool(str(spec.get("mark_accent_path", "")).strip()),
+        "mark_stroke_width": spec.get("mark_stroke_width"),
         "mark_viewbox": str(spec.get("mark_viewbox")),
+        "secondary_color": spec.get("secondary_color"),
         "clear_space_ratio": spec.get("clear_space_ratio", 0.25),
         "min_size_px": spec.get("min_size_px", 24),
         "artifacts": artifacts,

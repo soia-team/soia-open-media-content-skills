@@ -47,10 +47,12 @@ class BrandLogoRendererTest(unittest.TestCase):
                 "brand_name": "Example",
                 "mark_viewbox": "0 0 100 100",
                 "mark_path": "M10 50 A40 40 0 1 0 90 50 A40 40 0 1 0 10 50 Z",
+                "mark_accent_path": "M70 50 A10 10 0 1 0 90 50 A10 10 0 1 0 70 50 Z",
                 "wordmark": "Example",
                 "wordmark_viewbox": "0 0 100 20",
                 "wordmark_path": "M0 0 H100 V20 H0 Z",
                 "primary_color": "#1D4ED8",
+                "secondary_color": "#F79009",
                 "dark_background": "#111827",
                 "lockups": ["mark-only", "horizontal-lockup"],
                 "variants": ["color", "monochrome", "reversed"],
@@ -59,12 +61,41 @@ class BrandLogoRendererTest(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             manifest = json.loads((output / "manifest.yml").read_text(encoding="utf-8").split("\n", 1)[1])
             self.assertEqual(manifest["status"], "PASS")
+            self.assertTrue(manifest["mark_accent_present"])
             self.assertEqual(len(manifest["artifacts"]), 6)
             for artifact in manifest["artifacts"]:
                 svg = (output / artifact["file"]).read_text(encoding="utf-8")
                 self.assertIn("<svg", svg)
                 self.assertIn("viewBox=", svg)
                 self.assertNotIn("<image", svg)
+            color_svg = (output / "horizontal-lockup-color.svg").read_text(encoding="utf-8")
+            mono_svg = (output / "horizontal-lockup-monochrome.svg").read_text(encoding="utf-8")
+            self.assertIn("#F79009", color_svg)
+            self.assertNotIn("#F79009", mono_svg)
+            self.assertIn('translate(770.00 270.00)', color_svg)
+
+    def test_stroked_mark_preserves_accent_path(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            spec = {
+                "brand_name": "Stroke",
+                "mark_viewbox": "0 0 100 100",
+                "mark_path": "M10 50 C10 0 90 0 90 50",
+                "mark_accent_path": "M43 43 A7 7 0 1 0 57 43 A7 7 0 1 0 43 43 Z",
+                "mark_stroke_width": 12,
+                "wordmark": "Stroke",
+                "wordmark_path": "M0 0 H100 V20 H0 Z",
+                "wordmark_viewbox": "0 0 100 20",
+                "primary_color": "#155EEF",
+                "secondary_color": "#F79009",
+                "lockups": ["mark-only"],
+                "variants": ["color"],
+            }
+            result, output = self.run_renderer(Path(temp), spec)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            svg = (output / "mark-only-color.svg").read_text(encoding="utf-8")
+            self.assertIn('stroke="#155EEF"', svg)
+            self.assertIn('stroke-width="12.000"', svg)
+            self.assertIn('fill="#F79009"', svg)
 
     def test_text_wordmark_is_explicitly_marked_for_outline_conversion(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
