@@ -38,7 +38,13 @@ brand_logo:
   brand_name: <品牌名称>
   mark_concept: <一个核心图形概念>
   wordmark: <逐字字标，可选>
+  wordmark_viewbox: <有 wordmark_path 时必填，例如 0 0 500 110>
+  wordmark_path: <可选；确定性字标轮廓路径，必须与 wordmark_viewbox 同坐标系>
   tagline: <逐字副标题，可选>
+  mark_viewbox: <有 mark_path 时必填，例如 0 0 800 800>
+  mark_path: <确定性主图形路径>
+  mark_accent_path: <可选；强调节点/辅助图形路径，与 mark_viewbox 同坐标系>
+  mark_stroke_width: <可选；主图形为描边路径时的描边宽度>
   lockups: [mark-only, wordmark-only, horizontal-lockup, stacked-lockup, app-icon]
   variants: [color, monochrome, reversed]
   primary_color: <hex>

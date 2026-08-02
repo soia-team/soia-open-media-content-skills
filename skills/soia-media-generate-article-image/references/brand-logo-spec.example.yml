@@ -3,9 +3,11 @@ brand_name: Example
 mark_concept: "两条轨道汇聚成一个开放节点"
 mark_viewbox: "0 0 100 100"
 mark_path: "M10 50 A40 40 0 1 0 90 50 A40 40 0 1 0 10 50 Z M35 50 A15 15 0 1 0 65 50 A15 15 0 1 0 35 50 Z"
+mark_accent_path: "M76 50 A8 8 0 1 0 92 50 A8 8 0 1 0 76 50 Z"
 wordmark: Example
 approved_font: "Inter, Arial, sans-serif"
 primary_color: "#1D4ED8"
+secondary_color: "#F79009"
 dark_background: "#111827"
 clear_space_ratio: 0.25
 min_size_px: 24
