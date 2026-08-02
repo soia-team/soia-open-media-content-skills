@@ -42,6 +42,14 @@ REQUIRED_BLOCKS = (
     "aspect_and_output",
     "constraints_and_avoid",
 )
+SERIES_AXIS_FIELDS = (
+    "information_structure",
+    "visual_mechanism",
+    "aesthetic_system",
+    "text_strategy",
+    "batch_strategy",
+    "aspect",
+)
 HEADING_RE = re.compile(r"^##\s+([^\n]+)\s*$", re.MULTILINE)
 
 
@@ -170,6 +178,30 @@ def bullet_lines(values: Any) -> str:
     return f"- {as_text(values)}" if as_text(values) else "- 未提供"
 
 
+def axis_counts(items: list[dict[str, Any]]) -> dict[str, dict[str, int]]:
+    """Return deterministic per-family axis counts instead of treating the first item as canonical."""
+    result: dict[str, dict[str, int]] = {}
+    for axis in SERIES_AXIS_FIELDS:
+        counts = Counter(as_text(item["composition_axes"].get(axis)) for item in items)
+        result[axis] = {value: counts[value] for value in sorted(counts) if value}
+    return result
+
+
+def stable_and_variant_axes(items: list[dict[str, Any]]) -> tuple[dict[str, str], dict[str, dict[str, int]]]:
+    observations = axis_counts(items)
+    stable = {
+        axis: next(iter(values))
+        for axis, values in observations.items()
+        if len(values) == 1
+    }
+    variants = {
+        axis: values
+        for axis, values in observations.items()
+        if len(values) > 1
+    }
+    return stable, variants
+
+
 def extract_source_layers(source_prompt: str) -> dict[str, Any]:
     """Extract bounded evidence slices without treating the source as a final prompt."""
     fenced = re.findall(r"```(?:yaml|text)?\s*(.*?)```", source_prompt, flags=re.IGNORECASE | re.DOTALL)
@@ -234,13 +266,13 @@ def compile_item(
             "BASE VISUAL SYSTEM (stable across the family/series)",
             bullet_lines(base_visual_system),
             "",
-        "TOPIC SEASONING (derived from the selected source item)",
+            "TOPIC SEASONING (derived from the selected source item)",
             bullet_lines(topic_seasoning),
             "- Interpret only the bounded source seasoning evidence below; do not copy author wording or invent facts:",
             bullet_lines(source_layers["seasoning_excerpts"] or [visible_title]),
             "",
-            "SOURCE BASE EVIDENCE (for interpretation, not for verbatim copying)",
-            source_layers["base_excerpt"],
+            "SOURCE EVIDENCE POLICY",
+            "- Raw source prompt evidence is retained in source_visual_evidence/source_prompt_evidence; do not paste it into the execution prompt.",
             "",
             "SERIES VARIABLES",
             bullet_lines(series_variables),
@@ -284,6 +316,8 @@ def compile_item(
             "output_mode": output_mode,
             "render_mode": render_mode,
             "model_label_is_provenance": is_model_label,
+            "source_evidence_artifact": "source_visual_evidence + source_prompt_evidence",
+            "raw_source_evidence_in_execution_prompt": False,
             "max_variant_changes": 4,
             "requires_view_image": True,
         },
@@ -293,7 +327,7 @@ def compile_item(
 
 def render_bible(family: str, items: list[dict[str, Any]], evolution: dict[str, Any]) -> str:
     definition = family_definition(evolution, family)
-    axes = items[0]["composition_axes"]
+    stable_axes, variant_axes = stable_and_variant_axes(items)
     lines = [
         f"# Series Bible · {family}",
         "",
@@ -302,23 +336,16 @@ def render_bible(family: str, items: list[dict[str, Any]], evolution: dict[str, 
         "## Stable composition axes",
         "",
         "```yaml",
-        json.dumps(
-            {
-                key: axes.get(key)
-                for key in (
-                    "family",
-                    "information_structure",
-                    "visual_mechanism",
-                    "aesthetic_system",
-                    "text_strategy",
-                    "batch_strategy",
-                    "aspect",
-                )
-            },
-            ensure_ascii=False,
-            indent=2,
-        ),
+        json.dumps({"family": family, **stable_axes}, ensure_ascii=False, indent=2),
         "```",
+        "",
+        "## Observed axis variants",
+        "",
+        "```yaml",
+        json.dumps(variant_axes or {"none": {}}, ensure_ascii=False, indent=2),
+        "```",
+        "",
+        "Choose an observed variant per item; do not force the first item's aspect or information structure across the family.",
         "",
         "## Base visual system",
         "",
@@ -474,14 +501,11 @@ def main() -> int:
                 "family": family,
                 "count": family_counts[family],
                 "bible": f"bibles/{slugify(family)}.md",
-                "stable_axes": {
-                    key: family_items[0]["composition_axes"].get(key)
-                    for key in ("information_structure", "visual_mechanism", "aesthetic_system", "text_strategy", "aspect")
-                },
+                "stable_axes": stable_and_variant_axes(family_items)[0],
+                "variant_axes": stable_and_variant_axes(family_items)[1],
                 "axis_drift": {
-                    key: sorted({as_text(item["composition_axes"].get(key)) for item in family_items})
-                    for key in ("information_structure", "visual_mechanism", "aesthetic_system", "text_strategy", "aspect")
-                    if len({as_text(item["composition_axes"].get(key)) for item in family_items}) > 1
+                    key: sorted(values)
+                    for key, values in stable_and_variant_axes(family_items)[1].items()
                 },
             }
             for family, family_items in sorted(by_family.items())

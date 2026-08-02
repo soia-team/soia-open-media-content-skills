@@ -49,6 +49,10 @@ information_structures:
     reference: prompt-structure-campaign-pack.md
     compile_fields: [shared_facts, approved_assets, shared_visual_base, role_table, cta]
     acceptance: [each_asset_has_role, facts_are_consistent, no_duplicate_filler_pages]
+  logo_system:
+    reference: prompt-structure-logo-system.md
+    compile_fields: [brand_name, mark_concept, lockup_variants, color_variants, clear_space_ratio, min_size_px]
+    acceptance: [same_geometry_across_variants, wordmark_is_sourced, svg_master_exists]
 
 text_strategies:
   exact_text:
@@ -71,6 +75,10 @@ text_strategies:
     reference: prompt-text-quote-led.md
     compile_fields: [source_quote, attribution_boundary, short_supporting_line, source_marker]
     acceptance: [quote_is_sourced, attribution_not_invented, no_fake_authority]
+  logo_wordmark:
+    reference: prompt-text-logo-wordmark.md
+    compile_fields: [verbatim_wordmark, case_and_language, approved_font_or_path, tracking_and_baseline, outline_requirement]
+    acceptance: [wordmark_is_exact, font_or_path_is_approved, no_uninstalled_font_dependency]
 
 visual_mechanisms:
   typographic_mask:
@@ -125,6 +133,10 @@ visual_mechanisms:
     reference: prompt-visual-mechanism-pixel-dissolution.md
     compile_fields: [subject, dissolution_direction, preserved_identity_zone, pixel_density, background_safe_area]
     acceptance: [transition_is_controlled, subject_remains_identifiable, no_random_noise]
+  geometric_mark:
+    reference: prompt-visual-mechanism-geometric-mark.md
+    compile_fields: [mark_concept, primitive_set, grid_or_ratio, negative_space_rule, stroke_or_fill_rule, small_size_simplification]
+    acceptance: [outline_is_recognizable, same_geometry_across_lockups, deterministic_vector_path]
 
 aesthetic_systems:
   editorial_aesthetic:
@@ -159,3 +171,7 @@ aesthetic_systems:
     reference: prompt-aesthetic-travel-publication-system.md
     compile_fields: [cool_environment, warm_subject, neutral_type, accent_mark, print_treatment]
     acceptance: [sky_and_white_clean, subject_contrast, annotation_is_controlled]
+  brand_system:
+    reference: prompt-aesthetic-brand-system.md
+    compile_fields: [primary_color, secondary_color, neutral_background, dark_background, monochrome_color, surface_and_contrast_rule]
+    acceptance: [color_roles_are_fixed, light_dark_contrast, monochrome_variant_exists]

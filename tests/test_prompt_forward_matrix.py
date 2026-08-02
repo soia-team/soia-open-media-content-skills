@@ -47,6 +47,8 @@ class PromptForwardMatrixTest(unittest.TestCase):
         self.assertEqual(supported_families, matrix_families)
         self.assertEqual(self.matrix["coverage"]["prompt_families"], len(supported_families))
         self.assertEqual(self.matrix["coverage"]["generated_assets"], 18)
+        self.assertEqual(self.matrix["coverage"]["vector_contract_fixtures"], 1)
+        self.assertTrue(any(item["result"] == "pass_vector_contract" for item in self.matrix["delivery"]))
 
     def test_forward_matrix_does_not_claim_static_success_as_visual_success(self) -> None:
         self.assertEqual(self.matrix["backend"], "builtin_imagegen")

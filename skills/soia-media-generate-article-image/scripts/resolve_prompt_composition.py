@@ -46,6 +46,7 @@ def _fallbacks(result: dict[str, Any]) -> None:
         "hospitality_poster": "hospitality_food",
         "food_beverage": "hospitality_food",
         "archival_print": "archival_print",
+        "brand_identity": "brand_identity",
     }
     if result.get("family") == "auto" and result.get("use_case") in family_by_use_case:
         result["family"] = family_by_use_case[result["use_case"]]
@@ -60,6 +61,7 @@ def _fallbacks(result: dict[str, Any]) -> None:
         "hospitality_food": "campaign_pack",
         "archival_print": "knowledge_card",
         "pixel_play": "single_hook",
+        "brand_identity": "logo_system",
     }
     if result.get("information_structure") == "auto" and result.get("family") in structure_by_family:
         result["information_structure"] = structure_by_family[result["family"]]
@@ -71,6 +73,7 @@ def _fallbacks(result: dict[str, Any]) -> None:
         "event_people": "commercial_stage",
         "hospitality_food": "material_closeup",
         "travel_publication": "travel_editorial_narrative",
+        "brand_identity": "geometric_mark",
     }
     if result.get("visual_mechanism") == "auto" and result.get("family") in mechanism_by_family:
         result["visual_mechanism"] = mechanism_by_family[result["family"]]
@@ -86,6 +89,7 @@ def _fallbacks(result: dict[str, Any]) -> None:
         "event_people": "bright_modern",
         "hospitality_food": "hospitality_premium",
         "pixel_play": "playful_pixel",
+        "brand_identity": "brand_system",
     }
     if result.get("aesthetic_system") == "auto" and result.get("family") in aesthetic_by_family:
         result["aesthetic_system"] = aesthetic_by_family[result["family"]]
@@ -98,6 +102,7 @@ def _fallbacks(result: dict[str, Any]) -> None:
         "campaign_pack": "exact_text",
         "portrait_brief": "exact_text",
         "single_hook": "hero_typography",
+        "logo_system": "logo_wordmark",
     }
     if result.get("text_strategy") == "auto" and result.get("information_structure") in strategy_by_structure:
         result["text_strategy"] = strategy_by_structure[result["information_structure"]]
@@ -115,6 +120,7 @@ def resolve_query(query: str, index: dict[str, Any]) -> dict[str, Any]:
         "text_strategy",
         "batch_strategy",
         "output_mode",
+        "logo_variant",
     ]
     result: dict[str, Any] = {
         axis: ("auto" if axis in {"batch_strategy", "output_mode"} else (index["axes"][axis].get("default") or "auto"))
@@ -153,6 +159,7 @@ def resolve_query(query: str, index: dict[str, Any]) -> dict[str, Any]:
         "hospitality_food",
         "archival_print",
         "pixel_play",
+        "brand_identity",
     }:
         # Generic wording asks for the family default; a concrete aesthetic alias wins.
         has_concrete_aesthetic = any(
@@ -170,6 +177,7 @@ def resolve_query(query: str, index: dict[str, Any]) -> dict[str, Any]:
                 "hospitality_food": "hospitality_premium",
                 "archival_print": "archival_historical",
                 "pixel_play": "playful_pixel",
+                "brand_identity": "brand_system",
             }
             result["aesthetic_system"] = family_defaults[result["family"]]
     if result.get("batch_strategy") == "auto":
@@ -236,6 +244,10 @@ def main() -> int:
         print("\nPrompt 家族：")
         for item in catalog["supported_families"]:
             print(f"- {item['id']}｜{item['label']}：{item['choose_when']}；用法：{item['usage']}")
+        if catalog.get("supported_logo_variants"):
+            print("\nLogo 变体：")
+            for item in catalog["supported_logo_variants"]:
+                print(f"- {item['id']}｜{item['label']}：{item['choose_when']}")
     else:
         print(" + ".join(f"{item['axis']}={item['value']}" for item in payload["matched"]))
         print("load: " + ", ".join(payload["references"]))
