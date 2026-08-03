@@ -25,6 +25,46 @@ manifest 必须记录 `output_dir_origin`。禁止使用 cwd、技能仓、vault
 └── manifest.yml
 ```
 
+康奈尔笔记高密度系列：
+
+```text
+<output-dir>/
+├── prompts/01-cornell-notes-<topic>-p01-of-03.md
+├── prompts/02-cornell-notes-<topic>-p02-of-03.md
+├── prompts/03-cornell-notes-<topic>-p03-of-03.md
+├── cornell-notes-<topic>-p01-of-03.png
+├── cornell-notes-<topic>-p02-of-03.png
+├── cornell-notes-<topic>-p03-of-03.png
+└── manifest.yml
+```
+
+康奈尔系列的 `series.page_count` 为 1–6；单页也必须使用统一的页码字段（例如 `01/01`）。
+每张图左上角安全区固定显示 `NN/TT`，页码不能只存在文件名或 manifest。系列共享
+视觉底座和来源标记，按知识单元拆分；最后一页承担总结和一句话记忆。
+
+manifest 最小字段：
+
+```yaml
+series:
+  id: <series-id>
+  preset: cornell_notes
+  density_profile: dense_cornell_v1
+  style_reference_role: style_density_reference
+  page_count: 3
+  page_marker: top_left
+  pages:
+    - page_number: 1
+      page_count: 3
+      page_label: 01/03
+      density_audit:
+        cue_count: 10
+        note_module_count: 10
+        page_role: content
+      prompt_file: prompts/01-...-p01-of-03.md
+      image_file: ...-p01-of-03.png
+      image_status: passed
+```
+
 品牌 Logo 两阶段交付：
 
 ```text
@@ -60,6 +100,8 @@ X profile 进化导入：
 ```
 
 Prompt Deck 或 Prompt 编译通过不等于位图通过；最终交付必须有 PNG/JPG 和视觉验收记录。
+康奈尔多页还必须逐页 `view_image`；任一页的页码、文字、来源、比例或视觉一致性失败，
+系列整体不能标记为通过。
 
 ## 私密数据
 

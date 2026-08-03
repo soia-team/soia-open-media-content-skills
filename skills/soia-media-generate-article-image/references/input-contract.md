@@ -29,7 +29,7 @@ output_dir: <optional-directory>
 quick: false
 ```
 
-可选字段包括 `series_id`、`facts_source`、`batch_spec`、`claim_mode`、`featured_skills`、`cta_mode`、`qr_target`、`exact_text`、`brand_assets` 和 `reference_images`。参考图必须声明 `style-reference`、`composition-reference` 或 `edit-target`。
+可选字段包括 `series_id`、`facts_source`、`batch_spec`、`claim_mode`、`featured_skills`、`cta_mode`、`qr_target`、`exact_text`、`brand_assets` 和 `reference_images`。参考图必须声明 `style-reference`、`composition-reference`、`style_density_reference` 或 `edit-target`；标记 `style_density_reference` 时只继承版式、密度、材质和颜色角色，不继承参考图事实。
 
 Logo 请求还必须提供：
 

@@ -36,8 +36,8 @@ support_catalog:
     - id: cornell_notes
       label: 康奈尔学习笔记
       image_types: [learning_note, summary_card]
-      choose_when: "需要问题线索、模块化笔记、回顾总结和一句话记忆"
-      usage: "preset=cornell_notes; information_structure=knowledge_card; output_mode=poster"
+      choose_when: "需要问题线索、模块化笔记、回顾总结和一句话记忆；复杂文章可按密度生成 1–6 页"
+      usage: "preset=cornell_notes; information_structure=knowledge_card; batch_strategy=adaptive_series; output_mode=poster"
     - id: godot_pixel_metaphor
       label: 像素视觉隐喻封面
       image_types: [cover, poster]
@@ -161,6 +161,21 @@ support_catalog:
       common_mechanisms: [geometric_mark]
       common_aesthetics: [brand_system, bright_modern]
       usage: "family=brand_identity; information_structure=logo_system; visual_mechanism=geometric_mark; text_strategy=logo_wordmark"
+
+cornell_pagination:
+  applies_to: cornell_notes
+  page_count: "auto | 1..6"
+  max_pages: 6
+  page_marker: top_left
+  page_label_format: "NN/TT"
+  series_manifest: required
+  planner: scripts/resolve_cornell_pagination.py
+  density_profile: dense_cornell_v1
+  target_modules_per_page: 10
+  min_modules_per_page: 6
+  reference_role: style_density_reference
+  sparse_page_policy: "≤10 个完整模块默认单页；系列页低于 6 个模块时合并或减少页数"
+  split_policy: "按章节、知识模块和密度拆分；不机械截断，不用虚构内容填页；保留已认可母版的高信息密度"
 
 axes:
   model_adapter:
@@ -461,11 +476,16 @@ axes:
     default: single
     aliases:
       批量: series
+      复杂文章: adaptive_series
+      长文: adaptive_series
+      信息密集: adaptive_series
+      按章节拆图: adaptive_series
       10张: series
       10个城市: series
     options:
       single: "单张图，主题和知识点一次闭环"
       series: "锁定视觉底座；每页只改变 2–4 个变量，并保留逐页 facts"
+      adaptive_series: "康奈尔长文按内容密度生成 1–6 页；系列共享视觉底座，页码固定在左上角并写入 manifest"
       campaign_pack: "同一事实/品牌底座生成 4 张或 10 张不同物料角色"
 
   output_mode:
