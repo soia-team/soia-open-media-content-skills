@@ -167,6 +167,8 @@ cornell_pagination:
   page_count: "auto | 1..6"
   max_pages: 6
   page_marker: top_left
+  page_marker_style: compact_badge
+  reference_annotation_policy: ignore_red_annotations
   page_label_format: "NN/TT"
   series_manifest: required
   planner: scripts/resolve_cornell_pagination.py

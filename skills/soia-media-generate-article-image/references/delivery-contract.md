@@ -39,8 +39,9 @@ manifest 必须记录 `output_dir_origin`。禁止使用 cwd、技能仓、vault
 ```
 
 康奈尔系列的 `series.page_count` 为 1–6；单页也必须使用统一的页码字段（例如 `01/01`）。
-每张图左上角安全区固定显示 `NN/TT`，页码不能只存在文件名或 manifest。系列共享
+每张图左上角安全区用统一的 `compact_badge` 徽章显示 `NN/TT`，页码不能只存在文件名或 manifest。系列共享
 视觉底座和来源标记，按知识单元拆分；最后一页承担总结和一句话记忆。
+参考图里的红色圈号、红框、箭头或手写数字若未出现在 `exact_text`，均视为用户批注，不得渲染。
 
 manifest 最小字段：
 
@@ -52,6 +53,7 @@ series:
   style_reference_role: style_density_reference
   page_count: 3
   page_marker: top_left
+  page_marker_style: compact_badge
   pages:
     - page_number: 1
       page_count: 3

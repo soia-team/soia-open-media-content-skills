@@ -112,6 +112,8 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertTrue(template["adaptive_pagination"])
         self.assertEqual(template["max_pages"], 6)
         self.assertEqual(template["page_marker"], "top_left")
+        self.assertEqual(template["page_marker_style"], "compact_badge")
+        self.assertEqual(template["reference_annotation_policy"], "ignore_red_annotations")
         self.assertEqual(template["density_profile"], "dense_cornell_v1")
         self.assertEqual(template["target_modules_per_page"], 10)
         self.assertEqual(template["min_modules_per_page"], 6)
@@ -130,6 +132,8 @@ class ArticleImageContractTest(unittest.TestCase):
             "style_density_reference",
             "6–10",
             "3–4 个大卡片",
+            "compact_badge",
+            "红色圈号",
         ):
             self.assertIn(token, prompt)
         delivery = (SKILL / "references" / "delivery-contract.md").read_text(encoding="utf-8")
@@ -150,6 +154,8 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertEqual(pagination["applies_to"], "cornell_notes")
         self.assertEqual(pagination["max_pages"], 6)
         self.assertEqual(pagination["page_marker"], "top_left")
+        self.assertEqual(pagination["page_marker_style"], "compact_badge")
+        self.assertEqual(pagination["reference_annotation_policy"], "ignore_red_annotations")
         self.assertEqual(pagination["page_label_format"], "NN/TT")
         self.assertEqual(pagination["series_manifest"], "required")
         self.assertEqual(pagination["density_profile"], "dense_cornell_v1")
