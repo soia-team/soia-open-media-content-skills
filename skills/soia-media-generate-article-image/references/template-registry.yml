@@ -79,6 +79,8 @@ templates:
     adaptive_pagination: true
     max_pages: 6
     page_marker: top_left
+    page_marker_style: compact_badge
+    reference_annotation_policy: ignore_red_annotations
     density_profile: dense_cornell_v1
     target_modules_per_page: 10
     min_modules_per_page: 6

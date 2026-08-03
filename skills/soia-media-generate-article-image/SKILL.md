@@ -79,7 +79,7 @@ python3 scripts/resolve_prompt_composition.py --list-supported
 
 - 选择 `cornell_notes` 后默认运行 `scripts/resolve_cornell_pagination.py`，锁定 `density_profile=dense_cornell_v1`；客户给了已认可成品时标记 `style_density_reference`，只替换事实与页变量。
 - `page_count` 只能是 1–6；≤10 个完整模块默认保持一张高密度母版，系列页目标 6–10 个问题—笔记模块，内容不足就合并，不用虚构信息填页。
-- 生成前在 Prompt/manifest 记录 `density_audit`（cue/module 数、页角色、页码）；多页写入统一 `series_id`，左上角安全区显示 `NN/TT`。
+- 生成前在 Prompt/manifest 记录 `density_audit`（cue/module 数、页角色、页码）；多页写入统一 `series_id`，左上角安全区使用统一的紧凑页码徽章显示 `NN/TT`。参考图中的红圈、红框或手写数字只当用户批注，不得复制进成品。
 - 按知识单元拆分，不机械截断；所有页共享康奈尔视觉底座，最后一页承担总结/一句话记忆。
 - manifest 必须记录系列和逐页状态；每页都要 `view_image`，密度、页码、文字、来源或比例任一失败，系列不能通过。
 
