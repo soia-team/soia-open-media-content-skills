@@ -97,6 +97,69 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertIn("基础视觉系统", prompt)
         self.assertIn("主题佐料", prompt)
 
+    def test_editorial_presets_can_inherit_an_approved_density_reference(self) -> None:
+        research = (SKILL / "references" / "prompt-editorial-research-minimal.md").read_text(encoding="utf-8")
+        summary = (SKILL / "references" / "prompt-editorial-summary-card.md").read_text(encoding="utf-8")
+        for prompt in (research, summary):
+            self.assertIn("style_density_reference", prompt)
+            self.assertIn("6–10", prompt)
+            self.assertIn("只替换", prompt)
+
+    def test_cornell_template_declares_adaptive_one_to_six_page_series(self) -> None:
+        registry = yaml.safe_load((SKILL / "references" / "template-registry.yml").read_text(encoding="utf-8"))
+        template = {item["id"]: item for item in registry["templates"]}["cornell_notes"]
+        self.assertTrue(template["batch_consistency"])
+        self.assertTrue(template["adaptive_pagination"])
+        self.assertEqual(template["max_pages"], 6)
+        self.assertEqual(template["page_marker"], "top_left")
+        self.assertEqual(template["density_profile"], "dense_cornell_v1")
+        self.assertEqual(template["target_modules_per_page"], 10)
+        self.assertEqual(template["min_modules_per_page"], 6)
+
+    def test_cornell_prompt_and_delivery_contract_require_series_page_metadata(self) -> None:
+        prompt = (SKILL / "references" / "prompt-cornell-notes-infographic.md").read_text(encoding="utf-8")
+        for token in (
+            "page_count",
+            "series_id",
+            "page_number",
+            "page_label",
+            "NN/TT",
+            "左上角",
+            "1–6",
+            "dense_cornell_v1",
+            "style_density_reference",
+            "6–10",
+            "3–4 个大卡片",
+        ):
+            self.assertIn(token, prompt)
+        delivery = (SKILL / "references" / "delivery-contract.md").read_text(encoding="utf-8")
+        for token in (
+            "康奈尔笔记高密度系列",
+            "series.page_count",
+            "page_marker: top_left",
+            "page_label: 01/03",
+            "density_profile: dense_cornell_v1",
+            "density_audit",
+        ):
+            self.assertIn(token, delivery)
+
+    def test_composition_index_declares_cornell_pagination_without_new_preset(self) -> None:
+        index = yaml.safe_load((SKILL / "references" / "prompt-composition-index.yml").read_text(encoding="utf-8"))
+        self.assertNotIn("cornell_notes_series", {item["id"] for item in index["support_catalog"]["supported_delivery_presets"]})
+        pagination = index["cornell_pagination"]
+        self.assertEqual(pagination["applies_to"], "cornell_notes")
+        self.assertEqual(pagination["max_pages"], 6)
+        self.assertEqual(pagination["page_marker"], "top_left")
+        self.assertEqual(pagination["page_label_format"], "NN/TT")
+        self.assertEqual(pagination["series_manifest"], "required")
+        self.assertEqual(pagination["density_profile"], "dense_cornell_v1")
+        self.assertEqual(pagination["target_modules_per_page"], 10)
+        self.assertEqual(pagination["min_modules_per_page"], 6)
+        self.assertEqual(pagination["reference_role"], "style_density_reference")
+        adaptive = index["axes"]["batch_strategy"]["options"]["adaptive_series"]
+        self.assertIn("1–6 页", adaptive)
+        self.assertIn("左上角", adaptive)
+
     def test_composition_index_is_axis_based_not_a_new_preset(self) -> None:
         registry = yaml.safe_load((SKILL / "references" / "template-registry.yml").read_text(encoding="utf-8"))
         templates = {item["id"]: item for item in registry["templates"]}
@@ -188,6 +251,8 @@ class ArticleImageContractTest(unittest.TestCase):
         self.assertEqual(logo["normalized"]["text_strategy"], "logo_wordmark")
         self.assertEqual(logo["normalized"]["output_mode"], "logo")
         self.assertEqual(logo["normalized"]["logo_variant"], "all_variants")
+        dense = resolver["resolve_query"]("复杂文章 x 信息密集 x 按章节拆图", index)
+        self.assertEqual(dense["normalized"]["batch_strategy"], "adaptive_series")
 
     def test_social_catalog_prompt_requires_a_complete_poster_prompt(self) -> None:
         content = (SKILL / "references" / "prompt-social-skill-catalog.md").read_text(

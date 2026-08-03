@@ -3,7 +3,7 @@ name: soia-media-generate-article-image
 description: 将文章、开源项目、品牌 Logo 或公开 X Prompt Deck 编译为可验收的图片与矢量资产，按组合轴生成 Prompt 并完成事实、文字和视觉验收。
 version: 3.16.0
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-08-02 20:00:00
+updated_at: 2026-08-03 11:31:43
 created_by: claude opus 4.6
 updated_by: claude sonnet 4.6
 ---
@@ -75,10 +75,18 @@ python3 scripts/resolve_prompt_composition.py --list-supported
 
 读取所选模板、来源事实和质量门，落盘七个 canonical blocks 后调用 imagegen；实际打开位图、核对文字/比例/事实，失败则用新版本重生。
 
+### 康奈尔多页决策
+
+- 选择 `cornell_notes` 后默认运行 `scripts/resolve_cornell_pagination.py`，锁定 `density_profile=dense_cornell_v1`；客户给了已认可成品时标记 `style_density_reference`，只替换事实与页变量。
+- `page_count` 只能是 1–6；≤10 个完整模块默认保持一张高密度母版，系列页目标 6–10 个问题—笔记模块，内容不足就合并，不用虚构信息填页。
+- 生成前在 Prompt/manifest 记录 `density_audit`（cue/module 数、页角色、页码）；多页写入统一 `series_id`，左上角安全区显示 `NN/TT`。
+- 按知识单元拆分，不机械截断；所有页共享康奈尔视觉底座，最后一页承担总结/一句话记忆。
+- manifest 必须记录系列和逐页状态；每页都要 `view_image`，密度、页码、文字、来源或比例任一失败，系列不能通过。
+
 ## 路由索引
 
 - 普通文章图：读取 [输入契约](references/input-contract.md)、[模板注册表](references/template-registry.yml) 和 [组合索引](references/prompt-composition-index.yml)。
-- 研究封面/小结：`editorial_research_minimal`；正文小结：`editorial_summary_card`；康奈尔笔记：`cornell_notes`。
+- 研究封面/小结：`editorial_research_minimal`；正文小结：`editorial_summary_card`；康奈尔笔记：`cornell_notes`（长文使用 `adaptive_series`，最多 6 页）。
 - 交付选择支持 `social_card | carousel | icon | logo`；社交图使用 `social_skill_catalog`，插件图标使用 `plugin_icon`，品牌 Logo 使用 `brand_logo`。朋友圈单图或小红书轮播的事实和两阶段规则见 [社交卡契约](references/social-card-contract.yml)。
 - 研究封面使用 `editorial_research_minimal`；插件图标和品牌 Logo 的 imagegen 只给方向稿，终稿必须确定性矢量重绘。品牌 Logo 额外读取 [Logo 系统 Prompt](references/prompt-brand-logo.md)。
 - X profile 导入：`source=x-profile-export` 时，先读取 [X 导入契约](references/prompt-x-profile-import.md) 和 [X 提示词进化契约](references/x-profile-prompt-evolution.yml)，运行：
@@ -105,7 +113,7 @@ python3 scripts/audit_x_profile_prompt_deck.py \
 
 每次生成按以下顺序落盘，不从案例库整段复制：
 
-1. `composition_axes`：记录交付模板、家族、信息结构、视觉机制、美学系统、文字策略、模型适配和批次策略。
+1. `composition_axes`：记录交付模板、家族、信息结构、视觉机制、美学系统、文字策略、模型适配、批次策略及系列页字段。
 2. `source_grounding`：允许进入图片的事实、禁止补写的字段和缺失信息。
 3. `primary_task`：一个主要视觉任务，不把封面、小结和信息图混成一张。
 4. `composition_and_layout`、`visual_style_and_materials`：主体、空间、阅读顺序、材质、光线和颜色角色。
@@ -117,14 +125,9 @@ python3 scripts/audit_x_profile_prompt_deck.py \
 
 1. **确认**：解析 L0–L2，并记录未指定轴的假设。
 2. **取证**：仅 `social_skill_catalog` 运行 `build_social_catalog_facts.py`；仓库推荐/重点技能还要读取仓库 README 与重点技能 SKILL.md。
-3. **编译**：创建 `prompts/NN-*.md`，写全七个 blocks 和来源证据；未落盘不得生图。
-4. **生成**：按 `render_engine` 路由（manifest 须记录该字段）：
-   - `imagegen`（默认）：视觉海报、隐喻图、social 封面、logo 方向稿 → 调用 Agent 内置 imagegen
-   - `html_render`：文字密度高的信息图（`cornell_notes`、`editorial_summary_card`、`editorial_research_minimal`）→ 写 `html/` 目录下的模板 → puppeteer 截图 → 输出 PNG；view_image 对截图文件执行
-   - `svg_deterministic`：`plugin_icon` 与 `brand_logo` 终稿矢量重绘
-
-   禁止用 Pillow 或 canvas 代码绘图冒充终稿；`html_render` 路径的 Puppeteer 截图是正式产物，不是替代品。
-5. **验收**：按 [质量门](references/quality-gates.md) 实际 `view_image`；社交卡再运行 `validate_social_catalog_delivery.py`，检查事实、OCR、二维码、缩略图和语义密度。
+3. **编译**：创建 `prompts/NN-*.md`（系列页使用 `pNN-of-TT`），写全七个 blocks、页码字段和来源证据；未落盘不得生图。
+4. **生成**：按 `render_engine` 路由（manifest 须记录该字段）：`imagegen`（默认，视觉海报/隐喻图/social 封面/logo 方向稿）→ Agent 内置 imagegen；`html_render`（`cornell_notes`/`editorial_summary_card`/`editorial_research_minimal` 文字密度高）→ html 模板 + puppeteer 截图 → PNG（正式产物，view_image 验收）；`svg_deterministic`（`plugin_icon`/`brand_logo` 终稿）→ 矢量重绘。禁止 Pillow/canvas 冒充终稿。
+5. **验收**：按 [质量门](references/quality-gates.md) 实际 `view_image`（系列逐页执行）；社交卡再运行 `validate_social_catalog_delivery.py`，检查事实、OCR、二维码、缩略图和语义密度。
 6. **重生**：只改一个主要问题，使用新 Prompt 和新文件名，最多连续重生两次；不要覆盖已通过版本。
 
 ## 交付目录与数据边界
@@ -137,7 +140,7 @@ python3 scripts/resolve_output_dir.py --source <source> --json
 
 采用解析结果并在 manifest 记录 `output_dir_origin`。禁止把 cwd、技能仓、vault 根或 `<topic>-delivery-<date>` 当默认交付根；不要在交付目录保存缓存或未选候选。完整目录、配置、临时数据和回执见 [交付契约](references/delivery-contract.md)。
 
-普通交付至少包含 `prompts/`、最终 PNG/JPG 和 `manifest.yml`；两阶段模板另含事实清单和可复现合成源。X 进化交付另含 `evolution.yml`、`series-index.yml`、`bibles/` 和重编译 `prompts/`。
+普通交付至少包含 `prompts/`、最终 PNG/JPG 和 `manifest.yml`；Cornell 多页另需系列级 `page_count`/`series_id` 和逐页页码、状态；两阶段模板另含事实清单和可复现合成源。X 进化交付另含 `evolution.yml`、`series-index.yml`、`bibles/` 和重编译 `prompts/`。
 
 ### 私密信息与中间数据
 

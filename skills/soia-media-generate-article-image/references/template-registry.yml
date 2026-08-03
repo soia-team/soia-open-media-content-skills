@@ -75,7 +75,14 @@ templates:
     default_aspect: "A4-portrait"
     output_stem: cornell-notes
     text_density: high
-    use_when: "文章适合转成问题线索、模块化笔记、回顾总结和一句话记忆"
+    batch_consistency: required
+    adaptive_pagination: true
+    max_pages: 6
+    page_marker: top_left
+    density_profile: dense_cornell_v1
+    target_modules_per_page: 10
+    min_modules_per_page: 6
+    use_when: "文章适合转成问题线索、模块化笔记、回顾总结和一句话记忆；复杂文章按内容密度生成 1–6 页系列"
 
   - id: social_skill_catalog
     image_type: [social_card, carousel]
