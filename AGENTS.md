@@ -53,40 +53,13 @@ npx skills add soia-team/soia-open-media-content-skills -g --all
 
 ## Git Workflow
 
-### Protected branches — ABSOLUTE prohibition on direct push
-
-`dev` and `main` are protected. **Direct push to either branch is FORBIDDEN,
-even if the remote does not technically block it.** Both branches enforce a
-required `audit` status check; bypassing it corrupts governance history and
-must never happen.
-
-**If you are an AI agent**, follow these steps exactly — no shortcuts:
-
-1. Create a feature branch from `dev`:
-   ```bash
-   git checkout dev && git pull
-   git checkout -b feat/<short-description>
-   ```
-2. Make your commits on the feature branch.
-3. Push the feature branch to origin:
-   ```bash
-   git push origin feat/<short-description>
-   ```
-4. Open a PR targeting `dev` using `gh pr create --base dev`.
-5. Wait for `audit` CI to pass; do **not** merge yourself.
-
-**Never run `git push origin dev` or `git push origin main` from a feature or
-working branch.** If you find yourself about to do this, stop and open a PR
-instead. Bypassing branch protection — even accidentally — must be reported to
-the maintainer.
-
-### Branch purpose
-
-- `dev` is the default integration branch: all feature PRs merge here after
-  `audit` passes.
-- `main` always equals the latest formal release and only accepts release PRs
-  from `dev`, driven by `soia-meta-skill-release`. Never open feature PRs
-  against `main`.
+- **Branch off `main`** (the latest formal release), then open the PR against
+  `dev` and wait for the `audit` check. `main` is always an ancestor of `dev`,
+  so such a branch always merges cleanly. Branch off `dev` only when your change
+  genuinely builds on unreleased work, and say so in the PR body.
+- `main` never receives PRs. It moves only by **fast-forward from `dev`** during
+  a formal release driven by `soia-meta-skill-release`, so `main` and `dev` then
+  point at the same commit. Never push directly to `main` or `dev`.
 - Plugin manifests on `dev` carry a `-SNAPSHOT` version naming the next release
-  target. Do not change manifest versions in feature PRs; versions move only in
-  release PRs.
+  target. Do not change manifest versions in feature PRs; versions move only
+  during a release.
