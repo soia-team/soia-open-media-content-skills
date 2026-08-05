@@ -1,11 +1,11 @@
 ---
 name: soia-media-compose-article-draft
 description: 把 distill 提炼出的观点写成成文草稿。以用户观点为骨、vault 摘抄为料，生成可继续交给 publish 的文章。可指定公众号/知乎/随笔风格。Triggers：「把这些观点写成一篇」「把 X 主题写成文章」「compose 这篇」「写成草稿」「起草这篇」
-version: 3.0.0
+version: 3.0.1
 created_at: 2026-07-02 17:57:11
-updated_at: 2026-07-22 21:00:45
+updated_at: 2026-08-05 13:00:00
 created_by: claude opus 4.6
-updated_by: gpt-5.6-luna
+updated_by: claude-opus-5
 ---
 
 # soia-media-compose-article-draft
@@ -57,6 +57,8 @@ SOIA_MEDIA_COMPOSE_ARTICLE_DRAFT_CONFIG_FILE=<custom-config-path>
 - 如果本技能不需要私有配置，可以不创建 `config.yml`。
 - 如果需要 API key、cookie、session、provider home 或本机路径，只能放进私有 `config.yml`、进程环境或 provider 自己的登录态里，不能写进仓库、vault 正文或日志。
 - 第三方 skill 只能声明依赖和安装方式，不直接修改第三方 skill 文件。
+
+**WorkBuddy** 的装载单位是角色化专家而不是插件，`npx skills add -a '*'` 覆盖不到它，需要单独安装，见 [docs/install/workbuddy.md](https://github.com/soia-team/soia-open-skills/blob/main/docs/install/workbuddy.md)。
 
 ### 日志与完成回执
 

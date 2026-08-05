@@ -1,11 +1,11 @@
 ---
 name: soia-media-publish-rednote-card
 description: 把成文草稿改写成 rednote（小红书）笔记：生成吸睛标题（可带 emoji）、3–5 段短文、话题标签和配图建议。只产出文本并由客户人工发布，不接平台 API。Triggers：「发成小红书」「小红书笔记」「改成 rednote」「rednote 这篇」
-version: 2.0.1
+version: 2.0.2
 created_at: 2026-07-16 15:44:20
-updated_at: 2026-07-27 10:00:00
+updated_at: 2026-08-05 13:00:00
 created_by: gpt-5.6-luna
-updated_by: gpt-5.6-sol
+updated_by: claude-opus-5
 dependencies:
   optional: [soia-media-generate-article-image]
 ---
@@ -55,6 +55,8 @@ npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-
 - `soia-media-generate-article-image` 是可选衔接 skill：需要生成封面或正文位图时，先安装并运行它；本 skill 只提供配图方向，不替客户生成或上传图片。
 - `soia-media-compose-article-draft` 是常见上游产物，但不是安装级强依赖；也可以直接提供任意成文草稿。
 - 当前不接 rednote API。任何“发布”都只表示生成文本，人工发布由客户完成。
+
+**WorkBuddy** 的装载单位是角色化专家而不是插件，`npx skills add -a '*'` 覆盖不到它，需要单独安装，见 [docs/install/workbuddy.md](https://github.com/soia-team/soia-open-skills/blob/main/docs/install/workbuddy.md)。
 
 ### 日志与完成回执
 

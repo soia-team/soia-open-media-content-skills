@@ -1,11 +1,11 @@
 ---
 name: soia-media-generate-article-image
 description: 将文章、开源项目、品牌 Logo 或公开 X Prompt Deck 编译为可验收的图片与矢量资产，按组合轴生成 Prompt 并完成事实、文字和视觉验收。
-version: 3.16.0
+version: 3.16.1
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-08-03 11:31:43
+updated_at: 2026-08-05 13:00:00
 created_by: claude opus 4.6
-updated_by: claude sonnet 4.6
+updated_by: claude-opus-5
 ---
 
 # soia-media-generate-article-image
@@ -52,6 +52,8 @@ updated_by: claude sonnet 4.6
 `imagegen` 路径需要可调用的 imagegen 和 `view_image`；`html_render` 路径只需 Node.js + puppeteer，不依赖 imagegen。插件安装、配置文件和 provider 登录态按宿主文档处理，本技能不保存 API key、cookie 或 token。
 
 ## 渐进式选择与加载（必须遵守）
+
+装整个域：`claude plugin install soia-media-content@soia`（先 `claude plugin marketplace add soia-team/soia-open-skills`）；只装本技能：`npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-generate-article-image -y`。**WorkBuddy** 是角色化专家，`npx -a '*'` 覆盖不到，见 [docs/install/workbuddy.md](https://github.com/soia-team/soia-open-skills/blob/main/docs/install/workbuddy.md)。
 
 ### L0：支持目录
 

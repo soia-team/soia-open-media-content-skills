@@ -1,11 +1,11 @@
 ---
 name: soia-media-publish-x-thread
 description: 将成文草稿改写为带编号、符合字数限制的 X thread，并可按授权存草稿。触发：「发成 X thread」「拆成推文串」「thread 这篇」
-version: 2.0.1
+version: 2.0.2
 created_at: 2026-07-16 15:44:20
-updated_at: 2026-07-27 10:47:17
+updated_at: 2026-08-05 13:00:00
 created_by: gpt-5.6-luna
-updated_by: gpt-5.6-sol
+updated_by: claude-opus-5
 ---
 
 # soia-media-publish-x-thread
@@ -54,6 +54,8 @@ npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-
 - 本技能是纯 LLM 改写流程，无 scripts、无私有配置、无 API key 和无外部服务依赖。
 - `soia-media-compose-article-draft` 是常见上游产物，但不是安装级强依赖；也可以直接提供任意成文草稿。
 - 当前不接 X API。任何“发布”都只表示生成文本，人工发布由客户完成。
+
+**WorkBuddy** 的装载单位是角色化专家而不是插件，`npx skills add -a '*'` 覆盖不到它，需要单独安装，见 [docs/install/workbuddy.md](https://github.com/soia-team/soia-open-skills/blob/main/docs/install/workbuddy.md)。
 
 ### 日志与完成回执
 

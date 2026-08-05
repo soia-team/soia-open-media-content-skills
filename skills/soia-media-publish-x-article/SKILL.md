@@ -1,11 +1,11 @@
 ---
 name: soia-media-publish-x-article
 description: 将 Markdown 成文上传到 X Articles 草稿箱并校验格式，只保存草稿。触发：「发成 X Article」「推到 X 文章草稿箱」
-version: 2.0.1
+version: 2.0.2
 created_at: 2026-07-20 19:30:00
-updated_at: 2026-07-27 10:47:17
+updated_at: 2026-08-05 13:00:00
 created_by: claude fable 5
-updated_by: gpt-5.6-sol
+updated_by: claude-opus-5
 dependencies:
   hard: [soia-media-publish-x-thread]
 ---
@@ -58,6 +58,8 @@ npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-
 - 备选路线（宿主恰好提供浏览器控制工具，如 Claude Code 的 claude-in-chrome）需要 macOS，走 `clipboard_x.py`（osascript/sips）；详见下方「备选路线」。没有宿主工具、或在非 macOS 环境，用主路线即可。
 - X 账号需含「撰写文章」权益的 Premium 订阅（2026-07 购买页显示 US$4 的 Premium 档即含；以 X 购买页实时权益表为准）
 - 无私有 config.yml：本技能不接触任何 key/cookie
+
+**WorkBuddy** 的装载单位是角色化专家而不是插件，`npx skills add -a '*'` 覆盖不到它，需要单独安装，见 [docs/install/workbuddy.md](https://github.com/soia-team/soia-open-skills/blob/main/docs/install/workbuddy.md)。
 
 ### 日志与完成回执
 
