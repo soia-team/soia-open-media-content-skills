@@ -1,11 +1,11 @@
 ---
 name: soia-media-compose-article-draft
 description: 把 distill 提炼出的观点写成成文草稿。以用户观点为骨、vault 摘抄为料，生成可继续交给 publish 的文章。可指定公众号/知乎/随笔风格。Triggers：「把这些观点写成一篇」「把 X 主题写成文章」「compose 这篇」「写成草稿」「起草这篇」
-version: 3.0.0
+version: 3.0.1
 created_at: 2026-07-02 17:57:11
-updated_at: 2026-07-22 21:00:45
+updated_at: 2026-08-05 13:00:00
 created_by: claude opus 4.6
-updated_by: gpt-5.6-luna
+updated_by: claude-opus-5
 ---
 
 # soia-media-compose-article-draft

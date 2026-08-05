@@ -1,11 +1,11 @@
 ---
 name: soia-media-publish-x-article
 description: 将 Markdown 成文上传到 X Articles 草稿箱并校验格式，只保存草稿。触发：「发成 X Article」「推到 X 文章草稿箱」
-version: 2.0.1
+version: 2.0.2
 created_at: 2026-07-20 19:30:00
-updated_at: 2026-07-27 10:47:17
+updated_at: 2026-08-05 13:00:00
 created_by: claude fable 5
-updated_by: gpt-5.6-sol
+updated_by: claude-opus-5
 dependencies:
   hard: [soia-media-publish-x-thread]
 ---

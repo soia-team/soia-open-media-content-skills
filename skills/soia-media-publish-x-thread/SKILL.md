@@ -1,11 +1,11 @@
 ---
 name: soia-media-publish-x-thread
 description: 将成文草稿改写为带编号、符合字数限制的 X thread，并可按授权存草稿。触发：「发成 X thread」「拆成推文串」「thread 这篇」
-version: 2.0.1
+version: 2.0.2
 created_at: 2026-07-16 15:44:20
-updated_at: 2026-07-27 10:47:17
+updated_at: 2026-08-05 13:00:00
 created_by: gpt-5.6-luna
-updated_by: gpt-5.6-sol
+updated_by: claude-opus-5
 ---
 
 # soia-media-publish-x-thread

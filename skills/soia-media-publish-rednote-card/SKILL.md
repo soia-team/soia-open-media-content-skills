@@ -1,11 +1,11 @@
 ---
 name: soia-media-publish-rednote-card
 description: 把成文草稿改写成 rednote（小红书）笔记：生成吸睛标题（可带 emoji）、3–5 段短文、话题标签和配图建议。只产出文本并由客户人工发布，不接平台 API。Triggers：「发成小红书」「小红书笔记」「改成 rednote」「rednote 这篇」
-version: 2.0.1
+version: 2.0.2
 created_at: 2026-07-16 15:44:20
-updated_at: 2026-07-27 10:00:00
+updated_at: 2026-08-05 13:00:00
 created_by: gpt-5.6-luna
-updated_by: gpt-5.6-sol
+updated_by: claude-opus-5
 dependencies:
   optional: [soia-media-generate-article-image]
 ---

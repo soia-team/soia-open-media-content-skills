@@ -1,11 +1,11 @@
 ---
 name: soia-media-generate-article-image
 description: 将文章、开源项目、品牌 Logo 或公开 X Prompt Deck 编译为可验收的图片与矢量资产，按组合轴生成 Prompt 并完成事实、文字和视觉验收。
-version: 3.16.0
+version: 3.16.1
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-08-03 11:31:43
+updated_at: 2026-08-05 13:00:00
 created_by: claude opus 4.6
-updated_by: claude sonnet 4.6
+updated_by: claude-opus-5
 ---
 
 # soia-media-generate-article-image
@@ -53,20 +53,7 @@ updated_by: claude sonnet 4.6
 
 ## 渐进式选择与加载（必须遵守）
 
-装整个域（Claude Code 与 Codex 共用同一份域插件）：
-
-```bash
-claude plugin marketplace add soia-team/soia-open-skills
-claude plugin install soia-media-content@soia
-```
-
-只装这一个技能：
-
-```bash
-npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-generate-article-image -y
-```
-
-**WorkBuddy** 的装载单位是角色化专家而不是插件，`npx skills add -a '*'` 覆盖不到它，需要单独安装，见 [docs/install/workbuddy.md](https://github.com/soia-team/soia-open-skills/blob/main/docs/install/workbuddy.md)。
+装整个域：`claude plugin install soia-media-content@soia`（先 `claude plugin marketplace add soia-team/soia-open-skills`）；只装本技能：`npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-generate-article-image -y`。**WorkBuddy** 是角色化专家，`npx -a '*'` 覆盖不到，见 [docs/install/workbuddy.md](https://github.com/soia-team/soia-open-skills/blob/main/docs/install/workbuddy.md)。
 
 ### L0：支持目录
 
