@@ -53,6 +53,21 @@ updated_by: claude sonnet 4.6
 
 ## 渐进式选择与加载（必须遵守）
 
+装整个域（Claude Code 与 Codex 共用同一份域插件）：
+
+```bash
+claude plugin marketplace add soia-team/soia-open-skills
+claude plugin install soia-media-content@soia
+```
+
+只装这一个技能：
+
+```bash
+npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-generate-article-image -y
+```
+
+**WorkBuddy** 的装载单位是角色化专家而不是插件，`npx skills add -a '*'` 覆盖不到它，需要单独安装，见 [docs/install/workbuddy.md](https://github.com/soia-team/soia-open-skills/blob/main/docs/install/workbuddy.md)。
+
 ### L0：支持目录
 
 首次请求只读取 `template-registry.yml` 与 `prompt-composition-index.yml` 的 `support_catalog`。当前目录包含 7 个交付模板、11 个 Prompt 家族、4 个 Logo 变体和 1 条外部提示词进化导入路线。

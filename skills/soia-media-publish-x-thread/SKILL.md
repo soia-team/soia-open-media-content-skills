@@ -55,6 +55,8 @@ npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-
 - `soia-media-compose-article-draft` 是常见上游产物，但不是安装级强依赖；也可以直接提供任意成文草稿。
 - 当前不接 X API。任何“发布”都只表示生成文本，人工发布由客户完成。
 
+**WorkBuddy** 的装载单位是角色化专家而不是插件，`npx skills add -a '*'` 覆盖不到它，需要单独安装，见 [docs/install/workbuddy.md](https://github.com/soia-team/soia-open-skills/blob/main/docs/install/workbuddy.md)。
+
 ### 日志与完成回执
 
 每次执行都要回报实际处理范围、条目数量和人工发布边界，不把“已生成”说成“已发布”。最低格式：
