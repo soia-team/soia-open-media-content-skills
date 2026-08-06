@@ -1,18 +1,21 @@
 ---
 name: soia-media-publish-rednote-card
-description: 把成文草稿改写成 rednote（小红书）笔记：生成吸睛标题（可带 emoji）、3–5 段短文、话题标签和配图建议。只产出文本并由客户人工发布，不接平台 API。Triggers：「发成小红书」「小红书笔记」「改成 rednote」「rednote 这篇」
-version: 2.0.2
+description: 把成文草稿改写成 rednote（小红书）笔记：生成吸睛标题（可带 emoji）、3–5 段短文、话题标签和配图建议；获客户当次授权时可代其在创作服务平台网页端完成发布。不接平台 API、不用第三方逆向包。Triggers：「发成小红书」「小红书笔记」「改成 rednote」「rednote 这篇」「帮我发到小红书」
+version: 2.1.0
 created_at: 2026-07-16 15:44:20
-updated_at: 2026-08-05 13:00:00
+updated_at: 2026-08-07 00:10:00
 created_by: gpt-5.6-luna
-updated_by: claude-opus-5
+updated_by: claude fable 5
 dependencies:
   optional: [soia-media-generate-article-image]
 ---
 
 # soia-media-publish-rednote-card
 
-把 `compose` 产出的成文草稿改写成适合 rednote（小红书）的笔记文案。默认在回复中交付 Markdown 文本，供客户人工复制发布；本 skill 不调用 rednote API、不自动发送、不修改原稿。
+把 `compose` 产出的成文草稿改写成适合 rednote（小红书）的笔记文案。默认在回复中交付 Markdown
+文本供客户自行发布；客户当次明确授权时，也可由 Agent 驱动**客户已登录的浏览器**在创作服务平台
+网页端完成整套发布（见「网页端发布实操」）。本 skill 不调用 rednote 私有 API、不使用第三方逆向
+上传包、不修改原稿。
 
 ## 客户可读说明
 
@@ -24,7 +27,8 @@ dependencies:
 |---|---|---|
 | 把文章发成小红书笔记 | 提炼角度、重写标题和短段落、补充标签 | 一份可复制的 rednote Markdown 文案 |
 | 需要视觉素材方向 | 给出封面/配图的主体、构图、文字和比例建议 | 可执行的配图建议；需要时可衔接 `soia-media-generate-article-image` |
-| 发布到 rednote | 只生成发布文本 | “产出文本、人工发布”；不会调用 API 或发布内容 |
+| 自己发布 | 只生成文本与配图建议 | 可直接复制的文案，发布动作由客户完成 |
+| **代为发布**（需当次授权） | 在客户已登录的浏览器里传图、填文、加话题、挂 Red Skill 组件，停在发布前请客户确认 | 每步截图与最终状态；客户说「发布」后才点，发布后回执带笔记管理页核实结果 |
 
 ### 客户如何使用
 
@@ -51,16 +55,29 @@ claude plugin install soia-media-content@soia
 npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-publish-rednote-card -y
 ```
 
-- 本技能是纯 LLM 改写流程，无 scripts、无私有配置、无账号凭据和无 rednote API 依赖。
-- `soia-media-generate-article-image` 是可选衔接 skill：需要生成封面或正文位图时，先安装并运行它；本 skill 只提供配图方向，不替客户生成或上传图片。
+- 改写流程是纯 LLM，无 scripts、无私有配置、无账号凭据、无 rednote API 依赖。
+- `soia-media-generate-article-image` 是可选衔接 skill：需要生成封面或正文位图时，先安装并运行它。
 - `soia-media-compose-article-draft` 是常见上游产物，但不是安装级强依赖；也可以直接提供任意成文草稿。
-- 当前不接 rednote API。任何“发布”都只表示生成文本，人工发布由客户完成。
+- **代为发布**需要宿主具备浏览器操作能力（如 Claude in Chrome 一类的浏览器工具），且客户浏览器
+  已登录小红书创作服务平台。凭据始终留在客户浏览器里，本技能不读取、不导出、不存储 cookie。
+- 没有浏览器能力或客户未授权时，退回默认形态：只产出文本与配图建议。
 
 **WorkBuddy** 的装载单位是角色化专家而不是插件，`npx skills add -a '*'` 覆盖不到它，需要单独安装，见 [docs/install/workbuddy.md](https://github.com/soia-team/soia-open-skills/blob/main/docs/install/workbuddy.md)。
 
+### 私密信息与中间数据
+
+- **不读取、不导出、不存储账号凭据**。代为发布时始终使用客户浏览器已有的登录态，cookie、token
+  和会话只留在浏览器里；不落盘、不回显、不写进回执或日志。
+- 客户未登录或登录态失效时，如实告知并停下，请客户自行登录，不代填账号密码。
+- 发布过程中的页面截图只用于向客户展示当前状态，不保存到仓库或知识库；截图里若出现账号信息、
+  私信内容或其它无关个人数据，不转述、不摘录。
+- 配图与草稿属可重建的中间产物，放系统临时目录或客户指定路径；不进仓库，也不写入客户未指定的位置。
+- 代为发布用到的临时本地服务、注入脚本等仅存在于当次运行，用完即停，不留常驻进程。
+
 ### 日志与完成回执
 
-每次执行都要回报实际处理范围、标题/段落/标签数量和人工发布边界，不把“已生成”说成“已发布”。最低格式：
+每次执行都要回报实际处理范围、标题/段落/标签数量和发布边界，**不把“已生成”说成“已发布”，
+也不把“已点发布”说成“已确认发布成功”**。最低格式：
 
 ```markdown
 完成：已将 <输入范围> 改写为 rednote 笔记文本，未调用平台 API。
@@ -76,6 +93,17 @@ npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-
 
 问题与下一步：
 - 请客户人工复制文案并准备图片后发布；<其它问题，没有则写“无”>
+```
+
+代为发布时追加：
+
+```markdown
+发布回执：
+- 授权：<客户原话> | 原创声明：<已开/未开，未开时说明原因>
+- 配图：<张数 / 尺寸 / 注入方式>
+- 话题：<数量>，逐个下拉确认，编辑器内均为蓝色
+- 组件：Red Skill 已挂 <技能名> / 未挂
+- 核实：笔记管理页可见 <标题>，<发布时间>（不以 published=true 为准）
 ```
 
 ## 改写规则
@@ -107,6 +135,99 @@ npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-
 - 建议中的标题、数字和来源必须与文案一致；不把未经验证的事实放到图片文字里。
 - 客户需要实际图片时，说明可以把建议交给 `soia-media-generate-article-image`，但不要声称图片已生成、上传或发布。
 
+## 网页端发布实操
+
+**只走官方创作服务平台网页端，用客户自己已登录的浏览器。** 以下每条都由 2026-08-06 首次真实
+发布验证过，不是设想。
+
+### 执行前置
+
+必须有客户**当次**的明确授权（「帮我发」「开始发布吧」）。「写一篇小红书」只是要文案，不是要
+发布。最后点「发布」前把最终状态截图给客户，等一句确认再点——客户不在电脑旁时，这句确认可以
+在聊天里给，但不能省略。
+
+### 五步流程
+
+1. **切 tab**：发布页默认落在「上传视频」，必须先点「上传图文」，否则找不到图片上传控件。
+2. **传图**：见下方「传图」。
+3. **填标题与正文**：标题框与正文框分开点击定位；正文可一次性输入多段，换行会保留。
+4. **加话题**：见下方「话题标签必须逐个确认」。
+5. **挂 Red Skill 组件**：「添加组件 → 添加 Red Skill」下拉里选「我发布的 → <技能名>」，
+   内容讲场景、卡片管转化，是同平台闭环。
+
+### 传图：宿主 file_upload 不可用时的解法
+
+宿主的文件上传工具可能不可用（2026-08-06 实测 Claude in Chrome 的 `file_upload` 报
+`paths: expected array, received undefined`，四种参数写法全失败）。备用路径按下面顺序，**前两条
+已验证走不通，不要重复踩**：
+
+| 方案 | 结果 |
+|---|---|
+| 本地 HTTP 服务器 + 页面 `fetch` | ❌ Chrome 的 Private Network Access 封死 HTTPS 页面访问 localhost；加 `Access-Control-Allow-Private-Network: true` 标准应答头也不放行，请求根本不发出（服务器日志零记录） |
+| base64 分片注入 | ❌ 三张 2160×2880 的图约 1.29M base64 字符，代价过高 |
+| **SVG foreignObject + canvas** | ✅ **标准姿势** |
+
+配图若由 `soia-media-generate-article-image` 的 `html_render` 路径产出，**HTML 源码本身就在手上**，
+可以把它送进页面现场渲染，传输量从 MB 级降到几 KB，且保住 2x 清晰度：
+
+```javascript
+// 1) 把 HTML+CSS 包进 SVG 的 foreignObject，用 data: URL 载入 Image
+//    SVG 画布设 2x 尺寸，内部 div 用 transform:scale(2) 保清晰
+const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="2160" height="2880">'
+  + '<foreignObject width="100%" height="100%">'
+  + '<div xmlns="http://www.w3.org/1999/xhtml" style="transform:scale(2);transform-origin:0 0;width:1080px;height:1440px">'
+  + '<style>' + css + '</style>' + bodyHtml + '</div></foreignObject></svg>';
+const img = new Image();
+img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+await img.decode();
+
+// 2) canvas 渲染取 blob（纯内联 SVG 不会污染 canvas，toBlob 可用）
+const c = document.createElement('canvas'); c.width = 2160; c.height = 2880;
+c.getContext('2d').drawImage(img, 0, 0, 2160, 2880);
+const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+
+// 3) 构造 File 注入 input，并派发 change 让前端框架感知
+const dt = new DataTransfer();
+dt.items.add(new File([blob], '1-cover.png', {type: 'image/png'}));
+const input = document.querySelector('input[type=file]');   // accept=".jpg,.jpeg,.png,.webp" multiple
+input.files = dt.files;
+input.dispatchEvent(new Event('change', {bubbles: true}));
+```
+
+**注入器不返回 Promise 结果时**：部分宿主的 JS 执行工具不 await 异步返回值（拿到空对象）。
+改成两步——先把结果写进 `window.__r`，再单独读一次该变量。
+
+### 话题标签必须逐个确认
+
+连续输入 `#A #B #C` 只有**最后一个**生效，前面全部退化成纯文本（空格还会被吃掉）。正确做法：
+输入一个 `#关键词` → 等下拉出现 → **点选其中一项** → 再输入下一个。
+
+验收标志：生效的标签在编辑器里是**蓝色**，纯文本是黑色。发布前逐个核对颜色。
+下拉里带浏览量，可据此在近义标签中选流量更大的那个。
+
+### 原创声明要单独授权
+
+打开「原创声明」开关会弹出协议窗，需要勾选并同意《原创声明须知》。这属于**替客户接受协议条款**，
+必须单独征得客户同意，不能因为「已授权发布」就顺手勾。客户未表态时保持关闭，发布不受影响。
+
+### 发布后必须核实
+
+URL 出现 `published=true` **不等于发布成功**，且发布过程可能在草稿箱留下自动存档残留（显示
+「草稿箱(1)」属正常）。必须去**笔记管理**页确认笔记条目真实存在，再报告结果。
+
+## 不使用第三方发布工具
+
+社区有一批小红书 MCP / CLI（浏览器自动化或 `x-s`/`x-t` 签名逆向），**本技能不使用**：
+
+- 多数要求交出 cookie 登录态给第三方进程；本技能的原则是凭据留在客户浏览器里。
+- 头部项目自己的 issue 里记录着「小红书封号策略持续收紧，大量第三方工具账号被封」，
+  并在讨论增加鼠标轨迹模拟等反检测手段——即当前行为会被平台识别。
+- 官方只有 Skill 上传 CLI（`redskillhub-upload`），**没有发笔记的官方 API 或 MCP**；
+  开放平台的内容接口面向企业/服务商，个人创作者拿不到。
+
+驱动客户自己已登录的浏览器走官方网页端，与自动化脚本的区别在于：凭据不外流、走的是官方界面、
+每一步可见可停、发布由客户拍板。这条边界不因工具方便而放宽。
+
 ## 输出格式
 
 默认输出为 Markdown：
@@ -131,3 +252,10 @@ npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-
 ```
 
 列表之外可附事实取舍、禁用词或配图衔接说明。客户未指定落盘位置时，只产出回复文本；指定位置时再写入独立草稿文件，绝不覆盖源文件。不要输出“已发布”的假链接或 API 结果。
+
+## 前向测试
+
+- 未获当次授权时只产出文本，不打开发布页、不进行任何页面写入
+- 传图后页面预览出现对应张数；话题标签在编辑器内均为蓝色（纯文本为未生效）
+- 客户未就原创声明表态时，开关保持关闭，且不勾选任何协议
+- 发布后以笔记管理页的条目为准核实，`published=true` 不作为成功判据
