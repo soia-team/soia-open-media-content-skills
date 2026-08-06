@@ -3,6 +3,24 @@
 本文件由 soia-meta-skill-release 在每次正式发版时自动更新，与 GitHub Release 同源；
 更早的版本演进见 git 提交历史与 GitHub Releases。
 
+## v1.11.0 — 2026-08-06
+
+安装章节三宿主覆盖、config 归位 assets
+
+## 新增
+- feat(generate-article-image): add html_render path and source-id convention (v3.16.0) (#48)
+
+## 修复
+- fix(generate-article-image): clarify Cornell page marker style (#54)
+
+## 维护
+- chore(release): feat 在列,版本列车提为 next-minor
+- chore(skills): config.example.yml 归位到 assets/ (#60)
+- docs(skills): 安装章节补齐三个一等宿主 (#59)
+- docs(agents): branch off main; releases fast-forward dev onto main (#58)
+- chore(release): switch dev train to patch level (#56)
+- chore(release): reopen version train (missed after last release) (#55)
+
 ## v1.10.0 — 2026-08-03
 
 康奈尔笔记图支持多页路由
