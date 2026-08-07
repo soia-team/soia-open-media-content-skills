@@ -3,6 +3,21 @@
 本文件由 soia-meta-skill-release 在每次正式发版时自动更新，与 GitHub Release 同源；
 更早的版本演进见 git 提交历史与 GitHub Releases。
 
+## v1.12.0 — 2026-08-07
+
+generate-article-image 3.17.1：imagegen 默认路由（codex gpt-image-2 派发）、rednote 3:4、封面角色约束、两层契约澄清、prompt 排版说明分离规则；rednote-card 2.1.0：网页端发布实操
+
+## 新增
+- feat(generate-article-image): imagegen provider 路由、rednote 3:4、封面角色约束与两层契约澄清 (#64)
+- feat(rednote): 补齐网页端发布实操——由文案技能扩展为可代客户发布 (#63)
+
+## 修复
+- fix(generate-article-image): imagegen prompt 排版说明与逐字文字分离规则 (#65)
+
+## 维护
+- chore(release): feat 在列,版本列车提为 next-minor
+- chore(release): open next train after release
+
 ## v1.11.0 — 2026-08-06
 
 安装章节三宿主覆盖、config 归位 assets
