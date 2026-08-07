@@ -92,7 +92,8 @@ class SocialCatalogTest(unittest.TestCase):
             "presentation": {
                 "platform": platform,
                 "layout_mode": mode,
-                "aspect": "4:5",
+                # 契约按平台取比例：rednote 3:4，wechat-moments 4:5
+                "aspect": CONTRACT["platforms"][platform]["layout_modes"][mode]["aspect"],
                 "slides": slides,
             },
             "cta": {

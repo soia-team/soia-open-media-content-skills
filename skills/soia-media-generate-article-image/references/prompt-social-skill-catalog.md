@@ -72,7 +72,7 @@ prompts/02-featured-skill-deep-dive.md
 
 ```text
 Use case: ads-marketing
-Asset type: 4:5 portrait social-media skill-catalog poster / carousel slide
+Asset type: portrait social-media skill-catalog poster / carousel slide（比例按平台取：rednote 3:4，wechat-moments 4:5）
 
 Primary request:
 根据【来源事实】设计一张完整、可直接发布的 SOIA 开源技能宣传海报。图片要让读者在手机缩略图下先看到【核心价值】，打开后能快速读懂【能力结构、重点能力、典型场景和安装入口】。不要只画一个孤立的 3D 主视觉，也不要生成没有信息层级的通用卡片模板。
@@ -83,7 +83,7 @@ Input images:
 - 如有真实截图：只作为“效果证据”插入指定区域，不得重绘、改字或伪造界面。
 
 Canvas and visual style:
-- 4:5 竖版，目标 1120 × 1400 或同等高清比例，适合朋友圈与小红书
+- 竖版；投小红书用 3:4（1080 × 1440 或 2160 × 2880），投朋友圈用 4:5（1120 × 1400）。逐平台取值见 social-card-contract.yml 的 platforms 段
 - 蓝白为主、橙色强调；允许根据仓库主题增加一种局部辅助色，但不得破坏系列统一性
 - 高质量 3D 科技插画 + 清晰商业信息图排版；不是网页截图，不是 PPT 页面，不是纯扁平 UI
 - 顶部有明亮放射光、玻璃与金属质感、柔和体积光；主体边缘清楚，移动端缩略图下仍能识别

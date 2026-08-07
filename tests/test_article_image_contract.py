@@ -72,7 +72,8 @@ class ArticleImageContractTest(unittest.TestCase):
             ["direct_poster", "hybrid_exact_text"],
         )
         self.assertEqual(social["default_render_mode"], "direct_poster")
-        self.assertEqual(social["default_aspect"], "4:5")
+        # rednote 实发验证 3:4（2026-08-06，2160x2880）；逐平台取值在 social-card-contract.yml
+        self.assertEqual(social["default_aspect"], "3:4")
         self.assertIn("skill_labels", social["deterministic_fields"])
         self.assertIn("install_command", social["deterministic_fields"])
         self.assertIn("qr_code", social["deterministic_fields"])

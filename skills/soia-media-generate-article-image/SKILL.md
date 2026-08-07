@@ -1,9 +1,9 @@
 ---
 name: soia-media-generate-article-image
 description: 将文章、开源项目、品牌 Logo 或公开 X Prompt Deck 编译为可验收的图片与矢量资产，按组合轴生成 Prompt 并完成事实、文字和视觉验收。
-version: 3.16.1
+version: 3.17.0
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-08-05 13:00:00
+updated_at: 2026-08-07 15:20:00
 created_by: claude opus 4.6
 updated_by: claude-opus-5
 ---
@@ -20,8 +20,10 @@ updated_by: claude-opus-5
 
 ### 客户如何使用
 
-1. 先明确 `image_type`、用途和输出形态；省略的组合轴由 Agent 给出假设。
-2. 请求含糊时先展示 L0 支持目录，让客户选择 `preset` 或 `family`；不得静默套用早安、字体蒙版或某个美学 preset。
+**方向是「客户先给需求，技能负责匹配」，不是让客户先学选型体系。**
+
+1. 客户用自己的话给出需求（来源文章/主题、投放平台、张数、必须逐字出现的文字即可）；`image_type`、`preset`、组合轴由 Agent 从需求里推导并给出可确认的假设，不要求客户报字段名。
+2. 需求已足够路由（能定用途、平台、输出形态）就直接匹配进入编译，**不把 L0 目录当仪式走**；只有请求含糊到无法路由时才展示 L0 目录反问，且不得静默套用早安、字体蒙版或某个美学 preset。
 3. 选定后只加载命中的 references，编译完整 Prompt，调用 imagegen，执行 `view_image` 和对应质量门。
 
 ### 需求不明确时：先反问，不生成
@@ -111,15 +113,9 @@ python3 scripts/audit_x_profile_prompt_deck.py \
 
 ## 输入与 Prompt 编译
 
-完整字段见 [输入契约](references/input-contract.md)。最小输入必须包括 `source`、`image_type`、`preset/family`、用途、比例、输出目录和逐字文字；Logo 还必须提供品牌名称、图形概念、字标策略、颜色变体和矢量终稿要求；X 导入还必须保留 source URL、status ID、selection filters、source_prompt 和七个 blocks。
+完整字段见 [输入契约](references/input-contract.md)。最小输入必须包括 `source`、`image_type`、`preset/family`、用途、比例、输出目录和逐字文字；Logo 还必须提供品牌名称、图形概念、字标策略、颜色变体和矢量终稿要求；X 导入还必须保留 source URL、status ID、selection filters、source_prompt 和下面的七个内容块。
 
-每次生成按以下顺序落盘，不从案例库整段复制：
-
-1. `composition_axes`：记录交付模板、家族、信息结构、视觉机制、美学系统、文字策略、模型适配、批次策略及系列页字段。
-2. `source_grounding`：允许进入图片的事实、禁止补写的字段和缺失信息。
-3. `primary_task`：一个主要视觉任务，不把封面、小结和信息图混成一张。
-4. `composition_and_layout`、`visual_style_and_materials`：主体、空间、阅读顺序、材质、光线和颜色角色。
-5. `exact_text`、`aspect_and_output`、`constraints_and_avoid`：逐字文字、比例/格式和可验证禁项。
+**两个层级，别混**：Prompt 文件骨架 = `composition_axes` 头 + 七个内容块（`source_grounding` / `primary_task` / `composition_and_layout` / `visual_style_and_materials` / `exact_text` / `aspect_and_output` / `constraints_and_avoid`），定义见 [输入契约](references/input-contract.md)；[组合块执行契约](references/prompt-block-contract.yml) 里的 `per_block_required_fields`（`role_in_frame`、`acceptance_checks` 等）是**每个组合块内部**的字段，不是文件章节名。词条与实际版式对不上时写 `不适用` 并说明理由，不为填满字段编数值。
 
 封面和社交卡要区分基础视觉系统、主题佐料、系列变量和事实层；同一系列每张只改变 2–4 个变量。`GPT2 x 早安 x 字体蒙版`是组合查询，不是新 preset。
 
@@ -127,8 +123,8 @@ python3 scripts/audit_x_profile_prompt_deck.py \
 
 1. **确认**：解析 L0–L2，并记录未指定轴的假设。
 2. **取证**：仅 `social_skill_catalog` 运行 `build_social_catalog_facts.py`；仓库推荐/重点技能还要读取仓库 README 与重点技能 SKILL.md。
-3. **编译**：创建 `prompts/NN-*.md`（系列页使用 `pNN-of-TT`），写全七个 blocks、页码字段和来源证据；未落盘不得生图。
-4. **生成**：按 `render_engine` 路由（manifest 须记录该字段）：`imagegen`（默认，视觉海报/隐喻图/social 封面/logo 方向稿）→ Agent 内置 imagegen；`html_render`（`cornell_notes`/`editorial_summary_card`/`editorial_research_minimal` 文字密度高）→ html 模板 + puppeteer 截图 → PNG（正式产物，view_image 验收）；`svg_deterministic`（`plugin_icon`/`brand_logo` 终稿）→ 矢量重绘。禁止 Pillow/canvas 冒充终稿。
+3. **编译**：创建 `prompts/NN-*.md`（系列页使用 `pNN-of-TT`），写全 `composition_axes` 头与七个内容块、页码字段和来源证据；未落盘不得生图。
+4. **生成**：按 `render_engine` 路由（manifest 须记录该字段与实际 provider）：`imagegen`（**默认**，含社交卡/信息卡；provider 选择与 codex gpt-image-2 派发方式见 [imagegen-providers.md](references/imagegen-providers.md)）；`html_render`（无可用 imagegen provider 时的**降级**路由，降级原因必须写进 manifest；`cornell_notes` 等超高文字密度可直接选）→ html 模板 + 无头浏览器截图；`svg_deterministic`（`plugin_icon`/`brand_logo` 终稿）→ 矢量重绘。禁止 Pillow/canvas 冒充终稿。
 5. **验收**：按 [质量门](references/quality-gates.md) 实际 `view_image`（系列逐页执行）；社交卡再运行 `validate_social_catalog_delivery.py`，检查事实、OCR、二维码、缩略图和语义密度。
 6. **重生**：只改一个主要问题，使用新 Prompt 和新文件名，最多连续重生两次；不要覆盖已通过版本。
 
