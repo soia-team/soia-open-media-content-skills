@@ -98,9 +98,10 @@ slide_roles:
     information_density: "内页的一半以下"
     hero_text_share: "标题占画面高度 20%–30%，是全图第一视觉"
     max_distinct_facts: 3
-    must_have: [series_kicker, hook, one_line_payoff]
+    must_have: [series_kicker, hook, one_line_payoff, product_name]
     must_not_have: [表格, 命令行, 多行正文, 版本号清单, 二维码]
     rules:
+      - "封面必须出现被介绍对象的名称（product_name：技能名/产品名及可搜索名）。实证：2026-08-07 一版封面钩子齐全但从头到尾没写技能叫什么，读者被钩住也不知道搜什么，被客户审核打回。品牌条上的小字不算——名称要在正文区可读。"
       - "封面用字号与留白撑满画面，不靠堆信息量填空。"
       - "一个视觉锚点即可（一组状态块、一个大数字、一个对比），不要并列两个焦点。"
       - "钩子写成读者会自认的判断或疑问，不要写功能名。"
