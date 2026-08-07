@@ -23,7 +23,7 @@ purpose: <wechat-cover | x-cover | rednote | wechat-moments | article-inline | p
 platform: <rednote | wechat-moments | general>
 layout_mode: <single | carousel | auto>
 slide_count: <1 | 2 | 3 | auto>
-aspect: <2.35:1 | 16:9 | 3:2 | 4:5 | 9:16 | 1:1 | A4-portrait | custom>
+aspect: <2.35:1 | 16:9 | 3:2 | 3:4 | 4:5 | 9:16 | 1:1 | A4-portrait | custom>
 render_mode: <direct_poster | hybrid_exact_text | vector_two_stage | auto>
 output_dir: <optional-directory>
 quick: false
@@ -66,9 +66,27 @@ brand_logo:
 
 `family` 是 Prompt 检索家族，`preset` 是交付契约；组合轴优先于新增 preset。`GPT2` 只记录来源模型标签，不限制可用 imagegen provider。
 
+## 比例选择
+
+`aspect` 按投放平台定，不要一律套 4:5：
+
+| 平台 / 用途 | 比例 | 依据 |
+|---|---|---|
+| `rednote`（小红书） | **3:4** | 小红书信息流允许的最高竖版比例，占屏最多；4:5 会白白让出高度。2026-08-06 实发验证 2160×2880 正常展示 |
+| `wechat-moments`（朋友圈） | 4:5 | 朋友圈按方形裁切预览，4:5 更耐裁 |
+| `article-inline`（正文内嵌） | 3:2 或 16:9 | 随正文宽度排版，过高会打断阅读 |
+| `x-cover` | 16:9 | |
+
+## 层级 A：Prompt 文件的七个内容块
+
+下面七个是 **Prompt 文件的章节名**（前面还有一个 `composition_axes` 头，不计入七块）。
+它们与 [组合块执行契约](prompt-block-contract.yml) 里的 `per_block_required_fields` **不是同一层**——
+那组字段名（`role_in_frame`、`composition_parameters`、`acceptance_checks` 等）只在每个组合块内部使用，
+不要拿来当章节名。层级关系见 `SKILL.md`「两个层级，别混」。
+
 ## 必须保留的证据
 
-X profile 导入必须同时存在 `manifest.yml`、`source_profile`、`source_status_id`、`source_url`、`selection.filters`、`source_prompt`、`composition_axes` 和七个 blocks：
+X profile 导入必须同时存在 `manifest.yml`、`source_profile`、`source_status_id`、`source_url`、`selection.filters`、`source_prompt`、`composition_axes` 头和七个内容块：
 
 ```text
 source_grounding

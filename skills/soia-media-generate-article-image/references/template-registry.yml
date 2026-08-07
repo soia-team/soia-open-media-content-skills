@@ -90,7 +90,9 @@ templates:
     image_type: [social_card, carousel]
     reference: prompt-social-skill-catalog.md
     contract: social-card-contract.yml
-    default_aspect: "4:5"
+    # 平台相关：rednote 用 3:4（占屏最多），wechat-moments 用 4:5（耐方形裁切）。
+    # 逐平台取值以 social-card-contract.yml 的 platforms 段为准，本项只是无平台时的兜底。
+    default_aspect: "3:4"
     output_stem: social-skill-catalog
     text_density: high
     batch_consistency: required

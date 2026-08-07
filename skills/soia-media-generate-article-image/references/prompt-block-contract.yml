@@ -4,7 +4,19 @@ schema_version: 1
 # A short style label is never sufficient input to imagegen.
 purpose: "把结构、机制、美学和文字词条编译成带事实、参数、约束和验收的可执行 Prompt"
 
-required_fields:
+# ⚠️ 层级说明（曾因缺这段被误读，导致有人拿下面的字段名当 Prompt 文件的章节名）
+# 本文件描述的是**层级 B**：层级 A（Prompt 文件骨架）内部，每个被选中的
+# information_structure / visual_mechanism / aesthetic_system / text_strategy
+# 词条各自要填的参数与验收项。
+#
+# 层级 A 的章节名是 composition_axes 头 + 七个内容块
+#   (source_grounding / primary_task / composition_and_layout /
+#    visual_style_and_materials / exact_text / aspect_and_output / constraints_and_avoid)
+# 定义在 SKILL.md「层级 A：Prompt 文件骨架」与 input-contract.md，**不是本文件**。
+#
+# 下面这组字段名（role_in_frame、composition_parameters、acceptance_checks 等）
+# 只在层级 B 内部使用，禁止当成 Prompt 文件的章节名。
+per_block_required_fields:
   - source_grounding
   - role_in_frame
   - composition_parameters
@@ -15,6 +27,7 @@ required_fields:
 
 compile_rules:
   - "每个选择的块都必须填入本契约的 compile_fields；禁止只输出块名或形容词。"
+  - "compile_field 与实际版式不匹配时写 `不适用` 并说明理由（例如单列堆叠版式没有 column_count、表格版式没有 gutters），不得为填满字段编造数值。"
   - "source_grounding、exact_text_policy 和 constraints_and_avoid 必须逐图落盘。"
   - "没有来源的数字、地名、人物身份、价格、URL、品牌和效果承诺必须删除或标注 synthetic_test_data。"
   - "移动端/缩略图任务必须写出阅读顺序和最小可读字段。"

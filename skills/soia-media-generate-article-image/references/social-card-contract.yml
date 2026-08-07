@@ -19,19 +19,46 @@ narrative_modes:
       each_slide_must_be_complete: true
       shared_reference_allowed_only: [00-series-bible.md]
 
+  single_skill_walkthrough:
+    # 一个技能讲透，用于「某技能扩了能力 / 某技能怎么用」这类单主题多页笔记。
+    # repository_feature_pair 固定两页且必须推荐仓库，讲不了单技能的机制与实操，故单列。
+    default_slide_count: 6
+    slide_count_range: [4, 8]
+    slides:
+      - role: cover
+        required_sections: [series_kicker, hook, one_line_payoff, trust_badges]
+      - role: live_run
+        required_sections: [trigger_phrase, real_output, evidence_note]
+      - role: mechanism
+        required_sections: [claim, decision_logic, boundary]
+      - role: host_matrix
+        required_sections: [per_host_install, host_difference_callout]
+      - role: cta
+        required_sections: [series_position, repository_url, invite]
+    required_sources: [featured_skill_md, skill_references, real_run_output]
+    forbid_unsourced_evidence_values: true
+    rules:
+      - "live_run 页的输出必须来自一次真实执行；为版面删减行时，页面上要写「节选」，不得写「原样输出」。"
+      - "host_matrix 页的安装命令必须与仓内 README 逐字一致，包含 marketplace 接入等前置步骤；缺前置的命令读者照抄会失败。"
+      - "同一渠道下不同目标的版本门槛必须逐个核对来源，不得只填其中一个就套用全部。"
+
 platforms:
   rednote:
+    # 3:4 是小红书信息流允许的最高竖版比例，占屏最多；4:5 会白白让出高度。
+    # 2026-08-06 实发验证 2160×2880（3:4）正常展示，此处曾误写 4:5。
     layout_modes:
       carousel:
-        aspect: "4:5"
+        aspect: "3:4"
+        canvas_px: "1080x1440（2x 输出 2160x2880）"
         min_slides: 2
         max_slides: 12
         preferred_slide_counts: [2, 3]
         max_catalog_items_per_slide: 6
         required_roles: [cover, catalog, cta]
-        optional_roles: [highlight]
+        optional_roles: [highlight, live_run, host_matrix]
       single:
-        aspect: "4:5"
+        aspect: "3:4"
+        canvas_px: "1080x1440（2x 输出 2160x2880）"
         min_slides: 1
         max_slides: 1
         max_catalog_items_per_slide: 4
@@ -62,6 +89,38 @@ platforms:
         max_catalog_items_per_slide: 6
         required_roles: [cover, catalog, cta]
         optional_roles: [highlight]
+
+# 角色不只是文件名。每个 role 有各自的设计约束；只声明角色名会让首图长得和内页一样，
+# 那是「第一张」，不是「封面」。
+slide_roles:
+  cover:
+    purpose: "在信息流里停住滑动，并让人 3 秒内知道这篇讲什么"
+    information_density: "内页的一半以下"
+    hero_text_share: "标题占画面高度 20%–30%，是全图第一视觉"
+    max_distinct_facts: 3
+    must_have: [series_kicker, hook, one_line_payoff]
+    must_not_have: [表格, 命令行, 多行正文, 版本号清单, 二维码]
+    rules:
+      - "封面用字号与留白撑满画面，不靠堆信息量填空。"
+      - "一个视觉锚点即可（一组状态块、一个大数字、一个对比），不要并列两个焦点。"
+      - "钩子写成读者会自认的判断或疑问，不要写功能名。"
+  live_run:
+    purpose: "证明它真跑得起来——转化断点通常就在这里"
+    must_have: [trigger_phrase, real_output]
+    rules:
+      - "内容来自真实执行，不摆拍、不合成。"
+      - "为版面删减行时写「节选」；写「原样输出」而实际删减过，属夸大。"
+  mechanism:
+    purpose: "把判定逻辑讲到读者能复述"
+    rules: ["一页一个机制，不把多个判定矩阵挤在一起。"]
+  host_matrix:
+    purpose: "告诉读者在他自己的客户端上怎么装"
+    rules:
+      - "命令逐字取自仓内 README，含 marketplace 接入等前置步骤。"
+      - "装载单位不同的宿主（例如 WorkBuddy 装的是角色化专家而非插件）必须显式标出差异。"
+  cta:
+    purpose: "收束系列并给可追溯的去处"
+    must_have: [series_position, repository_url]
 
 deterministic_fields:
   - claim
