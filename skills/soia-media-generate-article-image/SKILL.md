@@ -1,9 +1,9 @@
 ---
 name: soia-media-generate-article-image
 description: 将文章、开源项目、品牌 Logo 或公开 X Prompt Deck 编译为可验收的图片与矢量资产，按组合轴生成 Prompt 并完成事实、文字和视觉验收。
-version: 3.17.1
+version: 3.17.2
 created_at: 2026-07-09 20:56:44
-updated_at: 2026-08-07 23:05:00
+updated_at: 2026-08-08 00:02:00
 created_by: claude opus 4.6
 updated_by: claude-opus-5
 ---
