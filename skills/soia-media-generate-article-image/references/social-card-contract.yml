@@ -37,6 +37,17 @@ narrative_modes:
         required_sections: [series_position, repository_url, invite]
     required_sources: [featured_skill_md, skill_references, real_run_output]
     forbid_unsourced_evidence_values: true
+    prompt_deck:
+      # 顺序是硬性的：先写 00-series-bible（背景/配色/面板/字体/品牌条/撑满规则，
+      # 每页 prompt 逐字引用同一份），再按各 role 的 required_sections 逐项核对写每页
+      # prompt，全部落盘后才允许生图。实证：2026-08-07 跳过此序（即兴逐张写 prompt、
+      # 事后补契约）导致同批 6 张背景黑蓝不一、留白失衡、封面漏技能名，整批被客户打回重做。
+      required_files:
+        - 00-series-bible.md
+        - NN-<role>.md（每页一份，编号与页码一致）
+      each_slide_must_be_complete: true
+      shared_reference_allowed_only: [00-series-bible.md]
+      compile_order_is_mandatory: true
     rules:
       - "live_run 页的输出必须来自一次真实执行；为版面删减行时，页面上要写「节选」，不得写「原样输出」。"
       - "host_matrix 页的安装命令必须与仓内 README 逐字一致，包含 marketplace 接入等前置步骤；缺前置的命令读者照抄会失败。"
