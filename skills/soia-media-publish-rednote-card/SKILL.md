@@ -1,11 +1,11 @@
 ---
 name: soia-media-publish-rednote-card
 description: 把成文草稿改写成 rednote（小红书）笔记：生成吸睛标题（可带 emoji）、3–5 段短文、话题标签和配图建议；获客户当次授权时可代其在创作服务平台网页端完成发布。不接平台 API、不用第三方逆向包。Triggers：「发成小红书」「小红书笔记」「改成 rednote」「rednote 这篇」「帮我发到小红书」
-version: 2.3.0
+version: 2.4.0
 created_at: 2026-07-16 15:44:20
-updated_at: 2026-08-08 01:05:00
+updated_at: 2026-08-08 02:30:00
 created_by: gpt-5.6-luna
-updated_by: pi deepseek-v4-flash
+updated_by: claude fable 5
 dependencies:
   optional: [soia-media-generate-article-image]
 ---
@@ -201,7 +201,35 @@ npx skills add soia-team/soia-open-media-content-skills -g -a '*' -s soia-media-
 |---|---|
 | 本地 HTTP 服务器 + 页面 `fetch` | ❌ Chrome 的 Private Network Access 封死 HTTPS 页面访问 localhost；加 `Access-Control-Allow-Private-Network: true` 标准应答头也不放行，请求根本不发出（服务器日志零记录） |
 | base64 分片注入 | ❌ 三张 2160×2880 的图约 1.29M base64 字符，代价过高 |
-| **SVG foreignObject + canvas** | ✅ **标准姿势** |
+| 合成键盘事件 Cmd+V | ❌ 扩展注入的合成键不携带系统剪贴板图像数据，页面收不到 paste 载荷（2026-08-08 实测） |
+| osascript 盲打系统键盘驱动原生文件框 | ❌ **禁用**——激活的可能是客户的另一个 Chrome 窗口，按键会打进客户正在编辑的页面（2026-08-08 实际风险事件）；且原生对话框开着时会挂起该 tab 的 JS 执行 |
+| **SVG foreignObject + canvas** | ✅ 图有 HTML 源码时的**标准姿势**（见下方代码） |
+| **系统剪贴板 + Clipboard API** | ✅ **纯位图（imagegen 直出 PNG/JPG 等无 HTML 源）的标准姿势**（见下方代码；2026-08-08 实测 5 张一次成功） |
+
+**纯位图路线**——逐张「osascript 只写剪贴板（无键盘事件，安全）→ 页面读取」，最后一次性注入：
+
+```bash
+# 每张执行（JPEG 可先压到 ~350KB，剪贴板转 PNG 后约 1.3MB，平台可收）
+osascript -e 'set the clipboard to (read (POSIX file "/abs/path/N.jpg") as JPEG picture)'
+```
+
+```javascript
+// 每张执行：读剪贴板存入 window.__files[N]（页面须处于聚焦标签；无需任何权限弹窗，实测直读成功）
+const items = await navigator.clipboard.read();
+for (const it of items) for (const t of it.types) if (t.startsWith('image/')) {
+  const b = await it.getType(t);
+  window.__files = window.__files || [];
+  window.__files[N] = new File([b], 'N.png', {type: t});
+}
+// 全部就绪后一次注入（input 选 accept 含 png 且 multiple 的那个）
+const dt = new DataTransfer();
+window.__files.filter(Boolean).forEach(f => dt.items.add(f));
+const input = [...document.querySelectorAll('input[type=file]')].find(i => i.multiple && /png/.test(i.accept));
+input.files = dt.files;
+input.dispatchEvent(new Event('change', {bubbles: true}));
+```
+
+注意：`navigator.clipboard.read()` 抛 `NotAllowedError: Document is not focused` 时先激活该标签页再读；新图追加在已有图之后，替换场景是「先传新、后删旧」，删除靠悬停缩略图点右上 ×（每删一张网格前移，重复同一位置即可）。
 
 配图若由 `soia-media-generate-article-image` 的 `html_render` 路径产出，**HTML 源码本身就在手上**，
 可以把它送进页面现场渲染，传输量从 MB 级降到几 KB，且保住 2x 清晰度：
