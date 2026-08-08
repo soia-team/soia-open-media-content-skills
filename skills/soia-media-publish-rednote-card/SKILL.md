@@ -1,9 +1,9 @@
 ---
 name: soia-media-publish-rednote-card
 description: 把成文草稿改写成 rednote（小红书）笔记：生成吸睛标题（可带 emoji）、3–5 段短文、话题标签和配图建议；获客户当次授权时可代其在创作服务平台网页端完成发布。不接平台 API、不用第三方逆向包。Triggers：「发成小红书」「小红书笔记」「改成 rednote」「rednote 这篇」「帮我发到小红书」
-version: 2.4.0
+version: 2.4.1
 created_at: 2026-07-16 15:44:20
-updated_at: 2026-08-08 02:30:00
+updated_at: 2026-08-08 03:05:00
 created_by: gpt-5.6-luna
 updated_by: claude fable 5
 dependencies:
@@ -230,6 +230,12 @@ input.dispatchEvent(new Event('change', {bubbles: true}));
 ```
 
 注意：`navigator.clipboard.read()` 抛 `NotAllowedError: Document is not focused` 时先激活该标签页再读；新图追加在已有图之后，替换场景是「先传新、后删旧」，删除靠悬停缩略图点右上 ×（每删一张网格前移，重复同一位置即可）。
+
+**剪贴板竞态（2026-08-08 实际事故）**：系统剪贴板是全局共享的——流水线执行期间若有其他自动化任务并行（codex 出图任务验证时会动剪贴板），「写入→页面读取」之间会被插队，实发时一张 codex 截图顶替了判定矩阵图混进笔记，靠客户人工发现替换。两条硬规则：
+1. **串行化**：执行剪贴板传图前确认无并行的 codex/自动化任务在跑（`pgrep -f 'codex exec'` 为空），期间不派新任务。
+2. **逐张读后核验**：读回的 File 用 `createImageBitmap` 比对宽高与来源图一致（如 1080×1440）才落位；不符即重写剪贴板重读，不带病注入。
+
+**发布后必须验证正式链接（客户铁律，2026-08-08 定）**：控制台「更新成功/已提交」≠ 用户拿到。回执必须附「正式链接验证」：打开笔记的对外链接（或搜索入口）确认新内容真实可见；平台在审核期时如实写「已提交，线上仍旧版，过审后切换」，禁止宣称已生效。
 
 配图若由 `soia-media-generate-article-image` 的 `html_render` 路径产出，**HTML 源码本身就在手上**，
 可以把它送进页面现场渲染，传输量从 MB 级降到几 KB，且保住 2x 清晰度：
