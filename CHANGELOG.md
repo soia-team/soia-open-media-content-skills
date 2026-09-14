@@ -3,6 +3,16 @@
 本文件由 soia-meta-skill-release 在每次正式发版时自动更新，与 GitHub Release 同源；
 更早的版本演进见 git 提交历史与 GitHub Releases。
 
+## v1.13.1 — 2026-09-14
+
+减少文章草稿的重复确认，沿用已给定角度、结构和标题；保留原文、观点与发布权限边界。
+
+## 修复
+- fix(skills): reduce redundant reading and confirmation (#78)
+
+## 维护
+- chore(release): open next train after v1.13.0 (#77)
+
 ## v1.13.0 — 2026-09-07
 
 发布全部已批准的长文与位图上传能力、剪贴板与线上验证规则、文章配图契约及指令自治调整
